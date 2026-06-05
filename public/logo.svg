@@ -1,13 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <!-- Kit box body -->
-  <rect x="5" y="8" width="35" height="34" rx="9" stroke="#E07B4C" stroke-width="2.5" fill="#FDF6F2"/>
-  <!-- Box lid accent -->
-  <path d="M5 17 L40 17" stroke="#E07B4C" stroke-width="2" opacity="0.6"/>
-  <!-- Growth arrow -->
-  <path d="M18 33 L24 21 L27 21 L33 33" stroke="#C9693F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Arrow head -->
-  <path d="M21 21 L24 14 L27 21" stroke="#C9693F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- AI nodes -->
-  <circle cx="38" cy="11" r="2.5" fill="#E07B4C"/>
-  <circle cx="38" cy="22" r="2" fill="#E07B4C" opacity="0.7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none">
+  <!-- P stem -->
+  <rect x="6" y="5" width="5" height="26" rx="2.5" fill="#E07B4C"/>
+  <!-- P bowl outer -->
+  <path d="M11 5 H25 A8 8 0 0 1 25 21 H11" fill="#E07B4C" opacity="0.85"/>
+  <!-- Bowl will show through to whatever background is behind it (no fill needed, the shape above already defines it) -->
+  <!-- K slash detail -->
+  <path d="M8 20 L14 18 L8 16" stroke="#C9693F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
 </svg>
