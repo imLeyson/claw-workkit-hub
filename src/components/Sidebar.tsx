@@ -46,7 +46,10 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-12 flex items-center px-[14px] border-b border-white/[0.06] shrink-0">
         <span className="text-[15px] font-medium tracking-tight text-white/90 whitespace-nowrap">
-          {expanded ? 'Claw Work Kit' : 'CW'}
+          <img src="/logo.svg" alt="CK" className="w-[20px] h-[20px] shrink-0" />
+          <span className={`transition-opacity duration-200 whitespace-nowrap text-white/90 font-medium tracking-tight ${expanded ? 'opacity-100 ml-2.5' : 'opacity-0 w-0'}`}>
+            CampaignKit
+          </span>
         </span>
       </div>
 
