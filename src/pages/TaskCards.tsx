@@ -71,12 +71,12 @@ export default function TaskCards() {
       </div>
 
       {/* Task card grid */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-2 gap-5 stagger">
         {tasks.map((task, idx) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
           const isFirst = idx === 0
           return (
-            <div key={task.id} className={`card-surface rounded-[24px] card-hover overflow-hidden group ${isFirst ? 'col-span-2' : 'border-l-[3px] border-l-transparent hover:border-l-accent-400'}`}>
+            <div key={task.id} className={`card-surface rounded-[24px] card-hover overflow-hidden group animate-fade-in-up ${isFirst ? 'col-span-2' : 'border-l-[3px] border-l-transparent hover:border-l-accent-400'}`}>
               {isFirst && <div className="h-[3px] bg-accent-500" />}
               <div className={`${isFirst ? 'p-8' : 'p-6'}`}>
                 <div className="flex items-start justify-between mb-4">

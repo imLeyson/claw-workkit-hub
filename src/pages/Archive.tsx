@@ -30,11 +30,11 @@ export default function Archive() {
           <p className="text-[12px] text-text-muted mt-1">完成大促分析项目后，可将策略报告沉淀为可复用工作包。</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 stagger">
           {mockWorkKits.map((wk) => {
             const showHistory = expandedHistory[wk.id] ?? false
             return (
-              <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden">
+              <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden animate-fade-in-up">
                 {/* Header */}
                 <div className="p-6 pb-0">
                   <div className="flex items-start justify-between mb-2">
