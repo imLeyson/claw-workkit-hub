@@ -38,7 +38,7 @@ export default function CreateProject() {
   const steps = workKit ? templateSteps : normalSteps
 
   const [step, setStep] = useState(0)
-  const [name, setName] = useState(workKit ? `${workKit.scenario.split('/')[0]} ${workKit.name.replace(' Work Kit', '')}` : '')
+  const [name, setName] = useState(workKit ? workKit.name.replace(' Work Kit', '') : '')
   const [description, setDescription] = useState(workKit ? `基于「${workKit.name}」模板创建。${workKit.description}` : '')
   const [competitorInput, setCompetitorInput] = useState('')
   const [competitors, setCompetitors] = useState<string[]>([])
