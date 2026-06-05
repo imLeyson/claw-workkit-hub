@@ -516,8 +516,8 @@ export const sourceTagLabels: Record<string, string> = {
 }
 
 export const platformColors: Record<string, string> = {
-  '京东': 'bg-red-50 text-red-700',
-  '天猫': 'bg-orange-50 text-orange-700',
-  '抖音商城': 'bg-cyan-50 text-cyan-700',
-  '拼多多': 'bg-amber-50 text-amber-700',
+  '京东': 'bg-red-50 text-red-600',
+  '天猫': 'bg-accent-50 text-accent-600',
+  '抖音商城': 'bg-sky-50 text-sky-600',
+  '拼多多': 'bg-amber-50 text-amber-600',
 }

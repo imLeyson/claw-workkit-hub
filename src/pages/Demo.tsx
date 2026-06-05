@@ -19,7 +19,7 @@ const steps = [
           ))}
         </div>
         <div className="bg-accent-50/80 border border-accent-200 rounded-xl p-3.5">
-          <p className="text-sm text-orange-800 font-medium">问题：分析结果无法复用。下一次大促，所有人重新来一遍。</p>
+          <p className="text-sm text-accent-700 font-medium">问题：分析结果无法复用。下一次大促，所有人重新来一遍。</p>
         </div>
       </div>
     ),
