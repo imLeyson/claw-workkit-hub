@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -7,58 +8,17 @@ import {
   BarChart3,
   Archive,
   Play,
-  ChevronRight,
 } from 'lucide-react'
 
-const overviewLinks = [
-  { to: '/', label: '大促分析看板', icon: LayoutDashboard, end: true },
-  { to: '/create', label: '新建分析项目', icon: PlusCircle },
+const links = [
+  { to: '/', label: '看板', icon: LayoutDashboard, end: true },
+  { to: '/create', label: '新建项目', icon: PlusCircle },
+  { to: '/materials/p1', label: '资料库', icon: FolderOpen, flow: true },
+  { to: '/tasks/p1', label: '任务卡', icon: LayoutGrid, flow: true },
+  { to: '/report/p1', label: '报告', icon: BarChart3, flow: true },
+  { to: '/archive', label: '资产库', icon: Archive },
+  { to: '/demo', label: '演示', icon: Play },
 ]
-
-function extractProjectId(pathname: string): string {
-  const flowRoutes = ['/materials', '/tasks', '/workspace', '/report']
-  for (const route of flowRoutes) {
-    if (pathname.startsWith(route)) {
-      const parts = pathname.split('/').filter(Boolean)
-      return parts[1] || 'p1'
-    }
-  }
-  return 'p1'
-}
-
-const outputLinks = [
-  { to: '/archive', label: 'AI 工作包资产库', icon: Archive },
-  { to: '/demo', label: '演示模式', icon: Play },
-]
-
-function NavGroup({ title, links, pathname }: { title: string; links: typeof overviewLinks; pathname: string }) {
-  return (
-    <div>
-      <div className="px-3 mb-1 text-[10px] font-semibold text-text-muted uppercase tracking-widest">
-        {title}
-      </div>
-      <nav className="space-y-0.5">
-        {links.map((link) => {
-          const active = pathname === link.to || (!link.end && pathname.startsWith(link.to.split('/').slice(0, 3).join('/')))
-          return (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group ${
-                active ? 'bg-ai-50 text-ai-700 font-medium' : 'text-text-secondary hover:bg-gray-50 hover:text-text-main'
-              }`}
-            >
-              <link.icon className={`w-4 h-4 transition-colors ${active ? 'text-ai-600' : 'text-gray-400 group-hover:text-gray-500'}`} />
-              <span className="flex-1">{link.label}</span>
-              {active && <ChevronRight className="w-3.5 h-3.5 text-ai-400" />}
-            </NavLink>
-          )
-        })}
-      </nav>
-    </div>
-  )
-}
 
 function isInFlow(pathname: string) {
   return ['/materials', '/tasks', '/workspace', '/report'].some((p) => pathname.startsWith(p))
@@ -68,36 +28,63 @@ export default function Sidebar() {
   const location = useLocation()
   const pathname = location.pathname
   const inFlow = isInFlow(pathname)
-  const pid = extractProjectId(pathname)
+  const [expanded, setExpanded] = useState(false)
 
-  const flowLinks = [
-    { to: `/materials/${pid}`, label: '电商资料库', icon: FolderOpen },
-    { to: `/tasks/${pid}`, label: '岗位分析任务', icon: LayoutGrid },
-    { to: `/report/${pid}`, label: '大促策略报告', icon: BarChart3 },
-  ]
+  const visibleLinks = links.filter((l) => {
+    if (l.flow) return inFlow
+    return true
+  })
 
   return (
-    <aside className="w-[260px] shrink-0 bg-white/85 backdrop-blur-md border-r border-border-default min-h-screen flex flex-col">
-      <div className="h-16 flex items-center px-5 border-b border-border-light">
-        <div>
-          <div className="text-sm font-semibold tracking-tight text-text-main">Claw Work Kit Hub</div>
-          <div className="text-[11px] text-text-muted tracking-wide">电商 AI 工作流系统</div>
-        </div>
+    <aside
+      className={`shrink-0 bg-sidebar min-h-screen flex flex-col transition-all duration-300 ease-out overflow-hidden ${
+        expanded ? 'w-[220px]' : 'w-[56px]'
+      }`}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+    >
+      {/* Logo */}
+      <div className="h-12 flex items-center px-[14px] border-b border-white/[0.06] shrink-0">
+        <span className="text-[15px] font-medium tracking-tight text-white/90 whitespace-nowrap">
+          {expanded ? 'Claw Work Kit' : 'CW'}
+        </span>
       </div>
 
-      <div className="flex-1 px-3 py-5 space-y-6 overflow-auto">
-        <NavGroup title="概览" links={overviewLinks} pathname={pathname} />
-        {inFlow && <NavGroup title="618 分析流程" links={flowLinks} pathname={pathname} />}
-        <NavGroup title="沉淀与输出" links={outputLinks} pathname={pathname} />
-      </div>
+      <nav className="flex-1 px-[8px] py-4 space-y-1">
+        {visibleLinks.map((link) => {
+          const active = link.end
+            ? pathname === link.to
+            : pathname.startsWith(link.to)
+          return (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              className={`flex items-center gap-3 px-[10px] py-2.5 rounded-[12px] text-[13px] transition-all duration-200 whitespace-nowrap ${
+                active
+                  ? 'bg-white/[0.10] text-white font-medium'
+                  : 'text-white/50 hover:bg-white/[0.05] hover:text-white/80'
+              }`}
+            >
+              <link.icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-accent-500' : ''}`} />
+              <span className={`transition-opacity duration-200 ${expanded ? 'opacity-100' : 'opacity-0'}`}>
+                {link.label}
+              </span>
+              {active && !expanded && (
+                <div className="absolute left-0 w-[3px] h-[18px] rounded-r-full bg-accent-500" />
+              )}
+            </NavLink>
+          )
+        })}
+      </nav>
 
-      <div className="mx-3 mb-4 card-surface rounded-xl p-3.5">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2 h-2 rounded-full bg-biz-500 animate-pulse" />
-          <span className="text-[11px] font-medium text-text-main">618 年中大促</span>
-        </div>
-        <div className="text-[10px] text-text-muted leading-relaxed">
-          高速吹风机竞品分析 · 进行中
+      {/* Bottom */}
+      <div className="px-[10px] pb-4">
+        <div className={`border-t border-white/[0.06] pt-3 transition-opacity ${expanded ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="flex items-center gap-2">
+            <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
+            <span className="text-[11px] text-white/40 whitespace-nowrap">618 大促 · 进行中</span>
+          </div>
         </div>
       </div>
     </aside>

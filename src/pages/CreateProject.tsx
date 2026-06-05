@@ -1,17 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
-import PageHeader from '../components/PageHeader'
-import SectionCard from '../components/SectionCard'
+import { ArrowRight, ArrowLeft } from 'lucide-react'
 import { mockWorkKits, roleLabels } from '../data/mock'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
 
-const steps = [
-  { num: 1, label: '基础信息' },
-  { num: 2, label: '参与岗位' },
-  { num: 3, label: '竞品设置' },
-]
+const steps = ['基础信息', '参与岗位', '竞品设置']
 
 const defaultRoles = [
   { role: 'operations', label: '运营', checked: true, desc: '用户痛点挖掘、数据分析、竞品洞察' },
@@ -32,7 +26,6 @@ export default function CreateProject() {
     [fromArchive, kitId],
   )
 
-  // Pre-fill role selections from work kit
   const initRoles = useMemo(() => {
     if (!workKit) return defaultRoles
     return defaultRoles.map((r) => ({
@@ -54,6 +47,7 @@ export default function CreateProject() {
     if (trimmed && !competitors.includes(trimmed)) {
       setCompetitors([...competitors, trimmed])
       setCompetitorInput('')
+      if (errors.competitors) setErrors((prev) => { const { competitors: _, ...rest } = prev; return rest })
     }
   }
 
@@ -93,157 +87,131 @@ export default function CreateProject() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <PageHeader
-        title={workKit ? '基于模板创建项目' : '创建新项目'}
-        description={workKit ? `正在复用「${workKit.name}」模板，角色和资料结构已预填。` : '配置竞品分析项目，系统将根据资料自动生成各岗位 AI 任务卡。'}
-      />
+    <div className="max-w-xl">
+      <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">
+        {workKit ? '基于模板创建' : '创建新项目'}
+      </h1>
+      <p className="text-[14px] text-text-secondary mb-12 leading-relaxed">
+        {workKit ? `复用「${workKit.name}」— 岗位和资料结构已预填。` : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
+      </p>
 
+      {/* Template badge */}
       {workKit && (
-        <div className="card-surface rounded-2xl p-4 mb-6 border-kit-200 bg-kit-50/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-kit-100 flex items-center justify-center shrink-0">
-              <Package className="w-5 h-5 text-kit-600" />
-            </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-text-main">基于 Work Kit 模板创建</div>
-              <div className="text-xs text-text-muted mt-0.5">
-                模板「{workKit.name}」v{workKit.version} — 已预填 {workKit.includedRoles.map((r) => roleLabels[r]).join('、')} 岗位，复用 {workKit.reuseCount} 次
-              </div>
-            </div>
-            <button
-              onClick={() => navigate('/archive')}
-              className="text-xs text-text-muted hover:text-text-secondary transition-colors"
-            >
-              返回资产库
-            </button>
-          </div>
+        <div className="flex items-center gap-3 mb-10 text-[13px] text-text-secondary bg-accent-50/50 rounded-2xl px-5 py-3">
+          <span className="w-[6px] h-[6px] rounded-full bg-accent-500" />
+          模板「{workKit.name}」v{workKit.version} · 已预填 {workKit.includedRoles.map((r) => roleLabels[r]).join('、')} · 复用 {workKit.reuseCount} 次
         </div>
       )}
 
-      {/* 步骤指示器 */}
-      <div className="flex items-center gap-2 mb-8">
-        {steps.map((s, i) => (
-          <div key={s.num} className="flex items-center gap-2">
-            <div
-              className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-semibold transition-all ${
-                i < step
-                  ? 'bg-success text-white'
-                  : i <= step
-                    ? 'bg-ai-600 text-white'
-                    : 'bg-gray-100 text-gray-400'
+      {/* Step dots */}
+      <div className="flex items-center gap-3 mb-12">
+        {steps.map((label, i) => (
+          <div key={label} className="flex items-center gap-3">
+            <button
+              onClick={() => { if (i < step) setStep(i) }}
+              className={`w-[10px] h-[10px] rounded-full transition-all ${
+                i === step ? 'bg-accent-500 scale-125' : i < step ? 'bg-accent-200' : 'bg-gray-200'
               }`}
-            >
-              {i < step ? '✓' : s.num}
-            </div>
-            <span className={`text-sm font-medium ${i <= step ? 'text-text-main' : 'text-text-muted'}`}>
-              {s.label}
+            />
+            <span className={`text-[12px] transition-colors ${i === step ? 'text-text-main font-medium' : 'text-text-muted'}`}>
+              {label}
             </span>
-            {i < steps.length - 1 && <div className="w-8 h-px bg-border-default mx-1" />}
+            {i < steps.length - 1 && <div className="w-6 h-px bg-border-default" />}
           </div>
         ))}
       </div>
 
-      {/* 表单内容 */}
-      <SectionCard className="mb-6">
+      {/* Form */}
+      <div className="mb-12 min-h-[200px]">
         {step === 0 && (
-          <div className="space-y-4">
+          <div className="space-y-8">
             <div>
-              <label className="block text-sm font-medium text-text-main mb-1.5">项目名称</label>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">项目名称</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => { setName(e.target.value); if (errors.name) setErrors((prev) => { const { name: _, ...rest } = prev; return rest }) }}
                 placeholder="例：618 美妆个护竞品分析"
-                className={`w-full px-4 py-2.5 border rounded-xl text-sm text-text-main placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-ai-500/20 focus:border-ai-400 transition-all ${errors.name ? 'border-red-300 bg-red-50/30' : 'border-border-default'}`}
+                className="input-underline"
               />
-              {errors.name && <p className="text-xs text-error mt-1.5">{errors.name}</p>}
+              {errors.name && <p className="text-[12px] text-error mt-2">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-main mb-1.5">项目描述</label>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">描述（选填）</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                placeholder="描述本次分析的目标、范围和预期输出..."
-                className="w-full px-4 py-2.5 border border-border-default rounded-xl text-sm text-text-main placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-ai-500/20 focus:border-ai-400 transition-all resize-none"
+                rows={2}
+                placeholder="描述本次分析的目标和预期输出..."
+                className="input-underline resize-none"
               />
             </div>
           </div>
         )}
+
         {step === 1 && (
-          <div className="space-y-3">
-            <p className="text-sm text-text-muted mb-4">选择参与本项目的岗位角色，系统将为每个角色生成对应的 AI 任务卡。</p>
-            {errors.roles && <p className="text-xs text-error bg-red-50 px-3 py-2 rounded-lg">{errors.roles}</p>}
+          <div className="space-y-1">
+            <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-5">参与岗位</label>
+            {errors.roles && <p className="text-[12px] text-error mb-4">{errors.roles}</p>}
             {roles.map((r) => (
-              <label key={r.role} className="flex items-center gap-4 p-4 border border-border-default rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+              <label key={r.role} className="flex items-center gap-4 py-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={r.checked}
                   onChange={() => { setRoles((prev) => prev.map((x) => x.role === r.role ? { ...x, checked: !x.checked } : x)); if (errors.roles) setErrors((prev) => { const { roles: _, ...rest } = prev; return rest }) }}
-                  className="w-4 h-4 rounded accent-ai-600"
+                  className="w-[18px] h-[18px] rounded-[5px] accent-accent-500"
                 />
-                <div>
-                  <div className="text-sm font-medium text-text-main">{r.label}</div>
-                  <div className="text-xs text-text-muted mt-0.5">{r.desc}</div>
+                <div className="flex-1">
+                  <div className="text-[14px] text-text-main group-hover:text-accent-600 transition-colors">{r.label}</div>
+                  <div className="text-[12px] text-text-muted mt-0.5">{r.desc}</div>
                 </div>
               </label>
             ))}
           </div>
         )}
+
         {step === 2 && (
-          <div className="space-y-4">
-            <p className="text-sm text-text-muted">输入竞品品牌名称，AI 将针对这些品牌进行评论挖掘与对比分析。</p>
-            {errors.competitors && <p className="text-xs text-error bg-red-50 px-3 py-2 rounded-lg">{errors.competitors}</p>}
-            <div className="flex gap-2">
+          <div className="space-y-6">
+            <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-2">竞品品牌</label>
+            {errors.competitors && <p className="text-[12px] text-error mb-2">{errors.competitors}</p>}
+            <div className="flex gap-3">
               <input
                 type="text"
                 value={competitorInput}
                 onChange={(e) => { setCompetitorInput(e.target.value); if (errors.competitors) setErrors((prev) => { const { competitors: _, ...rest } = prev; return rest }) }}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCompetitor() } }}
                 placeholder="输入竞品品牌名称"
-                className="flex-1 px-4 py-2.5 border border-border-default rounded-xl text-sm text-text-main placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-ai-500/20 focus:border-ai-400 transition-all"
+                className="input-underline flex-1"
               />
-              <button type="button" onClick={addCompetitor} className="px-5 py-2.5 bg-gray-100 text-text-secondary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
-                添加
-              </button>
+              <button type="button" onClick={addCompetitor} className="btn-ghost shrink-0">添加</button>
             </div>
             {competitors.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-2 mt-4">
                 {competitors.map((c) => (
-                  <div key={c} className="flex items-center justify-between px-4 py-2.5 bg-ai-50 border border-ai-100 rounded-xl text-sm text-text-main">
+                  <div key={c} className="flex items-center justify-between py-3 border-b border-border-light text-[14px] text-text-main">
                     {c}
-                    <button onClick={() => setCompetitors(competitors.filter((x) => x !== c))} className="text-text-muted hover:text-error transition-colors text-lg leading-none">×</button>
+                    <button onClick={() => setCompetitors(competitors.filter((x) => x !== c))} className="text-text-muted hover:text-error transition-colors text-lg">×</button>
                   </div>
                 ))}
               </div>
             )}
           </div>
         )}
-      </SectionCard>
+      </div>
 
+      {/* Navigation */}
       <div className="flex items-center justify-between">
-        <button
-          onClick={() => setStep(Math.max(0, step - 1))}
-          disabled={step === 0}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm text-text-muted hover:text-text-secondary disabled:opacity-30 transition-colors"
-        >
+        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-ghost disabled:opacity-20">
           <ArrowLeft className="w-4 h-4" />
           上一步
         </button>
         {step < steps.length - 1 ? (
-          <button
-            onClick={handleNext}
-            className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-gradient-to-r from-ai-500 to-ai-700 text-white text-sm font-semibold rounded-xl hover:from-ai-600 hover:to-ai-800 transition-all shadow-sm btn-primary-glow"
-          >
+          <button onClick={handleNext} className="btn-primary">
             下一步
             <ArrowRight className="w-4 h-4" />
           </button>
         ) : (
-          <button
-            onClick={handleCreate}
-            className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-gradient-to-r from-ai-500 to-ai-700 text-white text-sm font-semibold rounded-xl hover:from-ai-600 hover:to-ai-800 transition-all shadow-sm btn-primary-glow"
-          >
+          <button onClick={handleCreate} className="btn-primary-filled">
             创建项目
             <ArrowRight className="w-4 h-4" />
           </button>

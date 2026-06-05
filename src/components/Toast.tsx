@@ -31,13 +31,13 @@ const iconMap: Record<ToastType, typeof CheckCircle2> = {
 const colorMap: Record<ToastType, string> = {
   success: 'border-success/30 bg-success-soft',
   error: 'border-error/30 bg-error-soft',
-  info: 'border-ai-200 bg-ai-50',
+  info: 'border-accent-200 bg-accent-50',
 }
 
 const iconColorMap: Record<ToastType, string> = {
   success: 'text-success',
   error: 'text-error',
-  info: 'text-ai-500',
+  info: 'text-accent-500',
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -4,7 +4,7 @@ import { ArrowRight, Lightbulb, FileText, Upload, LayoutGrid, Sparkles, BarChart
 const steps = [
   {
     icon: Lightbulb, title: '大促前团队困境', subtitle: '各自整理，口径不统一',
-    color: 'bg-orange-50 border-orange-200', iconColor: 'text-orange-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="space-y-3">
         <p className="text-sm text-text-secondary leading-relaxed">
@@ -18,7 +18,7 @@ const steps = [
             </div>
           ))}
         </div>
-        <div className="bg-orange-50/80 border border-orange-200 rounded-xl p-3.5">
+        <div className="bg-accent-50/80 border border-accent-200 rounded-xl p-3.5">
           <p className="text-sm text-orange-800 font-medium">问题：分析结果无法复用。下一次大促，所有人重新来一遍。</p>
         </div>
       </div>
@@ -26,7 +26,7 @@ const steps = [
   },
   {
     icon: FileText, title: '创建 618 分析项目', subtitle: '设定类目、竞品和输出目标',
-    color: 'bg-ai-50 border-ai-200', iconColor: 'text-ai-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="grid grid-cols-3 gap-3">
         {[
@@ -35,7 +35,7 @@ const steps = [
           { step: '03', title: '输出目标', desc: '痛点矩阵、卖点、FAQ、话术、详情页、策略报告' },
         ].map((s) => (
           <div key={s.step} className="bg-white rounded-xl border border-gray-100 p-4 text-center">
-            <div className="text-xs font-bold text-ai-400 mb-2">{s.step}</div>
+            <div className="text-xs font-bold text-accent-400 mb-2">{s.step}</div>
             <div className="text-sm font-medium text-text-main mb-1">{s.title}</div>
             <div className="text-[11px] text-text-muted leading-relaxed">{s.desc}</div>
           </div>
@@ -45,7 +45,7 @@ const steps = [
   },
   {
     icon: Upload, title: '导入电商资料', subtitle: '竞品评论、商品信息、客服记录、历史文案',
-    color: 'bg-emerald-50 border-emerald-200', iconColor: 'text-emerald-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="grid grid-cols-2 gap-3">
         {[
@@ -67,7 +67,7 @@ const steps = [
   },
   {
     icon: LayoutGrid, title: '生成岗位分析任务', subtitle: '系统根据资料和岗位自动拆解',
-    color: 'bg-purple-50 border-purple-200', iconColor: 'text-purple-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="grid grid-cols-2 gap-3">
         {[
@@ -87,7 +87,7 @@ const steps = [
   },
   {
     icon: Sparkles, title: 'AI 辅助岗位分析', subtitle: '基于同一资料源生成结构化分析',
-    color: 'bg-ai-50 border-purple-200', iconColor: 'text-ai-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="space-y-3">
         <div className="bg-white rounded-xl border border-gray-100 p-4">
@@ -109,11 +109,11 @@ const steps = [
   },
   {
     icon: BarChart3, title: '汇总大促策略报告', subtitle: '跨岗位整合为可执行策略',
-    color: 'bg-sky-50 border-sky-200', iconColor: 'text-sky-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="grid grid-cols-5 gap-2">
         {['商品', '文案', '客服', '设计', '策略汇总'].map((label, i) => (
-          <div key={label} className={`bg-white rounded-xl border p-3 text-center ${i === 4 ? 'border-biz-200 bg-biz-50/50' : 'border-gray-100'}`}>
+          <div key={label} className={`bg-white rounded-xl border p-3 text-center ${i === 4 ? 'border-accent-200 bg-accent-50/50' : 'border-gray-100'}`}>
             <div className="text-xs font-medium text-text-main mb-0.5">{label}</div>
             <div className="text-[10px] text-text-muted">{i < 4 ? '1 个分析结果' : '含执行清单'}</div>
           </div>
@@ -123,7 +123,7 @@ const steps = [
   },
   {
     icon: Package, title: '沉淀为 Work Kit', subtitle: '将有效流程保存为可复用模板',
-    color: 'bg-emerald-50 border-emerald-200', iconColor: 'text-emerald-600',
+    color: 'bg-accent-50 border-accent-200', iconColor: 'text-accent-600',
     body: (
       <div className="space-y-2">
         {[
@@ -132,7 +132,7 @@ const steps = [
           { v: 'v1.2', desc: '详情页首屏优化：增加信息优先级和图示化建议。' },
         ].map((v) => (
           <div key={v.v} className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 p-3">
-            <span className="text-[11px] font-bold text-kit-600 bg-kit-50 px-2.5 py-1 rounded-lg shrink-0">{v.v}</span>
+            <span className="text-[11px] font-bold text-accent-600 bg-accent-50 px-2.5 py-1 rounded-lg shrink-0">{v.v}</span>
             <span className="text-xs text-text-secondary leading-relaxed">{v.desc}</span>
           </div>
         ))}
@@ -148,9 +148,9 @@ export default function Demo() {
   return (
     <div className="min-h-screen bg-bg-primary">
       <header className="max-w-4xl mx-auto pt-24 pb-14 px-6 text-center relative">
-        <div className="absolute inset-0 -top-32 -bottom-8 bg-gradient-to-b from-biz-50/80 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 -top-32 -bottom-8 bg-gradient-to-b from-accent-50/80 via-transparent to-transparent pointer-events-none" />
         <div className="relative">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-biz-100 to-rose-100 border border-biz-200/50 text-xs font-semibold text-biz-700 mb-8 tracking-wide shadow-sm">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-accent-100 to-rose-100 border border-accent-200/50 text-xs font-semibold text-accent-700 mb-8 tracking-wide shadow-sm">
           <ShoppingBag className="w-3.5 h-3.5" />
           Claw Work Kit Hub · 电商 AI 工作流演示
         </div>
@@ -161,7 +161,7 @@ export default function Demo() {
           将竞品评论、客服反馈和岗位经验，转化为团队可复用的大促分析流程。
         </p>
         <div className="flex items-center justify-center gap-3">
-          <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 bg-ai-600 text-white text-sm font-semibold rounded-xl hover:bg-ai-700 transition-colors shadow-sm">
+          <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 bg-accent-600 text-white text-sm font-semibold rounded-xl hover:bg-accent-700 transition-colors shadow-sm">
             进入产品演示 <ArrowRight className="w-4 h-4" />
           </Link>
           <Link to="/materials/p1" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-border-default text-text-secondary text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors">
@@ -198,7 +198,7 @@ export default function Demo() {
           <p className="text-sm text-white/80 mb-6 max-w-md mx-auto leading-relaxed">
             从第一个大促分析项目开始，将有效的 AI 工作流程保存为团队可复用的资产。
           </p>
-          <Link to="/create" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-biz-600 text-sm font-semibold rounded-xl hover:bg-white/90 transition-all shadow-sm btn-biz-glow">
+          <Link to="/create" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-accent-600 text-sm font-semibold rounded-xl hover:bg-white/90 transition-all shadow-sm btn-accent-glow">
             创建第一个大促分析项目 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
