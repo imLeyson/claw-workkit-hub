@@ -181,12 +181,48 @@ export const mockMaterials: Record<string, Material[]> = {
   p2: [
     {
       id: 'm7', projectId: 'p2', type: 'review', label: '科沃斯 X2 用户评论',
-      fileName: 'ecovacs-x2-reviews.xlsx', content: '京东平台312条评论。',
+      fileName: 'ecovacs-x2-reviews.xlsx', content: '京东平台312条评论，好评率90.5%，差评集中在避障误判和耗材成本。',
       uploadedAt: '2026-06-03 14:00', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
-      referencedBy: ['t6'], reviewCount: 312, rating: 90.5, platform: '京东', price: '¥3,999',
+      referencedBy: ['t6', 't7', 't8'], reviewCount: 312, rating: 90.5, platform: '京东', price: '¥3,999',
+      topIssues: ['避障误判', '耗材成本高'],
+    },
+    {
+      id: 'm8', projectId: 'p2', type: 'review', label: '石头 G20 用户评论',
+      fileName: 'roborock-g20-reviews.xlsx', content: '天猫平台285条评论，好评率92.1%，差评集中在划伤地板和地图丢失。',
+      uploadedAt: '2026-06-03 14:15', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
+      referencedBy: ['t6', 't7'], reviewCount: 285, rating: 92.1, platform: '天猫', price: '¥4,299',
+      topIssues: ['划伤地板', '地图丢失'],
+    },
+    {
+      id: 'm9', projectId: 'p2', type: 'spec', label: '扫地机器人参数对比表',
+      fileName: 'robot-vacuum-specs.xlsx', content: '科沃斯X2与石头G20的吸力、续航、避障技术、基站功能等参数对比。',
+      uploadedAt: '2026-06-03 14:30', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
+      referencedBy: ['t6', 't8'], price: '¥3,999-¥4,299',
     },
   ],
-}
+  p3: [
+    {
+      id: 'm10', projectId: 'p3', type: 'review', label: 'Babycare 纸尿裤用户评论',
+      fileName: 'babycare-diapers-reviews.xlsx', content: '天猫平台520条评论，好评率94.0%，差评集中在尺寸偏小和漏尿问题。',
+      uploadedAt: '2026-04-10 09:00', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
+      referencedBy: ['t9', 't10'], reviewCount: 520, rating: 94.0, platform: '天猫', price: '¥89',
+      topIssues: ['尺寸偏小', '漏尿'],
+    },
+    {
+      id: 'm11', projectId: 'p3', type: 'review', label: '全棉时代棉柔巾用户评论',
+      fileName: 'purcotton-wipes-reviews.xlsx', content: '京东平台610条评论，好评率95.5%，差评集中在掉絮和厚度不足。',
+      uploadedAt: '2026-04-10 09:15', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
+      referencedBy: ['t9', 't10'], reviewCount: 610, rating: 95.5, platform: '京东', price: '¥59',
+      topIssues: ['掉絮', '厚度不足'],
+    },
+    {
+      id: 'm12', projectId: 'p3', type: 'faq', label: '母婴客服高频问题记录',
+      fileName: 'mom-baby-faq.xlsx', content: '近半年售前售后共38条高频问题，覆盖安全性、材质、退换货等话题。',
+      uploadedAt: '2026-04-10 09:30', aiStatus: 'readable', sensitivity: 'sensitive', responsibleRole: 'customer_service',
+      referencedBy: ['t11'],
+    },
+  ],
+};
 
 // ─── Task Cards ───────────────────────────────────────────
 
@@ -246,13 +282,65 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
   p2: [
     {
       id: 't6', projectId: 'p2', role: 'merchandise', title: '竞品商品分析',
-      description: '基于扫地机器人竞品评论数据，提取产品问题和功能机会。',
-      status: 'pending', assignedTo: '李商品',
-      inputMaterials: ['m7'],
-      promptPreview: '分析竞品扫地机器人用户评论，提取产品问题和功能机会。',
-      outputFormat: '产品问题表 · 功能机会',
-      judgmentCriteria: ['覆盖核心竞品', '问题分类清晰'],
+      description: '基于科沃斯X2和石头G20的用户评论，提取产品问题、功能机会和差异化选品建议。',
+      status: 'generated', assignedTo: '李商品',
+      inputMaterials: ['m7', 'm8', 'm9'],
+      promptPreview: '你是一位智能家居选品经理。请分析科沃斯X2和石头G20的用户评论，识别TOP5产品问题和功能机会，输出选品建议。',
+      outputFormat: '产品问题表 · 功能机会 · 选品建议',
+      judgmentCriteria: ['覆盖核心竞品', '问题分类清晰', '选品建议可落地'],
+      sourceTags: ['竞品评论', '商品参数'],
+    },
+    {
+      id: 't7', projectId: 'p2', role: 'copywriting', title: '卖点文案生成',
+      description: '基于扫地机器人用户评论中的核心诉求，将清洁效果和智能体验转化为可传播的卖点文案。',
+      status: 'ready', assignedTo: '王文案',
+      inputMaterials: ['m7', 'm8'],
+      promptPreview: '你是一位家电类目资深文案。请基于用户评论中反映的清洁效果和智能体验诉求，生成可量化的卖点文案。',
+      outputFormat: '卖点文案库 · 用户原话摘录 · 标题方向',
+      judgmentCriteria: ['卖点是否可量化', '是否引用真实用户语言'],
       sourceTags: ['竞品评论'],
+    },
+    {
+      id: 't8', projectId: 'p2', role: 'operations', title: '618 大促策略汇总',
+      description: '综合商品分析和文案输出，提炼扫地机器人的618主推策略和价格表达。',
+      status: 'pending', assignedTo: '张运营',
+      inputMaterials: ['m7', 'm9'],
+      promptPreview: '你是家电运营负责人。综合商品和文案分析，为618扫地机器人大促提炼主推策略。',
+      outputFormat: '大促策略摘要 · 执行清单',
+      judgmentCriteria: ['策略有数据支撑', '执行清单可落地'],
+      sourceTags: ['竞品评论', '商品参数'],
+    },
+  ],
+  p3: [
+    {
+      id: 't9', projectId: 'p3', role: 'merchandise', title: '母婴用户痛点矩阵',
+      description: '基于Babycare纸尿裤和全棉时代棉柔巾的用户评论，构建母婴品类用户痛点矩阵。',
+      status: 'submitted', assignedTo: '李商品',
+      inputMaterials: ['m10', 'm11'],
+      promptPreview: '你是一位母婴品类选品专家。请基于用户评论，构建母婴用品的用户痛点矩阵和选品建议。',
+      outputFormat: '用户痛点矩阵 · 选品建议',
+      judgmentCriteria: ['痛点分类清晰', '建议有数据支撑'],
+      sourceTags: ['竞品评论'],
+    },
+    {
+      id: 't10', projectId: 'p3', role: 'copywriting', title: '商品卖点机会分析',
+      description: '提取母婴用户评论中的安全焦虑和复购动机，转化为卖点机会。',
+      status: 'submitted', assignedTo: '王文案',
+      inputMaterials: ['m10', 'm11'],
+      promptPreview: '你是一位母婴品牌文案。请基于用户评论中反映的安全焦虑和复购动机，提炼可传播的卖点机会。',
+      outputFormat: '卖点机会清单 · 标题方向',
+      judgmentCriteria: ['卖点是否抓住安全焦虑', '是否可传播'],
+      sourceTags: ['竞品评论'],
+    },
+    {
+      id: 't11', projectId: 'p3', role: 'customer_service', title: '母婴客服 FAQ',
+      description: '整理母婴用户的售前高频疑虑和售后风险，生成客服应答模板。',
+      status: 'submitted', assignedTo: '赵客服',
+      inputMaterials: ['m10', 'm11', 'm12'],
+      promptPreview: '你是一位母婴品类客服培训师。请基于用户评论和客服记录，生成风险等级标注的客服应答模板。',
+      outputFormat: '客服 FAQ · 风险话术',
+      judgmentCriteria: ['覆盖售前售后', '风险等级标注', '应答专业且亲和'],
+      sourceTags: ['竞品评论', '客服记录'],
     },
   ],
 }
@@ -379,6 +467,96 @@ export const mockAIResults: Record<string, AIResult> = {
     ],
     generatedAt: '', submitted: false,
   },
+  t6: {
+    id: 'r6', taskId: 't6', title: '竞品商品分析 - 扫地机器人',
+    sections: [
+      {
+        title: '高频痛点聚类 Top 5',
+        type: 'matrix',
+        headers: ['痛点', '频次', '严重度', '影响面', '竞品覆盖', '可转化策略'],
+        rows: [
+          ['避障误判', '高 (45次)', '严重', '有宠物/儿童家庭', '1/2', '主打「AI 视觉避障」技术'],
+          ['划伤地板', '高 (38次)', '严重', '实木地板用户', '1/2', '强调「柔性橡胶滚刷」'],
+          ['耗材成本高', '中 (31次)', '中等', '预算敏感用户', '1/2', '突出「耗材寿命长」数据'],
+          ['地图丢失', '中 (22次)', '中等', '大户型用户', '1/2', '强化「LDS 激光导航」'],
+          ['噪音偏大', '低 (15次)', '轻微', '全用户', '2/2', '标注「静音模式」分贝值'],
+        ],
+      },
+      {
+        title: '功能机会与选品建议',
+        type: 'list',
+        items: [
+          'AI 视觉避障：科沃斯的主要差评来源，石头未出现此问题。可作差异化攻击点',
+          '地板保护：石头 G20 被反馈划伤实木地板，科沃斯未出现。需要柔性滚刷方案',
+          '耗材经济性：一次性尘袋和拖布的长期成本是潜在用户的主要顾虑',
+          '定价参考区间：¥3,500-¥4,000 为高端甜点区间，需在智能功能和价格间平衡',
+        ],
+      },
+    ],
+    generatedAt: '2026-06-04 10:00', submitted: false,
+  },
+  t9: {
+    id: 'r9', taskId: 't9', title: '母婴用户痛点矩阵 - Q2 分析',
+    sections: [
+      {
+        title: '用户核心痛点 Top 3',
+        type: 'matrix',
+        headers: ['痛点', '频次', '严重度', '竞品覆盖', '机会方向'],
+        rows: [
+          ['尺寸偏小', '高 (67次)', '严重', '1/2', '推出「分龄尺码指南」'],
+          ['漏尿/侧漏', '高 (52次)', '严重', '1/2', '强化「防漏隔边」设计'],
+          ['掉絮/起毛', '中 (28次)', '中等', '1/2', '强调「不掉絮」材质认证'],
+        ],
+      },
+      {
+        title: '复购动机分析',
+        type: 'list',
+        items: [
+          '安全信任是第一决策因素：材质安全认证的展示直接影响转化率',
+          '尺寸合适度是复购核心：建议增加试用装或分龄推荐功能',
+          '品牌公众号内容的种草转化效率高于短视频 2.3 倍',
+        ],
+      },
+    ],
+    generatedAt: '2026-04-20 14:00', submitted: true,
+  },
+  t10: {
+    id: 'r10', taskId: 't10', title: '商品卖点机会 - Q2 母婴',
+    sections: [
+      {
+        title: '用户原话 → 卖点 转译',
+        type: 'matrix',
+        headers: ['用户原话', '痛点类型', '可转化卖点', '适用页面'],
+        rows: [
+          ['"穿了半天就漏了"', '安全焦虑', '「3D 防漏隔边，12小时不漏」', '详情页首屏'],
+          ['"宝宝用了起红点"', '材质焦虑', '「0添加·医护级认证·敏感肌可用」', '详情页·主图'],
+          ['"洗完脸一脸棉絮"', '品质焦虑', '「不掉絮·高压水刺工艺·100%棉」', '详情页材质区'],
+        ],
+      },
+    ],
+    generatedAt: '2026-04-21 10:00', submitted: true,
+  },
+  t11: {
+    id: 'r11', taskId: 't11', title: '母婴客服 FAQ - Q2 分析',
+    sections: [
+      {
+        title: '售前高频问题',
+        type: 'qa',
+        qa: [
+          { q: '宝宝过敏体质能用吗？', a: '我们产品通过了医护级安全认证和皮肤刺激性测试，敏感肌宝宝也可以放心使用。您可以先买试用装体验，不满意可退。' },
+          { q: '纸尿裤会不会起坨断层？', a: '采用日本住友高分子吸水树脂，吸水后不起坨不断层。评论区的宝妈反馈照片可以看效果。' },
+        ],
+      },
+      {
+        title: '售后风险话术',
+        type: 'qa',
+        qa: [
+          { q: '红屁股了怎么办？', a: '非常抱歉！建议更换频率和做好护臀护理。如确认是产品问题，我们支持全额退款，运费我们承担。' },
+        ],
+      },
+    ],
+    generatedAt: '2026-04-21 14:00', submitted: true,
+  },
   t5: {
     id: 'r5', taskId: 't5', title: '618 大促策略 - 高速吹风机',
     sections: [
@@ -421,8 +599,9 @@ export const mockReports: Record<string, Report> = {
       '用户对品牌公众号内容有高信任度，种草转化效率高于短视频',
     ],
     sections: [
-      { role: 'operations', roleLabel: '运营', results: [{ id: 'r_old_1', taskId: 't_old_1', title: '用户痛点矩阵 - Q2 母婴', sections: [], generatedAt: '2026-04-20', submitted: true }] },
-      { role: 'copywriting', roleLabel: '文案', results: [{ id: 'r_old_2', taskId: 't_old_2', title: '商品卖点机会 - Q2 母婴', sections: [], generatedAt: '2026-04-21', submitted: true }] },
+      { role: 'merchandise', roleLabel: '商品', results: [mockAIResults['t9']!] },
+      { role: 'copywriting', roleLabel: '文案', results: [mockAIResults['t10']!] },
+      { role: 'customer_service', roleLabel: '客服', results: [mockAIResults['t11']!] },
     ],
     nextSteps: [
       '将安全认证展示作为下半年的主要传播方向',
