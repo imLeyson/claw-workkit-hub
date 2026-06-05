@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
 import { mockWorkKits, roleLabels } from '../data/mock'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
@@ -44,7 +44,6 @@ export default function CreateProject() {
   const [competitors, setCompetitors] = useState<string[]>([])
   const [roles, setRoles] = useState(initRoles)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  // Campaign info for template mode
   const [campaign, setCampaign] = useState('')
   const [category, setCategory] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
@@ -85,7 +84,10 @@ export default function CreateProject() {
     if (workKit && campaign.trim().length < 2) errs.campaign = '请填写活动名称'
     if (Object.keys(errs).length === 0) {
       setErrors({})
-      showToast('项目创建成功，跳转到资料库', 'success')
+      const msg = workKit
+        ? `基于「${workKit.name}」模板创建成功，跳转到资料库`
+        : '项目创建成功，跳转到资料库'
+      showToast(msg, 'success')
       navigate('/materials/p1')
     } else {
       setErrors(errs)
@@ -96,18 +98,46 @@ export default function CreateProject() {
 
   return (
     <div className="max-w-xl">
+      {/* Header */}
       <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">
-        {workKit ? '基于模板创建' : '创建新项目'}
+        {workKit ? `基于模板创建项目` : '创建新项目'}
       </h1>
-      <p className="text-[14px] text-text-secondary mb-12 leading-relaxed">
-        {workKit ? `基于 PromoKit AI 模板创建 — 岗位和资料结构已预填。` : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
+      <p className="text-[14px] text-text-secondary mb-4 leading-relaxed">
+        {workKit
+          ? `复用「${workKit.name}」— 岗位角色、资料结构和分析流程已自动预填。`
+          : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
       </p>
 
-      {/* Template badge */}
+      {/* Template info card (persistent in template mode) */}
       {workKit && (
-        <div className="flex items-center gap-3 mb-10 text-[13px] text-text-secondary bg-accent-50/50 rounded-2xl px-5 py-3">
-          <span className="w-[6px] h-[6px] rounded-full bg-accent-500" />
-          模板「{workKit.name}」v{workKit.version} · 已预填 {workKit.includedRoles.map((r) => roleLabels[r]).join('、')} · 复用 {workKit.reuseCount} 次
+        <div className="card-surface rounded-[20px] p-5 mb-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-accent-50 flex items-center justify-center">
+              <Package className="w-4.5 h-4.5 text-accent-500" />
+            </div>
+            <div>
+              <div className="text-[13px] font-medium text-text-main">{workKit.name}</div>
+              <div className="text-[11px] text-text-muted">{workKit.version} · 复用 {workKit.reuseCount} 次 · {workKit.includedRoles.length} 个岗位</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-[12px]">
+            <div className="bg-gray-50 rounded-xl p-3">
+              <div className="text-text-muted mb-0.5">资料结构</div>
+              <div className="text-text-secondary leading-snug">{workKit.materialStructure}</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3">
+              <div className="text-text-muted mb-0.5">包含岗位</div>
+              <div className="text-text-secondary">{workKit.includedRoles.map((r) => roleLabels[r]).join('、')}</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3">
+              <div className="text-text-muted mb-0.5">适用场景</div>
+              <div className="text-text-secondary">{workKit.scenario}</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3">
+              <div className="text-text-muted mb-0.5">任务模板</div>
+              <div className="text-text-secondary">{workKit.sections.length} 个任务</div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -208,12 +238,12 @@ export default function CreateProject() {
 
         {step === 2 && workKit && (
           <div className="space-y-8">
-            <p className="text-[13px] text-text-secondary leading-relaxed">
-              基于「{workKit.name}」模板，{workKit.includedRoles.length} 个岗位的分析流程和资料结构已确定。补充活动信息即可开始。
+            <p className="text-[13px] text-text-secondary leading-relaxed bg-accent-50/30 rounded-xl p-4">
+              模板已预设 {workKit.includedRoles.length} 个岗位角色、{workKit.sections.length} 个任务模板和资料结构。你只需补充活动信息即可启动项目。
             </p>
             {errors.campaign && <p className="text-[12px] text-error">{errors.campaign}</p>}
             <div>
-              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动名称</label>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动名称 *</label>
               <input
                 type="text"
                 value={campaign}
@@ -233,7 +263,7 @@ export default function CreateProject() {
               />
             </div>
             <div>
-              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动日期（选填）</label>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动周期（选填）</label>
               <input
                 type="text"
                 value={campaignDate}
@@ -241,15 +271,6 @@ export default function CreateProject() {
                 placeholder="例：2026-06-01 ~ 2026-06-18"
                 className="input-underline"
               />
-            </div>
-            <div className="bg-gray-50 rounded-2xl p-5 mt-4">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-text-muted">模板预设内容</span>
-              <div className="mt-3 space-y-2 text-[13px] text-text-secondary">
-                <div className="flex justify-between"><span>资料结构</span><span>{workKit.materialStructure}</span></div>
-                <div className="flex justify-between"><span>包含岗位</span><span>{workKit.includedRoles.map((r) => roleLabels[r]).join('、')}</span></div>
-                <div className="flex justify-between"><span>适用场景</span><span>{workKit.scenario}</span></div>
-                <div className="flex justify-between"><span>模板版本</span><span>{workKit.version} · 复用 {workKit.reuseCount} 次</span></div>
-              </div>
             </div>
           </div>
         )}
