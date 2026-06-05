@@ -15,9 +15,9 @@ export default function Archive() {
   return (
     <div className="max-w-4xl">
       <div className="mb-14">
-        <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">AI 工作包资产库</h1>
+        <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">PromoKit AI 工作包资产库</h1>
         <p className="text-[14px] text-text-secondary max-w-md leading-relaxed">
-          沉淀可复用的大促分析流程，让下一次活动在几分钟内启动，而非几小时。
+          沉淀可复用的大促分析流程，减少下一次活动的重复整理成本。
         </p>
       </div>
 

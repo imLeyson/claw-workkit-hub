@@ -10,22 +10,25 @@ export default function Dashboard() {
     <div className="max-w-5xl">
       {/* Hero */}
       <div className="mb-20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
-          <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted">618 年中大促 · 个护小家电</span>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-accent-600 bg-accent-50 px-2 py-0.5 rounded-md">PROMOTION WORK KIT SYSTEM</span>
         </div>
-        <h1 className="text-[48px] font-light leading-[1.1] tracking-[-0.02em] text-text-main mb-6 max-w-[620px]">
-          竞品评论分析<br />AI 工作流系统
+        <h1 className="text-[48px] font-light leading-[1.1] tracking-[-0.02em] text-text-main mb-4 max-w-[620px]">
+          PromoKit AI
         </h1>
-        <p className="text-[15px] text-text-secondary leading-relaxed max-w-[440px] mb-8">
-          覆盖 {project.competitors.length} 个竞品品牌、{project.competitors.reduce((s, c) => s + c.reviewCount, 0)} 条用户评论，从资料库到 Work Kit 沉淀，完整体验一次大促 AI 分析流程。
+        <p className="text-[17px] text-text-secondary leading-relaxed mb-2">电商大促 AI 工作包系统</p>
+        <p className="text-[14px] text-text-muted leading-relaxed max-w-[460px] mb-8">
+          围绕竞品评论、商品卖点、客服反馈和历史文案，生成可复用的大促分析流程。覆盖 {project.competitors.length} 个竞品品牌、{project.competitors.reduce((s, c) => s + c.reviewCount, 0)} 条用户评论。
         </p>
         <div className="flex items-center gap-3">
           <Link to={`/materials/${project.id}`} className="btn-primary-filled">
             进入 618 分析项目
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/demo" className="btn-ghost">查看演示模式</Link>
+          <Link to="/create" className="btn-primary">
+            新建大促项目
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 
@@ -85,8 +88,7 @@ export default function Dashboard() {
       <div className="mb-20">
         <div className="insight-block py-2 max-w-[560px]">
           <p className="text-[14px] leading-relaxed">
-            大促团队缺少的不是 AI，而是可复用的分析流程。
-            Work Kit 的价值，是把一次有效的 AI 分析流程沉淀为下一次活动可直接复用的团队资产。
+            把一次有效的大促分析流程，沉淀为团队可复用的 AI 工作包。
           </p>
         </div>
       </div>

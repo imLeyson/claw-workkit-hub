@@ -152,10 +152,10 @@ export default function Demo() {
         <div className="relative">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-accent-100 to-rose-100 border border-accent-200/50 text-xs font-semibold text-accent-700 mb-8 tracking-wide shadow-sm">
           <ShoppingBag className="w-3.5 h-3.5" />
-          CampaignKit · 电商 AI 工作流演示
+          PromoKit AI · 电商 AI 工作流演示
         </div>
         <h1 className="text-4xl font-bold text-text-main mb-4 tracking-tight leading-tight">
-          从一次 618 分析<br />到可复用的电商 AI 工作包
+          从一次 618 分析<br />到可复用的 PromoKit AI 工作包
         </h1>
         <p className="text-lg text-text-muted max-w-xl mx-auto mb-8 leading-relaxed">
           将竞品评论、客服反馈和岗位经验，转化为团队可复用的大促分析流程。

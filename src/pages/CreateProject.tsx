@@ -100,7 +100,7 @@ export default function CreateProject() {
         {workKit ? '基于模板创建' : '创建新项目'}
       </h1>
       <p className="text-[14px] text-text-secondary mb-12 leading-relaxed">
-        {workKit ? `复用「${workKit.name}」— 岗位和资料结构已预填。` : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
+        {workKit ? `基于 PromoKit AI 模板创建 — 岗位和资料结构已预填。` : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
       </p>
 
       {/* Template badge */}

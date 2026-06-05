@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Claw Work Kit Hub — a frontend prototype for an AI Work Kit builder aimed at small e-commerce teams preparing for shopping festivals (618, 11.11). The tool helps teams structure and reuse AI analysis workflows: competitor review mining → pain point matrix → selling point translation → FAQ generation → livestream script → detail page optimization → reusable Work Kit.
+PromoKit AI — a frontend prototype for an AI Work Kit builder aimed at small e-commerce teams preparing for shopping festivals (618, 11.11). The tool helps teams structure and reuse AI analysis workflows: competitor review mining → pain point matrix → selling point translation → FAQ generation → livestream script → detail page optimization → reusable Work Kit.
 
 This is a **pure frontend prototype** with mock data. No real backend, no real AI API.
 

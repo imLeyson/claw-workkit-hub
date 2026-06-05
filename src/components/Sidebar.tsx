@@ -9,6 +9,7 @@ import {
   Archive,
   Play,
 } from 'lucide-react'
+import Logo from './Logo'
 
 const links = [
   { to: '/', label: '看板', icon: LayoutDashboard, end: true },
@@ -43,14 +44,17 @@ export default function Sidebar() {
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
-      {/* Logo */}
-      <div className="h-12 flex items-center px-[14px] border-b border-white/[0.06] shrink-0">
-        <span className="text-[15px] font-medium tracking-tight text-white/90 whitespace-nowrap">
-          <img src="/logo.svg" alt="CK" className="w-[20px] h-[20px] shrink-0" />
-          <span className={`transition-opacity duration-200 whitespace-nowrap text-white/90 font-medium tracking-tight ${expanded ? 'opacity-100 ml-2.5' : 'opacity-0 w-0'}`}>
-            CampaignKit
+      {/* Brand */}
+      <div className="h-14 flex items-center px-[14px] border-b border-white/[0.06] shrink-0 overflow-hidden">
+        <div className="flex items-center">
+          <Logo variant="icon" theme="light" size={22} />
+          <span className={`transition-all duration-200 whitespace-nowrap overflow-hidden ${expanded ? 'opacity-100 w-auto ml-2.5' : 'opacity-0 w-0 ml-0'}`}>
+            <div className="flex flex-col leading-tight">
+              <span className="text-[14px] font-semibold tracking-[-0.01em] text-white">PromoKit AI</span>
+              <span className="text-[9px] text-white/35 tracking-[0.03em]">电商大促 AI 工作包系统</span>
+            </div>
           </span>
-        </span>
+        </div>
       </div>
 
       <nav className="flex-1 px-[8px] py-4 space-y-1">
@@ -81,13 +85,14 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom */}
+      {/* Bottom status */}
       <div className="px-[10px] pb-4">
         <div className={`border-t border-white/[0.06] pt-3 transition-opacity ${expanded ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center gap-2">
             <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
-            <span className="text-[11px] text-white/40 whitespace-nowrap">618 大促 · 进行中</span>
+            <span className="text-[11px] text-white/40 whitespace-nowrap">演示项目 · 进行中</span>
           </div>
+          <div className="text-[10px] text-white/25 mt-1 whitespace-nowrap">618 竞品评论分析</div>
         </div>
       </div>
     </aside>
