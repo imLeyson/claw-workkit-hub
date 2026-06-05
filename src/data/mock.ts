@@ -231,7 +231,7 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
     {
       id: 't1', projectId: 'p1', role: 'merchandise', title: '竞品商品分析',
       description: '从竞品评论中识别产品问题、功能机会和用户未被满足的需求，输出选品与定价参考。',
-      status: 'generated', assignedTo: '李商品',
+      status: 'submitted', assignedTo: '李商品',
       inputMaterials: ['m1', 'm2', 'm3', 'm4'],
       promptPreview: '你是一位电商选品经理。请分析竞品吹风机的用户评论，识别TOP5产品问题和功能机会，按严重度和频次排序，输出选品建议。',
       outputFormat: '产品问题表 · 功能机会 · 选品建议',
@@ -283,7 +283,7 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
     {
       id: 't6', projectId: 'p2', role: 'merchandise', title: '竞品商品分析',
       description: '基于科沃斯X2和石头G20的用户评论，提取产品问题、功能机会和差异化选品建议。',
-      status: 'generated', assignedTo: '李商品',
+      status: 'submitted', assignedTo: '李商品',
       inputMaterials: ['m7', 'm8', 'm9'],
       promptPreview: '你是一位智能家居选品经理。请分析科沃斯X2和石头G20的用户评论，识别TOP5产品问题和功能机会，输出选品建议。',
       outputFormat: '产品问题表 · 功能机会 · 选品建议',
@@ -385,7 +385,7 @@ export const mockAIResults: Record<string, AIResult> = {
         ],
       },
     ],
-    generatedAt: '2026-06-03 09:30', submitted: false,
+    generatedAt: '2026-06-03 09:30', submitted: true,
   },
   t2: {
     id: 'r2', taskId: 't2', title: '卖点文案生成 - 618 高速吹风机',
@@ -493,7 +493,7 @@ export const mockAIResults: Record<string, AIResult> = {
         ],
       },
     ],
-    generatedAt: '2026-06-04 10:00', submitted: false,
+    generatedAt: '2026-06-04 10:00', submitted: true,
   },
   t9: {
     id: 'r9', taskId: 't9', title: '母婴用户痛点矩阵 - Q2 分析',
