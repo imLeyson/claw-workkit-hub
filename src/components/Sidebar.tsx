@@ -11,25 +11,32 @@ import {
 } from 'lucide-react'
 import Logo from './Logo'
 
-const links = [
-  { to: '/', label: '看板', icon: LayoutDashboard, end: true },
-  { to: '/create', label: '新建项目', icon: PlusCircle },
-  { to: '/materials/p1', label: '资料库', icon: FolderOpen, flow: true },
-  { to: '/tasks/p1', label: '任务卡', icon: LayoutGrid, flow: true },
-  { to: '/report/p1', label: '报告', icon: BarChart3, flow: true },
-  { to: '/archive', label: '资产库', icon: Archive },
-  { to: '/demo', label: '演示', icon: Play },
-]
-
 function isInFlow(pathname: string) {
   return ['/materials', '/tasks', '/workspace', '/report'].some((p) => pathname.startsWith(p))
+}
+
+function extractProjectId(pathname: string): string {
+  const parts = pathname.split('/').filter(Boolean)
+  if (parts.length >= 2 && isInFlow(pathname)) return parts[1]
+  return 'p1'
 }
 
 export default function Sidebar() {
   const location = useLocation()
   const pathname = location.pathname
   const inFlow = isInFlow(pathname)
+  const pid = extractProjectId(pathname)
   const [expanded, setExpanded] = useState(false)
+
+  const links = [
+    { to: '/', label: '看板', icon: LayoutDashboard, end: true },
+    { to: '/create', label: '新建项目', icon: PlusCircle },
+    { to: `/materials/${pid}`, label: '资料库', icon: FolderOpen, flow: true },
+    { to: `/tasks/${pid}`, label: '任务卡', icon: LayoutGrid, flow: true },
+    { to: `/report/${pid}`, label: '报告', icon: BarChart3, flow: true },
+    { to: '/archive', label: '资产库', icon: Archive },
+    { to: '/demo', label: '演示', icon: Play },
+  ]
 
   const visibleLinks = links.filter((l) => {
     if (l.flow) return inFlow
