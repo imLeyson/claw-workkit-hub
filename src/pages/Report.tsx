@@ -49,7 +49,7 @@ export default function Report() {
             '详情页信息层级需要重排：当前所有竞品详情页将技术参数放在第三屏之后，但用户评论显示「静音」「恒温」「售后」才是决策关键信息。',
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-4 text-[14px] text-text-secondary leading-relaxed">
-              <span className="text-[20px] font-light text-accent-400 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+              <span className="text-[28px] font-light text-accent-400 leading-none mt-0.5">{String(i + 1).padStart(2, '0')}</span>
               {item}
             </div>
           ))}
@@ -64,8 +64,8 @@ export default function Report() {
             <button
               key={role}
               onClick={() => setActiveTab(role)}
-              className={`block w-full text-left py-2 text-[13px] transition-colors ${
-                activeTab === role ? 'text-text-main font-medium' : 'text-text-muted hover:text-text-secondary'
+              className={`block w-full text-left py-2 pl-3 text-[13px] transition-colors border-l-[3px] ${
+                activeTab === role ? 'text-text-main font-medium border-l-accent-500' : 'text-text-muted hover:text-text-secondary border-l-transparent hover:border-l-accent-300'
               }`}
             >
               {roleLabels[role]}

@@ -69,7 +69,7 @@ export default function Workspace() {
 
       <div className="grid grid-cols-12 gap-10">
         {/* Sidebar context */}
-        <div className="col-span-3 space-y-6">
+        <div className="col-span-3 space-y-6 bg-gray-50/50 rounded-[24px] p-5 -m-2">
           <div>
             <span className="section-title">竞品数据</span>
             <div className="mt-3 space-y-2">

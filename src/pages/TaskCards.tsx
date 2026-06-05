@@ -4,6 +4,13 @@ import { ArrowRight, UserCircle, Loader2, Sparkles } from 'lucide-react'
 import { mockProjects, mockTaskCards, mockMaterials, roleLabels } from '../data/mock'
 import { useToast } from '../components/Toast'
 
+const sourceColorMap: Record<string, string> = {
+  '竞品评论': 'bg-accent-50 text-accent-700',
+  '商品参数': 'bg-gray-100 text-text-muted',
+  '客服记录': 'bg-success-soft text-success',
+  '历史文案': 'bg-accent-50/50 text-accent-700',
+}
+
 export default function TaskCards() {
   const { projectId } = useParams<{ projectId: string }>()
   const project = mockProjects.find((p) => p.id === projectId)
@@ -36,7 +43,7 @@ export default function TaskCards() {
 
   return (
     <div className="max-w-5xl">
-      <div className="flex items-start justify-between mb-12">
+      <div className="flex items-start justify-between mb-14">
         <div>
           <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">岗位分析任务</h1>
           <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 系统根据资料自动生成可执行的 AI 分析任务卡。</p>
@@ -55,26 +62,27 @@ export default function TaskCards() {
       </div>
 
       {/* Context bar */}
-      <div className="flex items-center gap-6 text-[12px] text-text-muted mb-10">
+      <div className="flex items-center gap-6 text-[12px] text-text-muted mb-10 pb-6 border-b border-border-default">
         <span>{project.competitors.length} 个竞品</span>
-        <span>·</span>
+        <span className="text-border-default">·</span>
         <span>{materials.length} 份资料</span>
-        <span>·</span>
+        <span className="text-border-default">·</span>
         <span>{project.team.length} 个岗位</span>
       </div>
 
       {/* Task card grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
         {tasks.map((task, idx) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
-          const large = idx === 0
+          const isFirst = idx === 0
           return (
-            <div key={task.id} className={`card-surface rounded-[24px] card-hover overflow-hidden ${large ? 'col-span-2' : ''}`}>
-              <div className="p-6">
+            <div key={task.id} className={`card-surface rounded-[24px] card-hover overflow-hidden group ${isFirst ? 'col-span-2' : 'border-l-[3px] border-l-transparent hover:border-l-accent-400'}`}>
+              {isFirst && <div className="h-[3px] bg-accent-500" />}
+              <div className={`${isFirst ? 'p-8' : 'p-6'}`}>
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-muted">{roleLabels[task.role]}岗</span>
-                    <h3 className="text-[17px] font-medium text-text-main mt-1">{task.title}</h3>
+                    <h3 className={`font-medium text-text-main mt-1 ${isFirst ? 'text-[20px]' : 'text-[17px]'}`}>{task.title}</h3>
                   </div>
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
@@ -84,27 +92,29 @@ export default function TaskCards() {
                     {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '可分析' : '待生成'}
                   </span>
                 </div>
-                <p className="text-[13px] text-text-muted leading-relaxed mb-4">{task.description}</p>
+                <p className={`text-text-muted leading-relaxed mb-4 ${isFirst ? 'text-[14px]' : 'text-[13px]'}`}>{task.description}</p>
 
-                <div className="flex items-center gap-4 text-[11px] text-text-muted mb-4">
-                  <span>输入：{inputMats.map((m) => m.label.split(' ')[0]).join(' · ')}</span>
-                </div>
+                {isFirst && (
+                  <div className="flex items-center gap-4 text-[11px] text-text-muted mb-4">
+                    <span>输入：{inputMats.map((m) => m.label.split(' ')[0]).join(' · ')}</span>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 flex-wrap">
                   {task.sourceTags.map((tag) => (
-                    <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-gray-50 text-text-muted">{tag}</span>
+                    <span key={tag} className={`text-[10px] px-2 py-1 rounded-md ${sourceColorMap[tag] || 'bg-gray-50 text-text-muted'}`}>{tag}</span>
                   ))}
                 </div>
               </div>
 
-              <div className="px-6 py-3 bg-gray-50/50 border-t border-border-light flex items-center justify-between">
+              <div className={`${isFirst ? 'px-8' : 'px-6'} py-3 bg-gray-50/50 border-t border-border-light flex items-center justify-between`}>
                 <div className="flex items-center gap-2 text-[12px] text-text-muted">
                   <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
                 </div>
                 <Link
                   to={`/workspace/${projectId}/${task.id}`}
                   className={`text-[12px] font-medium flex items-center gap-1.5 transition-all ${
-                    task.status === 'submitted' ? 'text-gray-400' : 'text-accent-600 hover:gap-2'
+                    task.status === 'submitted' ? 'text-gray-400' : 'text-accent-600 group-hover:gap-2'
                   }`}
                 >
                   {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '继续编辑' : task.status === 'ready' ? '进入分析' : '待生成'}

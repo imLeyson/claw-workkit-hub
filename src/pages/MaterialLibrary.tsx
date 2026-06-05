@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { UploadCloud, ArrowRight, ShoppingBag } from 'lucide-react'
+import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip } from 'lucide-react'
 import { mockProjects, mockMaterials, mockTaskCards, materialTypeLabels, roleLabels, aiStatusLabels, platformColors } from '../data/mock'
 import { useToast } from '../components/Toast'
 
@@ -8,6 +8,20 @@ const aiStatusConfig: Record<string, string> = {
   readable: 'bg-success-soft text-success',
   processing: 'bg-accent-50 text-accent-600',
   need_review: 'bg-warning-soft text-warning',
+}
+
+const typeColorMap: Record<string, string> = {
+  review: 'bg-accent-50 text-accent-700',
+  spec: 'bg-gray-100 text-text-muted',
+  faq: 'bg-success-soft text-success',
+  copy_asset: 'bg-accent-50/50 text-accent-700',
+}
+
+const typeIcons: Record<string, typeof FileSpreadsheet> = {
+  review: MessageSquareText,
+  spec: ClipboardList,
+  faq: MessageSquareText,
+  copy_asset: Paperclip,
 }
 
 export default function MaterialLibrary() {
@@ -23,7 +37,7 @@ export default function MaterialLibrary() {
 
   return (
     <div className="max-w-4xl">
-      <div className="flex items-start justify-between mb-12">
+      <div className="flex items-start justify-between mb-14">
         <div>
           <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">资料库</h1>
           <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录的统一管理。</p>
@@ -36,9 +50,9 @@ export default function MaterialLibrary() {
       {/* Upload */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-border-default rounded-[24px] p-12 text-center mb-12 hover:border-accent-200 hover:bg-accent-50/20 transition-all cursor-pointer"
+        className="border-2 border-dashed border-border-default rounded-[24px] p-12 text-center mb-14 hover:border-accent-300 hover:bg-accent-50/20 transition-all cursor-pointer group"
       >
-        <div className="w-16 h-16 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-5">
+        <div className="w-16 h-16 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition-transform">
           <UploadCloud className="w-8 h-8 text-accent-500" />
         </div>
         <p className="text-[15px] font-medium text-text-main mb-2">导入电商数据</p>
@@ -63,11 +77,11 @@ export default function MaterialLibrary() {
       <div className="mb-4">
         <span className="section-title">竞品商品</span>
       </div>
-      <div className="grid grid-cols-3 gap-4 mb-12">
+      <div className="grid grid-cols-3 gap-4 mb-14">
         {project.competitors.map((comp) => (
-          <div key={comp.name} className="card-surface rounded-[20px] p-5">
+          <div key={comp.name} className="card-surface rounded-[20px] p-5 bg-gradient-to-b from-white to-accent-50/20">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[13px] font-medium text-text-main">{comp.brand}</span>
+              <span className="text-[15px] font-medium text-text-main">{comp.brand}</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${platformColors[comp.platform] || 'bg-gray-100 text-gray-600'}`}>
                 {comp.platform}
               </span>
@@ -76,7 +90,7 @@ export default function MaterialLibrary() {
             <div className="flex items-center gap-4 text-[12px] text-text-secondary mb-3">
               <span>{comp.price}</span>
               <span>{comp.reviewCount} 条评论</span>
-              <span className="text-success">{comp.rating}%</span>
+              <span className="text-success font-medium">{comp.rating}%</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {comp.topIssues.map((issue) => (
@@ -94,16 +108,17 @@ export default function MaterialLibrary() {
       <div className="space-y-3">
         {materials.map((m) => {
           const refTasks = tasks.filter((t) => m.referencedBy.includes(t.id))
+          const Icon = typeIcons[m.type] || FileSpreadsheet
           return (
-            <div key={m.id} className="card-surface rounded-[20px] p-5 flex items-center gap-6">
-              <div className="w-10 h-10 rounded-[14px] bg-gray-50 flex items-center justify-center shrink-0">
-                <ShoppingBag className="w-5 h-5 text-text-muted" />
+            <div key={m.id} className="card-surface rounded-[20px] p-5 flex items-center gap-6 group cursor-default hover:border-accent-200 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
+              <div className="w-10 h-10 rounded-[14px] bg-gray-50 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors">
+                <Icon className="w-5 h-5 text-text-muted group-hover:text-accent-500 transition-colors" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[14px] font-medium text-text-main mb-0.5">{m.label}</div>
                 <div className="text-[11px] text-text-muted">{m.fileName}</div>
               </div>
-              <span className="tag bg-gray-50 text-text-muted">{materialTypeLabels[m.type]}</span>
+              <span className={`tag ${typeColorMap[m.type] || 'bg-gray-50 text-text-muted'}`}>{materialTypeLabels[m.type]}</span>
               <span className="text-[12px] text-text-muted">{roleLabels[m.responsibleRole]}</span>
               <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${aiStatusConfig[m.aiStatus]}`}>{aiStatusLabels[m.aiStatus]}</span>
               <div className="flex items-center gap-1">
