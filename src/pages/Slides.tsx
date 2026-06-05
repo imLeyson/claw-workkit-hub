@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, FileText, MessageSquareText, Palette, Repeat, ChevronLeft, ChevronRight, Clock, Users, TrendingUp } from 'lucide-react'
+import { ArrowRight, Bot, Box, ClipboardList, Database, FileBarChart, FileText, FolderOpen, LayoutDashboard, MessageSquareText, Network, Palette, Repeat, Search, Target, ChevronLeft, ChevronRight, Clock, Users, TrendingUp } from 'lucide-react'
 import Logo from '../components/Logo'
 
 /* ── Decorative background ── */
@@ -150,6 +150,217 @@ const slides = [
               <div className="text-[11px] text-text-muted leading-snug">{item.desc}</div>
             </div>
           ))}
+        </div>
+      </div>
+    ),
+  },
+  // 5. Design process mapping
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="w-[1160px] max-w-[calc(100vw-84px)] -my-10">
+        <div className="flex items-start justify-between mb-4 animate-fade-in-up">
+          <div className="flex items-center gap-3 shrink-0">
+            <img src="/logo.svg" alt="" className="w-10 h-10" />
+            <div>
+              <div className="text-[20px] font-semibold tracking-[-0.02em] text-text-main leading-tight">PromoKit AI</div>
+              <div className="text-[11px] text-text-muted">电商大促 AI 工作包系统</div>
+            </div>
+          </div>
+          <div className="text-center flex-1 -ml-20">
+            <h2 className="text-[35px] font-semibold tracking-[-0.035em] text-text-main leading-none mb-2">
+              PromoKit AI 的设计过程映射
+            </h2>
+            <p className="text-[13px] text-text-secondary">
+              将抽象需求逐步转化为可落地的系统架构与用户界面，形成可复用的 AI 工作包流程
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 px-1 mb-2 animate-fade-in" style={{ animationDelay: '80ms' }}>
+          <div />
+          {['需求 → 定义', '策略 → 架构', '架构 → 界面'].map((label) => (
+            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
+              <span>转换</span>
+              <span className="h-px w-12 bg-accent-300" />
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 mb-3">
+          {[
+            {
+              no: '01',
+              title: '需求池归类',
+              icon: Search,
+              lead: '从实际工作中归纳出关键问题',
+              visual: 'needs',
+              items: [
+                ['资料分散', '评论、商品、客服反馈散落在不同文件'],
+                ['岗位断裂', '各岗位分析口径与输出格式不统一'],
+                ['经验不可交接', 'AI 用法停留在个人经验中'],
+                ['重复整理', '每次大促都从零启动'],
+              ],
+            },
+            {
+              no: '02',
+              title: '定义与策略',
+              icon: Target,
+              lead: '将问题转化为产品定义与核心策略',
+              visual: 'strategy',
+              items: [
+                ['资料结构化', '统一资料类型与字段'],
+                ['岗位任务化', '明确目标、输入与输出格式'],
+                ['AI 可控化', '结构化分析 + 质量检查'],
+                ['流程资产化', '沉淀为 Work Kit'],
+              ],
+            },
+            {
+              no: '03',
+              title: '系统架构设计',
+              icon: Network,
+              lead: '将策略转化为系统结构与功能模块',
+              visual: 'system',
+              items: [
+                ['电商资料库', '集中管理评论、商品、客服、文案'],
+                ['岗位分析任务', '生成任务卡与 Prompt'],
+                ['AI 分析工作台', '承载结果与质量检查'],
+                ['报告与资产库', '汇总并保存流程资产'],
+              ],
+            },
+            {
+              no: '04',
+              title: '界面设计',
+              icon: LayoutDashboard,
+              lead: '将系统结构转化为用户可操作的界面',
+              visual: 'screens',
+              items: [
+                ['Dashboard', '项目总览与进度看板'],
+                ['资料库', '导入与管理电商资料'],
+                ['任务卡', '展示岗位任务和输出要求'],
+                ['AI 工作台', '生成结构化分析结果'],
+                ['报告页', '输出可执行策略报告'],
+              ],
+            },
+          ].map((col, colIndex) => (
+            <div key={col.no} className="relative animate-fade-in-up" style={{ animationDelay: `${colIndex * 80}ms` }}>
+              <div className="h-full rounded-[20px] border border-accent-200 bg-white shadow-[0_14px_38px_rgba(28,28,30,0.06)] overflow-hidden">
+                <div className="h-[56px] bg-gradient-to-r from-accent-50 to-white border-b border-accent-200 flex items-center justify-between px-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[27px] font-semibold text-accent-600 tracking-[-0.04em]">{col.no}</span>
+                    <span className="text-[18px] font-semibold text-text-main">{col.title}</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-xl bg-white border border-accent-100 flex items-center justify-center">
+                    <col.icon className="w-4 h-4 text-accent-500" />
+                  </div>
+                </div>
+                <div className="p-3">
+                  <div className="mb-3 h-[112px] rounded-2xl border border-accent-100 bg-gradient-to-br from-white to-accent-50/55 p-3 overflow-hidden">
+                    {col.visual === 'needs' && (
+                      <div className="h-full flex items-center gap-3">
+                        <div className="w-16 h-16 rounded-2xl bg-white border border-accent-100 flex items-center justify-center shrink-0">
+                          <col.icon className="w-8 h-8 text-accent-500" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {['竞品评论', '客服问答', '历史文案'].map((label, i) => (
+                            <div key={label} className="h-6 rounded-lg bg-white border border-border-light flex items-center gap-2 px-2">
+                              <span className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-accent-500' : i === 1 ? 'bg-success' : 'bg-warning'}`} />
+                              <span className="text-[10px] text-text-secondary">{label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {col.visual === 'strategy' && (
+                      <div className="h-full flex items-center justify-center gap-3">
+                        <div className="w-[72px] h-[72px] rounded-full bg-white border border-accent-100 flex items-center justify-center">
+                          <Target className="w-10 h-10 text-accent-500" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {['结构', '任务', '质检', '资产'].map((label) => (
+                            <div key={label} className="w-14 h-8 rounded-lg bg-white border border-border-light text-[10px] text-text-secondary flex items-center justify-center">{label}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {col.visual === 'system' && (
+                      <div className="h-full grid grid-cols-2 gap-2">
+                        {[
+                          { icon: Database, label: '资料库', color: 'text-blue-500' },
+                          { icon: ClipboardList, label: '任务卡', color: 'text-success' },
+                          { icon: Bot, label: '工作台', color: 'text-accent-500' },
+                          { icon: Box, label: '资产库', color: 'text-error' },
+                        ].map((item) => (
+                          <div key={item.label} className="rounded-xl bg-white border border-border-light flex items-center gap-2 px-2">
+                            <item.icon className={`w-4 h-4 ${item.color}`} />
+                            <span className="text-[10px] text-text-secondary">{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {col.visual === 'screens' && (
+                      <div className="h-full grid grid-cols-2 gap-2">
+                        {[
+                          { icon: LayoutDashboard, label: 'Dashboard' },
+                          { icon: FolderOpen, label: '资料库' },
+                          { icon: Bot, label: '工作台' },
+                          { icon: FileBarChart, label: '报告页' },
+                        ].map((item) => (
+                          <div key={item.label} className="rounded-xl bg-white border border-border-light p-2">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <item.icon className="w-3.5 h-3.5 text-accent-500" />
+                              <span className="text-[9px] text-text-main font-medium">{item.label}</span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="h-1.5 rounded-full bg-accent-100" />
+                              <div className="h-1.5 rounded-full bg-gray-100 w-4/5" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-[11px] text-text-secondary text-center leading-relaxed mb-2 min-h-[30px]">{col.lead}</p>
+                  <div className="space-y-1.5">
+                    {col.items.map(([name, desc]) => (
+                      <div key={name} className="rounded-lg border border-border-light bg-white px-2.5 py-1.5 flex gap-2">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
+                        <div>
+                          <div className="text-[11.5px] font-semibold text-text-main leading-tight mb-0.5">{name}</div>
+                          <div className="text-[9.5px] leading-snug text-text-muted">{desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 px-1 mb-3 animate-fade-in" style={{ animationDelay: '360ms' }}>
+          {['归类决策', '定义决策', '架构决策'].map((label) => (
+            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
+              <span>决策</span>
+              <span className="h-px w-12 bg-accent-300" />
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          ))}
+          <div className="flex items-center justify-center text-[12px] text-text-muted">{'界面落地'}</div>
+        </div>
+
+        <div className="mx-auto w-[76%] rounded-2xl border border-accent-200 bg-white px-6 py-3.5 flex items-center gap-5 animate-fade-in-up shadow-[0_12px_36px_rgba(28,28,30,0.06)]" style={{ animationDelay: '420ms' }}>
+          <div className="w-12 h-12 rounded-2xl bg-accent-50 border border-accent-100 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6 text-accent-500" />
+          </div>
+          <div className="text-[20px] font-semibold text-accent-600 shrink-0">最终目标</div>
+          <div className="w-px h-8 bg-accent-200" />
+          <p className="text-[13px] leading-relaxed text-text-main">
+            把一次有效的大促分析流程，转化为团队可复用、可交接、可迭代的 AI 工作包资产，
+            持续提升团队效率与决策质量。
+          </p>
         </div>
       </div>
     ),
@@ -349,12 +560,12 @@ export default function Slides() {
 
       {/* Nav arrows */}
       <button onClick={goPrev} disabled={current === 0}
-        className={`absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
-        <ChevronLeft className={`w-5 h-5 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
+        className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
+        <ChevronLeft className={`w-4 h-4 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
       </button>
       <button onClick={goNext} disabled={current === total - 1}
-        className={`absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
-        <ChevronRight className={`w-5 h-5 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
+        className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
+        <ChevronRight className={`w-4 h-4 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
       </button>
 
       {/* Dots */}
