@@ -5,7 +5,8 @@ import { mockWorkKits, roleLabels } from '../data/mock'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
 
-const steps = ['基础信息', '参与岗位', '竞品设置']
+const normalSteps = ['基础信息', '参与岗位', '竞品设置']
+const templateSteps = ['基础信息', '参与岗位', '活动信息']
 
 const defaultRoles = [
   { role: 'operations', label: '运营', checked: true, desc: '用户痛点挖掘、数据分析、竞品洞察' },
@@ -34,13 +35,19 @@ export default function CreateProject() {
     }))
   }, [workKit])
 
+  const steps = workKit ? templateSteps : normalSteps
+
   const [step, setStep] = useState(0)
-  const [name, setName] = useState(workKit ? `618 ${workKit.name.replace(' Work Kit', '')}` : '')
+  const [name, setName] = useState(workKit ? `${workKit.scenario.split('/')[0]} ${workKit.name.replace(' Work Kit', '')}` : '')
   const [description, setDescription] = useState(workKit ? `基于「${workKit.name}」模板创建。${workKit.description}` : '')
   const [competitorInput, setCompetitorInput] = useState('')
   const [competitors, setCompetitors] = useState<string[]>([])
   const [roles, setRoles] = useState(initRoles)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  // Campaign info for template mode
+  const [campaign, setCampaign] = useState('')
+  const [category, setCategory] = useState('')
+  const [campaignDate, setCampaignDate] = useState('')
 
   const addCompetitor = () => {
     const trimmed = competitorInput.trim()
@@ -54,7 +61,7 @@ export default function CreateProject() {
   const goToErrorStep = (errs: Record<string, string>) => {
     if (errs.name) return 0
     if (errs.roles) return 1
-    if (errs.competitors) return 2
+    if (errs.competitors || errs.campaign) return 2
     return 0
   }
 
@@ -74,7 +81,8 @@ export default function CreateProject() {
     const errs: Record<string, string> = {}
     if (name.trim().length < 2) errs.name = '项目名称至少需要 2 个字符'
     if (!roles.some((r) => r.checked)) errs.roles = '请至少选择 1 个参与岗位'
-    if (competitors.length === 0) errs.competitors = '请至少添加 1 个竞品'
+    if (!workKit && competitors.length === 0) errs.competitors = '请至少添加 1 个竞品'
+    if (workKit && campaign.trim().length < 2) errs.campaign = '请填写活动名称'
     if (Object.keys(errs).length === 0) {
       setErrors({})
       showToast('项目创建成功，跳转到资料库', 'success')
@@ -170,7 +178,7 @@ export default function CreateProject() {
           </div>
         )}
 
-        {step === 2 && (
+        {step === 2 && !workKit && (
           <div className="space-y-6">
             <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-2">竞品品牌</label>
             {errors.competitors && <p className="text-[12px] text-error mb-2">{errors.competitors}</p>}
@@ -195,6 +203,54 @@ export default function CreateProject() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {step === 2 && workKit && (
+          <div className="space-y-8">
+            <p className="text-[13px] text-text-secondary leading-relaxed">
+              基于「{workKit.name}」模板，{workKit.includedRoles.length} 个岗位的分析流程和资料结构已确定。补充活动信息即可开始。
+            </p>
+            {errors.campaign && <p className="text-[12px] text-error">{errors.campaign}</p>}
+            <div>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动名称</label>
+              <input
+                type="text"
+                value={campaign}
+                onChange={(e) => { setCampaign(e.target.value); if (errors.campaign) setErrors((prev) => { const { campaign: _, ...rest } = prev; return rest }) }}
+                placeholder="例：618 年中大促"
+                className="input-underline"
+              />
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">商品类目（选填）</label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="例：个护小家电"
+                className="input-underline"
+              />
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动日期（选填）</label>
+              <input
+                type="text"
+                value={campaignDate}
+                onChange={(e) => setCampaignDate(e.target.value)}
+                placeholder="例：2026-06-01 ~ 2026-06-18"
+                className="input-underline"
+              />
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-5 mt-4">
+              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-text-muted">模板预设内容</span>
+              <div className="mt-3 space-y-2 text-[13px] text-text-secondary">
+                <div className="flex justify-between"><span>资料结构</span><span>{workKit.materialStructure}</span></div>
+                <div className="flex justify-between"><span>包含岗位</span><span>{workKit.includedRoles.map((r) => roleLabels[r]).join('、')}</span></div>
+                <div className="flex justify-between"><span>适用场景</span><span>{workKit.scenario}</span></div>
+                <div className="flex justify-between"><span>模板版本</span><span>{workKit.version} · 复用 {workKit.reuseCount} 次</span></div>
+              </div>
+            </div>
           </div>
         )}
       </div>

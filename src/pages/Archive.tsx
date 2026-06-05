@@ -43,12 +43,13 @@ export default function Archive() {
                     <span key={role}>{roleLabels[role]}</span>
                   ))}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button onClick={() => setReuseKit(wk.id)} className="text-[11px] font-medium text-accent-600 hover:text-accent-700 transition-colors flex items-center gap-1">
-                    <Repeat className="w-3 h-3" /> 复用
+                    <Repeat className="w-3 h-3" /> 复用此工作包
                   </button>
-                  <button onClick={() => navigate(`/create?from=archive&kit=${wk.id}`)} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors">
-                    创建项目
+                  <span className="text-border-default">|</span>
+                  <button onClick={() => navigate('/create')} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors">
+                    新建空白项目
                   </button>
                 </div>
               </div>
