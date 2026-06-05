@@ -8,6 +8,7 @@ import {
   BarChart3,
   Archive,
   Play,
+  Presentation,
 } from 'lucide-react'
 import Logo from './Logo'
 
@@ -36,6 +37,7 @@ export default function Sidebar() {
     { to: `/report/${pid}`, label: '报告', icon: BarChart3, flow: true },
     { to: '/archive', label: '资产库', icon: Archive },
     { to: '/demo', label: '演示', icon: Play },
+    { to: '/slides', label: '幻灯片', icon: Presentation },
   ]
 
   const visibleLinks = links.filter((l) => {

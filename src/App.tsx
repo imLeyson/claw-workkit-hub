@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
-import { Monitor } from 'lucide-react'
+import { Monitor, Sparkles } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
@@ -10,6 +10,7 @@ import Workspace from './pages/Workspace'
 import Report from './pages/Report'
 import Archive from './pages/Archive'
 import Demo from './pages/Demo'
+import Slides from './pages/Slides'
 
 function Breadcrumb() {
   const location = useLocation()
@@ -46,6 +47,7 @@ export default function App() {
   const isDemo = location.pathname === '/demo'
 
   if (isDemo) return <Demo />
+  if (location.pathname === '/slides') return <Slides />
 
   return (
     <ToastProvider>
@@ -55,6 +57,13 @@ export default function App() {
           <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-10">
             <Breadcrumb />
             <div className="flex items-center gap-4">
+              <Link
+                to="/slides"
+                className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                幻灯片
+              </Link>
               <Link
                 to="/demo"
                 className="text-[11px] text-text-muted hover:text-text-secondary transition-colors flex items-center gap-1.5"
