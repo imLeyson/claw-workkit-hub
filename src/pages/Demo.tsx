@@ -190,15 +190,15 @@ export default function Demo() {
       </div>
 
       <footer className="max-w-3xl mx-auto text-center pb-24 px-6">
-        <div className="hero-gradient rounded-2xl p-10 shadow-[0_8px_32px_rgba(249,115,22,0.15)]">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-5 shadow-sm">
-            <Sparkles className="w-7 h-7 text-white" />
+        <div className="bg-sidebar rounded-[24px] p-12">
+          <div className="w-14 h-14 rounded-2xl bg-accent-500/20 flex items-center justify-center mx-auto mb-5">
+            <Sparkles className="w-7 h-7 text-accent-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">准备好沉淀团队的电商 AI 经验了吗？</h3>
-          <p className="text-sm text-white/80 mb-6 max-w-md mx-auto leading-relaxed">
+          <h3 className="text-[20px] font-medium text-white mb-2">准备好沉淀团队的电商 AI 经验了吗？</h3>
+          <p className="text-[14px] text-white/50 mb-8 max-w-md mx-auto leading-relaxed">
             从第一个大促分析项目开始，将有效的 AI 工作流程保存为团队可复用的资产。
           </p>
-          <Link to="/create" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-accent-600 text-sm font-semibold rounded-xl hover:bg-white/90 transition-all shadow-sm btn-accent-glow">
+          <Link to="/create" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white hover:text-accent-700">
             创建第一个大促分析项目 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
