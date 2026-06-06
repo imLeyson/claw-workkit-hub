@@ -16,7 +16,8 @@ export default function Report() {
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
-  const roleTabs = [...new Set(tasks.map((t) => t.role))]
+  const roleOrder = ['operations', 'merchandise', 'copywriting', 'customer_service', 'design']
+  const roleTabs = [...new Set(tasks.map((t) => t.role))].sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b))
   const submittedCount = tasks.filter((t) => mockAIResults[t.id]?.submitted).length
 
   return (
