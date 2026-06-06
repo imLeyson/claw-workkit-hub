@@ -88,7 +88,7 @@ export default function CreateProject() {
         ? `基于「${workKit.name}」模板创建成功，跳转到资料库`
         : '项目创建成功，跳转到资料库'
       showToast(msg, 'success')
-      navigate('/materials/p1')
+      navigate('/materials/618-hair-dryer')
     } else {
       setErrors(errs)
       setStep(goToErrorStep(errs))

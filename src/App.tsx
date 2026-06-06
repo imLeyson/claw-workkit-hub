@@ -67,10 +67,10 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/create" element={<CreateProject />} />
-              <Route path="/materials/:projectId" element={<MaterialLibrary />} />
-              <Route path="/tasks/:projectId" element={<TaskCards />} />
-              <Route path="/workspace/:projectId/:taskId" element={<Workspace />} />
-              <Route path="/report/:projectId" element={<Report />} />
+              <Route path="/materials/:projectSlug" element={<MaterialLibrary />} />
+              <Route path="/tasks/:projectSlug" element={<TaskCards />} />
+              <Route path="/workspace/:projectSlug/:taskId" element={<Workspace />} />
+              <Route path="/report/:projectSlug" element={<Report />} />
               <Route path="/archive" element={<Archive />} />
             </Routes>
           </main>

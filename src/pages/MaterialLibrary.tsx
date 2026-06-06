@@ -25,10 +25,10 @@ const typeIcons: Record<string, typeof FileSpreadsheet> = {
 }
 
 export default function MaterialLibrary() {
-  const { projectId } = useParams<{ projectId: string }>()
-  const project = mockProjects.find((p) => p.id === projectId)
-  const materials = mockMaterials[projectId ?? ''] ?? []
-  const tasks = mockTaskCards[projectId ?? ''] ?? []
+  const { projectSlug } = useParams<{ projectSlug: string }>()
+  const project = mockProjects.find((p) => p.slug === projectSlug)
+  const materials = mockMaterials[projectSlug ?? ''] ?? []
+  const tasks = mockTaskCards[projectSlug ?? ''] ?? []
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeQuickType, setActiveQuickType] = useState<string | null>(null)
@@ -42,7 +42,7 @@ export default function MaterialLibrary() {
           <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">资料库</h1>
           <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录的统一管理。</p>
         </div>
-        <Link to={`/tasks/${projectId}`} className="btn-primary">
+        <Link to={`/tasks/${projectSlug}`} className="btn-primary">
           下一步：任务卡 <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

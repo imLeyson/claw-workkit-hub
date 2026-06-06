@@ -1,5 +1,6 @@
 export interface Project {
   id: string
+  slug: string
   name: string
   description: string
   category: string // 商品类目

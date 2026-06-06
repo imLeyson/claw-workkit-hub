@@ -5,11 +5,11 @@ import { mockProjects, mockTaskCards, mockAIResults, roleLabels } from '../data/
 import { useToast } from '../components/Toast'
 
 export default function Report() {
-  const { projectId } = useParams<{ projectId: string }>()
+  const { projectSlug } = useParams<{ projectSlug: string }>()
   const navigate = useNavigate()
   const { showToast } = useToast()
-  const project = mockProjects.find((p) => p.id === projectId)
-  const tasks = mockTaskCards[projectId ?? ''] ?? []
+  const project = mockProjects.find((p) => p.slug === projectSlug)
+  const tasks = mockTaskCards[projectSlug ?? ''] ?? []
   const [activeTab, setActiveTab] = useState(tasks[0]?.role ?? 'merchandise')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -35,7 +35,7 @@ export default function Report() {
           <button onClick={() => setShowSaveDialog(true)} className="btn-primary">
             <Package className="w-4 h-4" /> 沉淀为复用工作包
           </button>
-          <Link to={`/tasks/${projectId}`} className="btn-ghost">返回任务卡</Link>
+          <Link to={`/tasks/${projectSlug}`} className="btn-ghost">返回任务卡</Link>
         </div>
       </div>
 
@@ -110,7 +110,7 @@ export default function Report() {
                   ) : (
                     <div className="card-surface rounded-[20px] p-6 text-center">
                       <p className="text-[13px] text-text-muted mb-2">尚未生成分析结果</p>
-                      <Link to={`/workspace/${projectId}/${task.id}`} className="text-[12px] font-medium text-accent-600 hover:text-accent-700">前往 AI 工作台 <ArrowRight className="w-3.5 h-3.5 inline" /></Link>
+                      <Link to={`/workspace/${projectSlug}/${task.id}`} className="text-[12px] font-medium text-accent-600 hover:text-accent-700">前往 AI 工作台 <ArrowRight className="w-3.5 h-3.5 inline" /></Link>
                     </div>
                   )}
                 </div>

@@ -5,11 +5,11 @@ import { mockProjects, mockTaskCards, mockAIResults, mockMaterials, roleLabels }
 import { useToast } from '../components/Toast'
 
 export default function Workspace() {
-  const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>()
-  const project = mockProjects.find((p) => p.id === projectId)
-  const task = mockTaskCards[projectId ?? '']?.find((t) => t.id === taskId)
+  const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
+  const project = mockProjects.find((p) => p.slug === projectSlug)
+  const task = mockTaskCards[projectSlug ?? '']?.find((t) => t.id === taskId)
   const result = mockAIResults[taskId ?? '']
-  const materials = mockMaterials[projectId ?? ''] ?? []
+  const materials = mockMaterials[projectSlug ?? ''] ?? []
   const { showToast } = useToast()
 
   const [submitted, setSubmitted] = useState(result?.submitted ?? false)
@@ -49,7 +49,7 @@ export default function Workspace() {
     <div className="max-w-4xl">
       <div className="flex items-start justify-between mb-12">
         <div>
-          <Link to={`/tasks/${projectId}`} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors flex items-center gap-1.5 mb-4">
+          <Link to={`/tasks/${projectSlug}`} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors flex items-center gap-1.5 mb-4">
             <ArrowLeft className="w-3.5 h-3.5" /> 返回任务列表
           </Link>
           <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">{task.title}</h1>
@@ -229,7 +229,7 @@ export default function Workspace() {
                     <p className="text-[14px] font-medium text-success">已提交到策略报告</p>
                     <p className="text-[12px] text-text-muted">该分析结果已汇入报告，可在报告页查看。</p>
                   </div>
-                  <Link to={`/tasks/${projectId}`} className="btn-ghost text-[12px]">继续其他任务 →</Link>
+                  <Link to={`/tasks/${projectSlug}`} className="btn-ghost text-[12px]">继续其他任务 →</Link>
                 </div>
               )}
             </div>

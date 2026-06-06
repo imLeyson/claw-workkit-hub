@@ -15,25 +15,25 @@ function isInFlow(pathname: string) {
   return ['/materials', '/tasks', '/workspace', '/report'].some((p) => pathname.startsWith(p))
 }
 
-function extractProjectId(pathname: string): string {
+function extractSlug(pathname: string): string {
   const parts = pathname.split('/').filter(Boolean)
   if (parts.length >= 2 && isInFlow(pathname)) return parts[1]
-  return 'p1'
+  return '618-hair-dryer'
 }
 
 export default function Sidebar() {
   const location = useLocation()
   const pathname = location.pathname
   const inFlow = isInFlow(pathname)
-  const pid = extractProjectId(pathname)
+  const slug = extractSlug(pathname)
   const [expanded, setExpanded] = useState(false)
 
   const links = [
     { to: '/', label: '看板', icon: LayoutDashboard, end: true },
     { to: '/create', label: '新建项目', icon: PlusCircle },
-    { to: `/materials/${pid}`, label: '资料库', icon: FolderOpen, flow: true },
-    { to: `/tasks/${pid}`, label: '任务卡', icon: LayoutGrid, flow: true },
-    { to: `/report/${pid}`, label: '报告', icon: BarChart3, flow: true },
+    { to: `/materials/${slug}`, label: '资料库', icon: FolderOpen, flow: true },
+    { to: `/tasks/${slug}`, label: '任务卡', icon: LayoutGrid, flow: true },
+    { to: `/report/${slug}`, label: '报告', icon: BarChart3, flow: true },
     { to: '/archive', label: '资产库', icon: Archive },
     { to: '/slides', label: '幻灯片', icon: Presentation },
   ]

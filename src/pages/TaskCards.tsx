@@ -12,10 +12,10 @@ const sourceColorMap: Record<string, string> = {
 }
 
 export default function TaskCards() {
-  const { projectId } = useParams<{ projectId: string }>()
-  const project = mockProjects.find((p) => p.id === projectId)
-  const [tasks, setTasks] = useState(mockTaskCards[projectId ?? ''] ?? [])
-  const materials = mockMaterials[projectId ?? ''] ?? []
+  const { projectSlug } = useParams<{ projectSlug: string }>()
+  const project = mockProjects.find((p) => p.slug === projectSlug)
+  const [tasks, setTasks] = useState(mockTaskCards[projectSlug ?? ''] ?? [])
+  const materials = mockMaterials[projectSlug ?? ''] ?? []
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -56,7 +56,7 @@ export default function TaskCards() {
             </button>
           )}
           {anyGenerated && (
-            <Link to={`/report/${projectId}`} className="btn-ghost">查看策略报告</Link>
+            <Link to={`/report/${projectSlug}`} className="btn-ghost">查看策略报告</Link>
           )}
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function TaskCards() {
                   <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
                 </div>
                 <Link
-                  to={`/workspace/${projectId}/${task.id}`}
+                  to={`/workspace/${projectSlug}/${task.id}`}
                   className={`text-[12px] font-medium flex items-center gap-1.5 transition-all ${
                     task.status === 'submitted' ? 'text-gray-400' : 'text-accent-600 group-hover:gap-2'
                   }`}

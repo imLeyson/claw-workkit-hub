@@ -14,7 +14,7 @@ import type {
 
 export const mockProjects: Project[] = [
   {
-    id: 'p1',
+    id: 'p1', slug: '618-hair-dryer',
     name: '618 高速吹风机竞品评论分析',
     description:
       '针对米家 H700、飞科 F8、徕芬 SE 三款高速吹风机的用户评论进行深度分析，输出用户痛点、卖点机会、客服 FAQ、直播话术与详情页优化建议。',
@@ -60,7 +60,7 @@ export const mockProjects: Project[] = [
     ],
   },
   {
-    id: 'p2',
+    id: 'p2', slug: '618-robot-vacuum',
     name: '618 扫地机器人竞品分析',
     description: '针对科沃斯、石头、追觅三家扫地机器人的用户反馈进行分析。',
     category: '智能家居',
@@ -77,7 +77,7 @@ export const mockProjects: Project[] = [
     ],
   },
   {
-    id: 'p3',
+    id: 'p3', slug: 'q2-mom-baby',
     name: 'Q2 母婴用品用户洞察',
     description: '分析母婴类目用户复购动机、安全焦虑与内容偏好。',
     category: '母婴用品',

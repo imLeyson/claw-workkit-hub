@@ -58,7 +58,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-3 gap-5 mb-20 stagger">
         {mockProjects.map((p) => (
-          <Link key={p.id} to={p.status === 'in_progress' ? `/materials/${p.id}` : p.status === 'completed' ? `/report/${p.id}` : `/tasks/${p.id}`} className="card-surface rounded-[24px] card-hover overflow-hidden group flex flex-col relative animate-fade-in-up">
+          <Link key={p.id} to={p.status === 'in_progress' ? `/materials/${p.slug}` : p.status === 'completed' ? `/report/${p.slug}` : `/tasks/${p.slug}`} className="card-surface rounded-[24px] card-hover overflow-hidden group flex flex-col relative animate-fade-in-up">
             {p.status === 'in_progress' && <div className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full bg-accent-500" />}
             <div className={`p-6 flex-1 ${p.status === 'in_progress' ? 'pt-7' : ''}`}>
               <div className="flex items-center gap-2 mb-3">
