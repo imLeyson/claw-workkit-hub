@@ -5,9 +5,9 @@ interface LogoProps {
 }
 
 export default function Logo({ variant = 'full', theme = 'light', size = 24 }: LogoProps) {
-  const accent = '#E07B4C'
-  const textColor = theme === 'light' ? '#1A1A1A' : '#FFFFFF'
-  const muted = theme === 'light' ? '#8A8A8A' : 'rgba(255,255,255,0.40)'
+  const primary = '#E07B4C'
+  const textColor = theme === 'light' ? '#1C1C1E' : '#FAFAF9'
+  const muted = theme === 'light' ? '#6B7280' : 'rgba(255,255,255,0.40)'
 
   const icon = (
     <svg
@@ -18,15 +18,15 @@ export default function Logo({ variant = 'full', theme = 'light', size = 24 }: L
       xmlns="http://www.w3.org/2000/svg"
       style={{ flexShrink: 0 }}
     >
-      {/* P stem — solid vertical bar */}
-      <rect x="6" y="5" width="5.5" height="22" rx="2.75" fill={accent} />
-      {/* P bowl — open arc on the right */}
+      {/* Stem — solid vertical module */}
+      <rect x="7" y="5" width="5" height="22" rx="2.5" fill={primary} />
+      {/* Bowl — open stroke container */}
       <path
-        d="M 11.5 5 C 22 5 26 12 26 16 C 26 20 22 27 11.5 27"
-        stroke={accent}
-        strokeWidth="5.5"
+        d="M 12 5 H 19 C 24 5 27 9 27 13.5 C 27 18 24 21 19 21"
+        stroke={primary}
+        strokeWidth="5"
         strokeLinecap="round"
-        fill="none"
+        strokeLinejoin="round"
       />
     </svg>
   )
@@ -38,7 +38,8 @@ export default function Logo({ variant = 'full', theme = 'light', size = 24 }: L
       {icon}
       <div className="flex flex-col leading-tight">
         <span className="text-[15px] font-semibold tracking-[-0.01em]" style={{ color: textColor }}>
-          PromoKit AI
+          PromoKit{' '}
+          <span style={{ color: primary }}>AI</span>
         </span>
         {size >= 20 && (
           <span className="text-[10px] tracking-[0.04em]" style={{ color: muted }}>
