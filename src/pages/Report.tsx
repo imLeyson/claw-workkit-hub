@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowRight, Package } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockAIResults, roleLabels } from '../data/mock'
+import { mockProjects, mockTaskCards, mockAIResults, roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
 import { useToast } from '../components/Toast'
 
 export default function Report() {
@@ -43,11 +43,7 @@ export default function Report() {
       <div className="mb-14">
         <span className="section-title">执行摘要</span>
         <div className="mt-5 space-y-4">
-          {[
-            '用户对风力和干发速度最敏感：三个竞品的高频好评均围绕「风速快、干发快」，差评集中在噪音、发热和售后。',
-            '噪音是最大共性痛点：62条高频评论提到噪音偏大，覆盖全部3个竞品。低噪音风道技术是可量化且极具传播力的核心卖点。',
-            '详情页信息层级需要重排：当前所有竞品详情页将技术参数放在第三屏之后，但用户评论显示「静音」「恒温」「售后」才是决策关键信息。',
-          ].map((item, i) => (
+          {(reportSummaries[project.id] || reportSummaries['p1']).map((item, i) => (
             <div key={i} className="flex items-start gap-4 text-[14px] text-text-secondary leading-relaxed">
               <span className="text-[28px] font-light text-accent-400 leading-none mt-0.5">{String(i + 1).padStart(2, '0')}</span>
               {item}
@@ -124,7 +120,7 @@ export default function Report() {
       <div className="mt-16">
         <span className="section-title">下一步执行清单</span>
         <div className="mt-5 space-y-3">
-          {['商品岗确认产品能力', '文案岗优化首屏标题', '客服岗补充售后话术', '设计岗重排详情页模块', '运营岗确认618主推策略'].map((item, i) => (
+          {(reportNextSteps[project.id] || reportNextSteps['p1']).map((item, i) => (
             <div key={i} className="flex items-center gap-4 text-[14px] text-text-secondary">
               <span className="text-[11px] font-medium text-text-muted w-5">{i + 1}.</span>
               {item}
