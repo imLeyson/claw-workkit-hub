@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#2563eb"/>
-  <text x="16" y="22" text-anchor="middle" fill="white" font-size="18" font-family="sans-serif">⚡</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="promokit-app-gradient" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7A2F"/>
+      <stop offset="1" stop-color="#E85F1E"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="40" height="40" rx="11" fill="url(#promokit-app-gradient)"/>
+  <path d="M13 12C13 10.9 13.9 10 15 10H29.1C35 10 39.2 14.2 39.2 19.7C39.2 25.2 35.05 29.3 29.1 29.3H25.1C24 29.3 23.1 28.4 23.1 27.3V24.15C23.1 23.05 24 22.15 25.1 22.15H28.4C30.75 22.15 32.2 20.9 32.2 19.15C32.2 17.35 30.75 16.15 28.4 16.15H13V12Z" fill="white"/>
+  <path d="M13 21.4C13 20.3 13.9 19.4 15 19.4H17.6C18.7 19.4 19.6 20.3 19.6 21.4V36C19.6 37.1 18.7 38 17.6 38H15C13.9 38 13 37.1 13 36V21.4Z" fill="white"/>
 </svg>

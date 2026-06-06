@@ -1,3 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <path d="M 7 6 C 7 4.9 7.9 4 9 4 H 19.8 C 25.4 4 29 7.4 29 12.6 C 29 17.8 25.4 21.2 19.8 21.2 H 15.2 V 25 C 15.2 26.7 13.9 28 12.2 28 H 9 C 7.9 28 7 27.1 7 26 V 6 Z M 15.2 9.4 V 15.8 H 19 C 21.7 15.8 23.4 14.6 23.4 12.6 C 23.4 10.6 21.7 9.4 19 9.4 H 15.2 Z" fill="#E07B4C" fill-rule="evenodd"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="promokit-logo-gradient" x1="7" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7A2F"/>
+      <stop offset="1" stop-color="#E85F1E"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 8C9 6.35 10.35 5 12 5H29.2C37.9 5 44 11.25 44 19.4C44 27.55 37.95 33.6 29.2 33.6H23.4C21.75 33.6 20.4 32.25 20.4 30.6V25.55C20.4 23.9 21.75 22.55 23.4 22.55H28.2C32.05 22.55 34.4 20.6 34.4 17.8C34.4 14.95 32.05 13.05 28.2 13.05H9V8Z" fill="url(#promokit-logo-gradient)"/>
+  <path d="M9 20.3C9 18.65 10.35 17.3 12 17.3H15.8C17.45 17.3 18.8 18.65 18.8 20.3V40C18.8 41.65 17.45 43 15.8 43H12C10.35 43 9 41.65 9 40V20.3Z" fill="url(#promokit-logo-gradient)"/>
 </svg>
