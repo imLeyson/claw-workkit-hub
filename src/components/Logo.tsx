@@ -18,26 +18,31 @@ export default function Logo({ variant = 'full', theme = 'light', size = 24 }: L
       xmlns="http://www.w3.org/2000/svg"
       style={{ flexShrink: 0 }}
     >
-      {/* Left vertical module — Work Kit structure */}
-      <rect x="7" y="6" width="6" height="21" rx="3" fill={primary} />
-      {/* Right bowl module — Promo flow container, separated from left */}
       <path
         d="
-          M 14.5 6
-          H 21
-          C 25.5 6 28 8.8 28 13
-          C 28 17.2 25.5 20 21 20
-          H 16.5
-          C 15.4 20 14.5 19.1 14.5 18
-          V 16.5
-          H 20.5
-          C 23.1 16.5 24.7 15.2 24.7 13
-          C 24.7 10.8 23.1 9.5 20.5 9.5
-          H 14.5
+          M 7 6
+          C 7 4.9 7.9 4 9 4
+          H 19.8
+          C 25.4 4 29 7.4 29 12.6
+          C 29 17.8 25.4 21.2 19.8 21.2
+          H 15.2
+          V 25
+          C 15.2 26.7 13.9 28 12.2 28
+          H 9
+          C 7.9 28 7 27.1 7 26
           V 6
+          Z
+
+          M 15.2 9.4
+          V 15.8
+          H 19
+          C 21.7 15.8 23.4 14.6 23.4 12.6
+          C 23.4 10.6 21.7 9.4 19 9.4
+          H 15.2
           Z
         "
         fill={primary}
+        fillRule="evenodd"
       />
     </svg>
   )
