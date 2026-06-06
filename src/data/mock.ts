@@ -110,6 +110,14 @@ export const mockReviewSamples: ReviewSample[] = [
   { id: 'rv10', competitorId: 'm3', text: '按键位置设计有问题，每次吹着吹着误触就关机了，太烦。', rating: 3, platform: '抖音商城', sentiment: 'negative', topic: '设计' },
   { id: 'rv11', competitorId: 'm3', text: '高速模式下声音很尖，像吹哨子一样，头皮发麻。', rating: 2, platform: '天猫', sentiment: 'negative', topic: '噪音' },
   { id: 'rv12', competitorId: 'm3', text: '六百块不算便宜了，但是跟戴森比确实很能打，就是按键这些小细节要优化。', rating: 4, platform: '京东', sentiment: 'neutral', topic: '性价比' },
+  { id: 'rv13', competitorId: 'm7', text: '用了一个月，避障功能偶尔会把拖鞋当成障碍物绕开，但地毯就撞上去。整体清洁效果还是满意的。', rating: 3, platform: '京东', sentiment: 'neutral', topic: '避障' },
+  { id: 'rv14', competitorId: 'm7', text: '耗材太贵了，尘袋和拖布两三个月就得换，一年下来耗材都快赶上机器价格了。', rating: 2, platform: '京东', sentiment: 'negative', topic: '耗材' },
+  { id: 'rv15', competitorId: 'm7', text: '扫地很干净，拖地功能也不错。基站自清洁很方便，不用自己洗拖布。解放双手神器！', rating: 5, platform: '天猫', sentiment: 'positive', topic: '清洁效果' },
+  { id: 'rv16', competitorId: 'm7', text: '大户型清扫一次电量不够用，得中途回充再继续。续航要是能再强一点就好了。', rating: 3, platform: '京东', sentiment: 'negative', topic: '续航' },
+  { id: 'rv17', competitorId: 'm8', text: '用了两周，发现实木地板上有轻微划痕，不确定是不是机器造成的，但之前没有。', rating: 2, platform: '天猫', sentiment: 'negative', topic: '划伤地板' },
+  { id: 'rv18', competitorId: 'm8', text: '地图经常丢失，已经重新建图三次了。大户型一次建图要跑一个小时，心累。', rating: 1, platform: '京东', sentiment: 'negative', topic: '地图' },
+  { id: 'rv19', competitorId: 'm8', text: '吸力真的强，猫毛狗毛全都吸干净了。APP 操作也很方便，可以分区设置不同的清洁模式。', rating: 5, platform: '天猫', sentiment: 'positive', topic: '吸力' },
+  { id: 'rv20', competitorId: 'm8', text: '避障比我家之前的科沃斯好太多了，数据线和小玩具都能识别绕开。就是价格偏高。', rating: 4, platform: '京东', sentiment: 'positive', topic: '避障' },
 ]
 
 // ─── Customer Queries ─────────────────────────────────────
@@ -293,7 +301,7 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
     {
       id: 't7', projectId: 'p2', role: 'copywriting', title: '卖点文案生成',
       description: '基于扫地机器人用户评论中的核心诉求，将清洁效果和智能体验转化为可传播的卖点文案。',
-      status: 'ready', assignedTo: '王文案',
+      status: 'generated', assignedTo: '王文案',
       inputMaterials: ['m7', 'm8'],
       promptPreview: '你是一位家电类目资深文案。请基于用户评论中反映的清洁效果和智能体验诉求，生成可量化的卖点文案。',
       outputFormat: '卖点文案库 · 用户原话摘录 · 标题方向',
@@ -303,7 +311,7 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
     {
       id: 't8', projectId: 'p2', role: 'operations', title: '618 大促策略汇总',
       description: '综合商品分析和文案输出，提炼扫地机器人的618主推策略和价格表达。',
-      status: 'pending', assignedTo: '张运营',
+      status: 'generated', assignedTo: '张运营',
       inputMaterials: ['m7', 'm9'],
       promptPreview: '你是家电运营负责人。综合商品和文案分析，为618扫地机器人大促提炼主推策略。',
       outputFormat: '大促策略摘要 · 执行清单',
@@ -494,6 +502,59 @@ export const mockAIResults: Record<string, AIResult> = {
       },
     ],
     generatedAt: '2026-06-04 10:00', submitted: true,
+  },
+  t7: {
+    id: 'r7', taskId: 't7', title: '卖点文案生成 - 扫地机器人',
+    sections: [
+      {
+        title: '用户原话 → 卖点文案 转译',
+        type: 'matrix',
+        headers: ['用户原话', '痛点类型', '可转化卖点文案', '适用场景'],
+        rows: [
+          ['"耗材太贵了，一年下来快赶上机器价格"', '成本焦虑', '「零耗材设计·一年省下¥800」', '详情页·直播间'],
+          ['"实木地板上有轻微划痕"', '安全焦虑', '「柔性橡胶滚刷·实木地板零划痕」', '详情页首屏'],
+          ['"地图经常丢失，重新建图三次"', '体验焦虑', '「LDS 激光导航·一次建图永久记忆」', '详情页·主图'],
+          ['"吸力真的强，猫毛全都吸干净了"', '清洁效果', '「5500Pa 飓风吸力·宠物家庭首选」', '主图·短视频'],
+        ],
+      },
+      {
+        title: '标题方向建议',
+        type: 'bullet',
+        items: [
+          '「避障」+「不伤地板」双卖点型：AI 视觉避障·柔性滚刷，智能到不碰家具、温柔到不伤地板',
+          '「吸力」性能型：5500Pa 飓风吸力，猫毛狗毛一吸而净 · 宠物家庭首选的扫地机器人',
+          '「省心」体验型：基站自清洁 + 零耗材设计，一年省下 ¥800 · 真正的解放双手',
+        ],
+      },
+    ],
+    generatedAt: '2026-06-05 09:00', submitted: false,
+  },
+  t8: {
+    id: 'r8', taskId: 't8', title: '618 大促策略 - 扫地机器人',
+    sections: [
+      {
+        title: '618 主推策略',
+        type: 'list',
+        items: [
+          '核心卖点：「AI 避障 + 不伤地板」双卖点，对标石头 G20 划地板差评和科沃斯 X2 避障误判',
+          '价格策略：618 到手价 ¥3,699（日常价 ¥3,999），卡位 ¥3,500-¥4,000 高端甜点区间',
+          '主推人群：28-40 岁有宠/有孩家庭，实木地板用户，追求智能家居体验',
+          '对比策略：详情页重点对比两竞品的避障实测和地板保护数据，用真实视频构建信任',
+        ],
+      },
+      {
+        title: '直播话术框架（五段式）',
+        type: 'bullet',
+        items: [
+          '开场（0-3min）：「618 最后 48 小时，今天给大家带来一台真正懂得避障的扫拖一体机——先看一段黑暗环境下避障挑战视频」',
+          '痛点共鸣（3-6min）：「有没有家人买了扫地机，结果回家发现地板划了一道道的？今天这款搭载柔性橡胶滚刷，实木地板也能放心用」',
+          '卖点演示（6-12min）：「左边这台某品牌，右边是我们的——大家看避障测试，数据线、拖鞋、宠物玩具全部精准绕开」',
+          '信任背书（12-15min）：「京东好评率 90.5%，天猫评分 4.6，用户真实评论和避障测试视频都在屏幕上滚动」',
+          '逼单（15-18min）：「618 专属价 3699，现在下单额外送一年耗材包+延保，只剩最后 150 单」',
+        ],
+      },
+    ],
+    generatedAt: '2026-06-06 11:00', submitted: false,
   },
   t9: {
     id: 'r9', taskId: 't9', title: '母婴用户痛点矩阵 - Q2 分析',
