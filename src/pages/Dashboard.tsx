@@ -35,10 +35,6 @@ export default function Dashboard() {
             进入 618 分析项目
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/create" className="btn-primary">
-            新建大促项目
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </div>
 
@@ -95,29 +91,11 @@ export default function Dashboard() {
       </div>
 
       {/* Insight */}
-      <div className="mb-20 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+      <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
         <div className="insight-block py-2 max-w-[560px]">
           <p className="text-[14px] leading-relaxed">
             把一次有效的大促分析流程，沉淀为团队可复用的 AI 工作包。
           </p>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="bg-gray-50 rounded-[24px] p-10 flex items-center justify-between animate-fade-in-up hover-lift" style={{ animationDelay: '400ms' }}>
-        <div>
-          <h3 className="text-[18px] font-medium text-text-main mb-1">准备好开始了吗？</h3>
-          <p className="text-[13px] text-text-muted">创建新的大促分析项目，或浏览已有的工作包模板。</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to="/create" className="btn-primary-filled">
-            新建分析项目
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link to="/archive" className="btn-ghost">
-            浏览资产库
-            <ArrowRight className="w-[14px] h-[14px]" />
-          </Link>
         </div>
       </div>
     </div>
