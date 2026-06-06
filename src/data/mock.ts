@@ -80,12 +80,13 @@ export const mockProjects: Project[] = [
   {
     id: 'p3', slug: 'q2-mom-baby',
     name: 'Q2 母婴用品用户洞察',
-    description: '分析母婴类目用户复购动机、安全焦虑与内容偏好。',
+    description: '分析 Babycare、全棉时代、好奇三大母婴品牌的用户评论与客服反馈，挖掘安全焦虑、复购动机与内容偏好。',
     category: '母婴用品',
     campaign: '日常分析',
     competitors: [
       { name: 'Babycare 纸尿裤', brand: 'Babycare', platform: '天猫', price: '¥89', reviewCount: 520, rating: 94.0, topIssues: ['尺寸偏小', '漏尿'] },
       { name: '全棉时代棉柔巾', brand: '全棉时代', platform: '京东', price: '¥59', reviewCount: 610, rating: 95.5, topIssues: ['掉絮', '厚度不足'] },
+      { name: '好奇金装纸尿裤', brand: '好奇 Huggies', platform: '天猫', price: '¥79', reviewCount: 445, rating: 92.3, topIssues: ['红屁股', '吸水性不足'] },
     ],
     status: 'completed',
     createdAt: '2026-04-15',
@@ -123,6 +124,15 @@ export const mockReviewSamples: ReviewSample[] = [
   { id: 'rv22', competitorId: 'm13', text: '拖地功能水箱水量控制不太稳定，有时候太湿有时候又干了。希望能固件升级优化。', rating: 3, platform: '京东', sentiment: 'negative', topic: '水量' },
   { id: 'rv23', competitorId: 'm13', text: '性价比真的高！不到四千块买到这么多功能，基站自清洁、自动集尘全都有。国货崛起了。', rating: 5, platform: '抖音商城', sentiment: 'positive', topic: '性价比' },
   { id: 'rv24', competitorId: 'm13', text: '外观设计很好看，白色机身很有质感。APP 操作也很流畅，家里老人也能轻松用。', rating: 5, platform: '京东', sentiment: 'positive', topic: '设计' },
+  { id: 'rv25', competitorId: 'm10', text: '宝宝用了两包，没有红屁股，吸收也很快。就是尺寸确实偏小，建议买大一码。', rating: 4, platform: '天猫', sentiment: 'neutral', topic: '尺寸' },
+  { id: 'rv26', competitorId: 'm10', text: '漏尿漏了两次，换得勤也没有用。客服说是尺码不对，换了大一号还是漏。不会再买了。', rating: 1, platform: '京东', sentiment: 'negative', topic: '漏尿' },
+  { id: 'rv27', competitorId: 'm10', text: '材质很柔软，宝宝皮肤没有过敏反应。已经回购第三次了，值得信赖的品牌。', rating: 5, platform: '天猫', sentiment: 'positive', topic: '材质安全' },
+  { id: 'rv28', competitorId: 'm11', text: '洗完脸一脸白絮，太尴尬了。说是100%棉但掉毛也太严重了，不如便宜的品牌。', rating: 2, platform: '京东', sentiment: 'negative', topic: '掉絮' },
+  { id: 'rv29', competitorId: 'm11', text: '很柔软，给宝宝擦脸很放心。厚度刚好，不会一扯就破。活动价囤了六包。', rating: 5, platform: '天猫', sentiment: 'positive', topic: '柔软' },
+  { id: 'rv30', competitorId: 'm11', text: '太薄了，擦一次要用两三张。性价比不太高，希望出厚款。包装倒是很方便抽取。', rating: 3, platform: '京东', sentiment: 'neutral', topic: '厚度' },
+  { id: 'rv31', competitorId: 'm14', text: '用了几天宝宝屁股就起红点了，赶紧换回之前的牌子。不知道是不是个体差异。', rating: 2, platform: '天猫', sentiment: 'negative', topic: '红屁股' },
+  { id: 'rv32', competitorId: 'm14', text: '吸水性确实不如广告说的那么强，尿了两次就感觉有点潮潮的。价格倒是比较实惠。', rating: 3, platform: '京东', sentiment: 'negative', topic: '吸水性' },
+  { id: 'rv33', competitorId: 'm14', text: '性价比很高，比进口品牌便宜不少。宝宝用着也没有不适，日常用足够了。', rating: 4, platform: '天猫', sentiment: 'positive', topic: '性价比' },
 ]
 
 // ─── Customer Queries ─────────────────────────────────────
@@ -136,6 +146,10 @@ export const mockCustomerQueries: CustomerQuery[] = [
   { id: 'cq6', question: '收到就坏了怎么退？有没有上门取件？', category: 'after_sale', frequency: 'high', riskLevel: 'high' },
   { id: 'cq7', question: '用了两个月风力变小了能保修吗？', category: 'after_sale', frequency: 'medium', riskLevel: 'caution' },
   { id: 'cq8', question: '退货运费谁出？七天无理由退货包运费吗？', category: 'after_sale', frequency: 'high', riskLevel: 'high' },
+  { id: 'cq9', question: '宝宝过敏体质能用这款纸尿裤吗？有没有致敏成分？', category: 'pre_sale', frequency: 'high', riskLevel: 'high' },
+  { id: 'cq10', question: '纸尿裤会不会起坨断层？一晚上不换可以吗？', category: 'pre_sale', frequency: 'high', riskLevel: 'normal' },
+  { id: 'cq11', question: '棉柔巾真的不掉絮吗？宝宝擦脸会不会吃到棉絮？', category: 'pre_sale', frequency: 'medium', riskLevel: 'caution' },
+  { id: 'cq12', question: '用了之后宝宝红屁股了怎么办？能退款吗？', category: 'after_sale', frequency: 'medium', riskLevel: 'high' },
 ]
 
 // ─── Copy Snippets ────────────────────────────────────────
@@ -145,6 +159,9 @@ export const mockCopySnippets: CopySnippet[] = [
   { id: 'cp2', type: 'livestream', content: '姐妹们看我的头发！刚洗完就吹成这样，不打结不毛躁。今天618只要299，再送磁吸风嘴一个！', source: '飞科 F8 直播回放' },
   { id: 'cp3', type: 'xiaohongshu', content: '徕芬SE真实使用感受：颜值拉满，吹完头发很顺，但是按键太容易误触了。适合发量少到中等的姐妹。#高速吹风机测评', source: '小红书博主' },
   { id: 'cp4', type: 'campaign', content: '618年中大促：个护小家电专场。高速吹风机到手价¥249起，晒单返现20元。限时赠磁吸风嘴+收纳袋。', source: '往期618活动方案' },
+  { id: 'cp5', type: 'detail_page', content: '医护级安全认证·0添加0致敏·3D防漏隔边设计。日本住友高分子吸水树脂，不起坨不断层，宝宝安睡一整晚。', source: 'Babycare 详情页' },
+  { id: 'cp6', type: 'detail_page', content: '100%新疆长绒棉·高压水刺工艺·不掉絮不起毛。干湿两用，擦脸擦手擦屁屁，一张搞定。', source: '全棉时代 详情页' },
+  { id: 'cp7', type: 'xiaohongshu', content: '当了妈才知道，选纸尿裤要看这三点：材质、吸收速度、防漏设计。Babycare 这三项全满足，宝宝再也没有红过屁股。#母婴好物推荐', source: '小红书博主' },
 ]
 
 // ─── Materials ────────────────────────────────────────────
@@ -241,6 +258,13 @@ export const mockMaterials: Record<string, Material[]> = {
       uploadedAt: '2026-04-10 09:30', aiStatus: 'readable', sensitivity: 'sensitive', responsibleRole: 'customer_service',
       referencedBy: ['t11'],
     },
+    {
+      id: 'm14', projectId: 'p3', type: 'review', label: '好奇金装纸尿裤用户评论',
+      fileName: 'huggies-diapers-reviews.xlsx', content: '天猫平台445条评论，好评率92.3%，差评集中在红屁股和吸水性不足。',
+      uploadedAt: '2026-04-11 09:00', aiStatus: 'readable', sensitivity: 'normal', responsibleRole: 'merchandise',
+      referencedBy: ['t9', 't10'], reviewCount: 445, rating: 92.3, platform: '天猫', price: '¥79',
+      topIssues: ['红屁股', '吸水性不足'],
+    },
   ],
 };
 
@@ -336,8 +360,8 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
       id: 't9', projectId: 'p3', role: 'merchandise', title: '母婴用户痛点矩阵',
       description: '基于Babycare纸尿裤和全棉时代棉柔巾的用户评论，构建母婴品类用户痛点矩阵。',
       status: 'submitted', assignedTo: '李商品',
-      inputMaterials: ['m10', 'm11'],
-      promptPreview: '你是一位母婴品类选品专家。请基于用户评论，构建母婴用品的用户痛点矩阵和选品建议。',
+      inputMaterials: ['m10', 'm11', 'm14'],
+      promptPreview: '你是一位母婴品类选品专家。请基于Babycare、全棉时代和好奇的用户评论，构建母婴用品的用户痛点矩阵和选品建议。',
       outputFormat: '用户痛点矩阵 · 选品建议',
       judgmentCriteria: ['痛点分类清晰', '建议有数据支撑'],
       sourceTags: ['竞品评论'],
@@ -346,8 +370,8 @@ export const mockTaskCards: Record<string, TaskCard[]> = {
       id: 't10', projectId: 'p3', role: 'copywriting', title: '商品卖点机会分析',
       description: '提取母婴用户评论中的安全焦虑和复购动机，转化为卖点机会。',
       status: 'submitted', assignedTo: '王文案',
-      inputMaterials: ['m10', 'm11'],
-      promptPreview: '你是一位母婴品牌文案。请基于用户评论中反映的安全焦虑和复购动机，提炼可传播的卖点机会。',
+      inputMaterials: ['m10', 'm11', 'm14'],
+      promptPreview: '你是一位母婴品牌文案。请基于Babycare、全棉时代和好奇的用户评论中反映的安全焦虑和复购动机，提炼可传播的卖点机会。',
       outputFormat: '卖点机会清单 · 标题方向',
       judgmentCriteria: ['卖点是否抓住安全焦虑', '是否可传播'],
       sourceTags: ['竞品评论'],
@@ -578,18 +602,21 @@ export const mockAIResults: Record<string, AIResult> = {
         type: 'matrix',
         headers: ['痛点', '频次', '严重度', '竞品覆盖', '机会方向'],
         rows: [
-          ['尺寸偏小', '高 (67次)', '严重', '1/2', '推出「分龄尺码指南」'],
-          ['漏尿/侧漏', '高 (52次)', '严重', '1/2', '强化「防漏隔边」设计'],
-          ['掉絮/起毛', '中 (28次)', '中等', '1/2', '强调「不掉絮」材质认证'],
+          ['尺寸偏小', '高 (89次)', '严重', '2/3', '推出「分龄尺码指南」或试用装'],
+          ['漏尿/侧漏', '高 (52次)', '严重', '1/3', '强化「3D 防漏隔边」设计'],
+          ['红屁股/过敏', '中 (38次)', '严重', '2/3', '医护级安全认证 + 敏感肌适用'],
+          ['掉絮/起毛', '中 (28次)', '中等', '1/3', '强调「不掉絮」高压水刺工艺'],
+          ['吸水性不足', '中 (22次)', '中等', '1/3', '突出「高分子吸水树脂」技术'],
         ],
       },
       {
-        title: '复购动机分析',
+        title: '复购动机与竞品对比',
         type: 'list',
         items: [
-          '安全信任是第一决策因素：材质安全认证的展示直接影响转化率',
-          '尺寸合适度是复购核心：建议增加试用装或分龄推荐功能',
-          '品牌公众号内容的种草转化效率高于短视频 2.3 倍',
+          '安全信任是第一决策因素：材质安全认证的展示直接影响转化率，Babycare 凭借医护认证领先',
+          '尺寸合适度是复购核心：Babycare 和好奇都被反馈尺寸偏小，建议增加试用装或分龄推荐功能',
+          '品牌公众号内容的种草转化效率高于短视频 2.3 倍，全棉时代的内容营销值得参考',
+          '好奇价格有优势但红屁股差评多，需要强化透气性和吸水性数据对比',
         ],
       },
     ],
@@ -606,6 +633,8 @@ export const mockAIResults: Record<string, AIResult> = {
           ['"穿了半天就漏了"', '安全焦虑', '「3D 防漏隔边，12小时不漏」', '详情页首屏'],
           ['"宝宝用了起红点"', '材质焦虑', '「0添加·医护级认证·敏感肌可用」', '详情页·主图'],
           ['"洗完脸一脸棉絮"', '品质焦虑', '「不掉絮·高压水刺工艺·100%棉」', '详情页材质区'],
+          ['"用了几天屁股就起红点了"', '安全焦虑', '「医护级认证·0致敏原·敏感肌专研」', '详情页首屏·主图'],
+          ['"吸水性不如广告说的那么强"', '功效焦虑', '「500ml 瞬吸·一整晚干爽」', '详情页·对比区'],
         ],
       },
     ],
