@@ -30,12 +30,6 @@ export default function Dashboard() {
         <p className="text-[14px] text-text-muted leading-relaxed max-w-[460px] mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           围绕竞品评论、商品卖点、客服反馈和历史文案，生成可复用的大促分析流程。覆盖 {project.competitors.length} 个竞品品牌、{project.competitors.reduce((s, c) => s + c.reviewCount, 0)} 条用户评论。
         </p>
-        <div className="flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <Link to={`/materials/${project.id}`} className="btn-primary-filled hover-lift">
-            进入 618 分析项目
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
       </div>
 
       {/* Stats row */}
