@@ -154,7 +154,139 @@ const slides = [
       </div>
     ),
   },
-  // 5. Design process mapping
+  // 5. Workflow
+  {
+    theme: 'dark' as const,
+    content: (
+      <div className="max-w-3xl w-full">
+        <SlideLabel text="The Workflow" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-white mb-10 leading-tight animate-fade-in-up">
+          从创建到沉淀<br />完整闭环
+        </h2>
+        <div className="flex items-start gap-0 stagger mb-12">
+          {[
+            { step: '01', label: '创建项目', sub: '设定目标' },
+            { step: '02', label: '导入资料', sub: '上传数据' },
+            { step: '03', label: '生成任务', sub: 'AI 拆解' },
+            { step: '04', label: 'AI 分析', sub: '结构化输出' },
+            { step: '05', label: '汇总报告', sub: '跨岗整合' },
+            { step: '06', label: '沉淀复用', sub: 'Work Kit' },
+          ].map((item, i, arr) => (
+            <div key={item.step} className="flex-1 flex items-start animate-fade-in-up">
+              <div className="text-center flex-1">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 transition-colors ${i === 5 ? 'bg-accent-500 text-white' : 'bg-white/8 text-white/60'}`}>
+                  <span className="text-[15px] font-semibold">{item.step}</span>
+                </div>
+                <div className="text-[13px] text-white/80 font-medium">{item.label}</div>
+                <div className="text-[11px] text-white/30 mt-1">{item.sub}</div>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="pt-6 -ml-1 mr-1">
+                  <ArrowRight className="w-3 h-3 text-white/15" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="bg-white/5 rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+          <p className="text-[15px] text-white/60">
+            <span className="text-accent-400 font-medium">关键</span>：第 6 步沉淀的 Work Kit，让第 1 步从"从零开始"变成<span className="text-white/90">「几分钟启动」</span>。
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  // 6. Work Kit deep dive
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="max-w-2xl w-full">
+        <SlideLabel text="The Differentiator" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">
+          不保存结果<br />只保存流程
+        </h2>
+        <p className="text-[15px] text-text-muted mb-8 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          Work Kit 保存的是<span className="text-accent-600 font-medium">资料结构、任务模板、Prompt 和报告格式</span>，而非单次结果。
+        </p>
+        <div className="bg-white rounded-[24px] p-7 border border-border-default mb-6 animate-scale-in shadow-sm" style={{ animationDelay: '200ms' }}>
+          {/* mini Work Kit card */}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Repeat className="w-5 h-5 text-accent-500" /></div>
+              <div>
+                <div className="text-[15px] font-medium text-text-main">618 竞品评论分析 Work Kit</div>
+                <div className="text-[11px] text-text-muted">v1.2 · 复用 3 次</div>
+              </div>
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-600 font-medium">可复用</span>
+          </div>
+          <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+            {['v1.0 · 初始模板', 'v1.1 · 客服增强', 'v1.2 · 首屏优化'].map((v, i, arr) => (
+              <div key={v} className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] text-text-muted whitespace-nowrap">{v}</span>
+                {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300 shrink-0" />}
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            {['资料结构 · 4 类数据', '岗位配置 · 5 个角色', '任务模板 · 5 个 Prompt', '报告格式 · 固定输出'].map((t) => (
+              <div key={t} className="bg-gray-50 rounded-lg px-3 py-2 text-text-secondary">{t}</div>
+            ))}
+          </div>
+        </div>
+        <p className="text-[14px] text-text-secondary text-center animate-fade-in-up leading-relaxed" style={{ animationDelay: '400ms' }}>
+          每次大促后迭代，版本持续积累——<span className="text-accent-600 font-medium">团队经验不随人员变动而丢失</span>。
+        </p>
+      </div>
+    ),
+  },
+  // 7. Before/After
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="max-w-2xl w-full">
+        <SlideLabel text="The Impact" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-10 leading-tight animate-fade-in-up">
+          Before & After
+        </h2>
+        <div className="grid grid-cols-2 gap-6 stagger">
+          <div className="animate-fade-in-up bg-gray-50 rounded-2xl p-6 border border-border-default">
+            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted mb-4">之前</div>
+            <div className="space-y-3">
+              {['各岗位各自整理资料', '分析口径不统一', '结果无法复用', '每次大促从零开始'].map((t) => (
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted">
+                  <span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span>
+                  {t}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="animate-fade-in-up bg-accent-50 rounded-2xl p-6 border border-accent-200">
+            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-accent-600 mb-4">使用 PromoKit AI</div>
+            <div className="space-y-3">
+              {['统一资料库 · 同源分析', '各岗位结构化 AI 输出', '一键沉淀为 Work Kit', '下次大促几分钟启动'].map((t) => (
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary">
+                  <span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span>
+                  {t}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-10 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <div className="inline-flex items-center gap-4 bg-sidebar rounded-2xl px-6 py-4">
+            <Clock className="w-5 h-5 text-accent-400" />
+            <span className="text-[15px] text-white/70">启动耗时</span>
+            <span className="text-[24px] font-light text-white mx-2">3h → 5min</span>
+            <span className="w-px h-5 bg-white/10" />
+            <span className="text-[15px] text-white/70">复用率</span>
+            <span className="text-[24px] font-light text-accent-400 mx-2">0 → 100%</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  // 8. Design process mapping
   {
     theme: 'light' as const,
     content: (
@@ -365,139 +497,7 @@ const slides = [
       </div>
     ),
   },
-  // 5. Workflow
-  {
-    theme: 'dark' as const,
-    content: (
-      <div className="max-w-3xl w-full">
-        <SlideLabel text="The Workflow" />
-        <h2 className="text-[40px] font-light tracking-[-0.02em] text-white mb-10 leading-tight animate-fade-in-up">
-          从创建到沉淀<br />完整闭环
-        </h2>
-        <div className="flex items-start gap-0 stagger mb-12">
-          {[
-            { step: '01', label: '创建项目', sub: '设定目标' },
-            { step: '02', label: '导入资料', sub: '上传数据' },
-            { step: '03', label: '生成任务', sub: 'AI 拆解' },
-            { step: '04', label: 'AI 分析', sub: '结构化输出' },
-            { step: '05', label: '汇总报告', sub: '跨岗整合' },
-            { step: '06', label: '沉淀复用', sub: 'Work Kit' },
-          ].map((item, i, arr) => (
-            <div key={item.step} className="flex-1 flex items-start animate-fade-in-up">
-              <div className="text-center flex-1">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 transition-colors ${i === 5 ? 'bg-accent-500 text-white' : 'bg-white/8 text-white/60'}`}>
-                  <span className="text-[15px] font-semibold">{item.step}</span>
-                </div>
-                <div className="text-[13px] text-white/80 font-medium">{item.label}</div>
-                <div className="text-[11px] text-white/30 mt-1">{item.sub}</div>
-              </div>
-              {i < arr.length - 1 && (
-                <div className="pt-6 -ml-1 mr-1">
-                  <ArrowRight className="w-3 h-3 text-white/15" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="bg-white/5 rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-          <p className="text-[15px] text-white/60">
-            <span className="text-accent-400 font-medium">关键</span>：第 6 步沉淀的 Work Kit，让第 1 步从"从零开始"变成<span className="text-white/90">「几分钟启动」</span>。
-          </p>
-        </div>
-      </div>
-    ),
-  },
-  // 6. Work Kit deep dive
-  {
-    theme: 'light' as const,
-    content: (
-      <div className="max-w-2xl w-full">
-        <SlideLabel text="The Differentiator" />
-        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">
-          不保存结果<br />只保存流程
-        </h2>
-        <p className="text-[15px] text-text-muted mb-8 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          Work Kit 保存的是<span className="text-accent-600 font-medium">资料结构、任务模板、Prompt 和报告格式</span>，而非单次结果。
-        </p>
-        <div className="bg-white rounded-[24px] p-7 border border-border-default mb-6 animate-scale-in shadow-sm" style={{ animationDelay: '200ms' }}>
-          {/* mini Work Kit card */}
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Repeat className="w-5 h-5 text-accent-500" /></div>
-              <div>
-                <div className="text-[15px] font-medium text-text-main">618 竞品评论分析 Work Kit</div>
-                <div className="text-[11px] text-text-muted">v1.2 · 复用 3 次</div>
-              </div>
-            </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-600 font-medium">可复用</span>
-          </div>
-          <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
-            {['v1.0 · 初始模板', 'v1.1 · 客服增强', 'v1.2 · 首屏优化'].map((v, i, arr) => (
-              <div key={v} className="flex items-center gap-2 shrink-0">
-                <span className="text-[11px] text-text-muted whitespace-nowrap">{v}</span>
-                {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300 shrink-0" />}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            {['资料结构 · 4 类数据', '岗位配置 · 5 个角色', '任务模板 · 5 个 Prompt', '报告格式 · 固定输出'].map((t) => (
-              <div key={t} className="bg-gray-50 rounded-lg px-3 py-2 text-text-secondary">{t}</div>
-            ))}
-          </div>
-        </div>
-        <p className="text-[14px] text-text-secondary text-center animate-fade-in-up leading-relaxed" style={{ animationDelay: '400ms' }}>
-          每次大促后迭代，版本持续积累——<span className="text-accent-600 font-medium">团队经验不随人员变动而丢失</span>。
-        </p>
-      </div>
-    ),
-  },
-  // 7. Before/After
-  {
-    theme: 'light' as const,
-    content: (
-      <div className="max-w-2xl w-full">
-        <SlideLabel text="The Impact" />
-        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-10 leading-tight animate-fade-in-up">
-          Before & After
-        </h2>
-        <div className="grid grid-cols-2 gap-6 stagger">
-          <div className="animate-fade-in-up bg-gray-50 rounded-2xl p-6 border border-border-default">
-            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted mb-4">之前</div>
-            <div className="space-y-3">
-              {['各岗位各自整理资料', '分析口径不统一', '结果无法复用', '每次大促从零开始'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted">
-                  <span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span>
-                  {t}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="animate-fade-in-up bg-accent-50 rounded-2xl p-6 border border-accent-200">
-            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-accent-600 mb-4">使用 PromoKit AI</div>
-            <div className="space-y-3">
-              {['统一资料库 · 同源分析', '各岗位结构化 AI 输出', '一键沉淀为 Work Kit', '下次大促几分钟启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary">
-                  <span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span>
-                  {t}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="mt-10 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <div className="inline-flex items-center gap-4 bg-sidebar rounded-2xl px-6 py-4">
-            <Clock className="w-5 h-5 text-accent-400" />
-            <span className="text-[15px] text-white/70">启动耗时</span>
-            <span className="text-[24px] font-light text-white mx-2">3h → 5min</span>
-            <span className="w-px h-5 bg-white/10" />
-            <span className="text-[15px] text-white/70">复用率</span>
-            <span className="text-[24px] font-light text-accent-400 mx-2">0 → 100%</span>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  // 8. CTA
+  // 9. CTA
   {
     theme: 'dark' as const,
     content: (
