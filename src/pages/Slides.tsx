@@ -1,25 +1,105 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, FileText, MessageSquareText, Palette, Repeat, ChevronLeft, ChevronRight, Clock, Users, TrendingUp, Target, Search, Network, LayoutDashboard, Database, ClipboardList, Bot, Box, FolderOpen, FileBarChart } from 'lucide-react'
 import Logo from '../components/Logo'
 
-/* ── Decorative dots grid ── */
-function Decors({ theme }: { theme: 'light' | 'dark' }) {
-  const dots = Array.from({ length: 12 }, (_, i) => ({
-    cx: 8 + (i * 7.5) % 88,
-    cy: 12 + (i * 11) % 82,
-    r: i % 3 === 0 ? 1.5 : 1,
-    opacity: theme === 'dark' ? 0.06 + (i % 3) * 0.02 : 0.04 + (i % 3) * 0.02,
-  }))
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <circle cx="94" cy="6" r="18" fill={theme === 'dark' ? 'rgba(224,123,76,0.08)' : 'rgba(224,123,76,0.05)'} />
-      <circle cx="5" cy="92" r="22" fill={theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.012)'} />
-      {dots.map((d, i) => (
-        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} fill={theme === 'dark' ? `rgba(255,255,255,${d.opacity})` : `rgba(0,0,0,${d.opacity})`} />
-      ))}
-    </svg>
-  )
+/* ── Background system ── */
+function Decors({ theme, variant }: { theme: 'light' | 'dark'; variant: number }) {
+  const patterns: Record<number, React.ReactNode> = {
+    // Cover / CTA — centered radial glow
+    0: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="45%"><stop offset="0%" stopColor={theme === 'dark' ? 'rgba(224,123,76,0.15)' : 'rgba(224,123,76,0.08)'} /><stop offset="100%" stopColor="transparent" /></radialGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#glow)" />
+        {/* Subtle ring */}
+        <circle cx="50" cy="45" r="28" fill="none" stroke={theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'} strokeWidth="0.3" />
+        <circle cx="50" cy="45" r="42" fill="none" stroke={theme === 'dark' ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.02)'} strokeWidth="0.2" />
+      </svg>
+    ),
+    // Problem — scattered dots lower-left
+    1: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <radialGradient id="accent1" cx="12%" cy="88%"><stop offset="0%" stopColor="rgba(224,123,76,0.06)" /><stop offset="100%" stopColor="transparent" /></radialGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#accent1)" />
+        {[[8,92],[14,88],[20,94],[10,82],[18,90]].map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r={i === 0 ? 1.8 : 1} fill="rgba(224,123,76,0.12)" />
+        ))}
+        {/* Fine line top-right */}
+        <line x1="82" y1="12" x2="92" y2="12" stroke="rgba(0,0,0,0.04)" strokeWidth="0.4" strokeLinecap="round" />
+        <line x1="85" y1="16" x2="90" y2="16" stroke="rgba(0,0,0,0.03)" strokeWidth="0.3" strokeLinecap="round" />
+      </svg>
+    ),
+    // Cost — large soft accent shape
+    2: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <radialGradient id="accent2" cx="90%" cy="10%"><stop offset="0%" stopColor="rgba(224,123,76,0.08)" /><stop offset="100%" stopColor="transparent" /></radialGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#accent2)" />
+        <rect x="86" y="8" width="8" height="8" rx="2" fill="none" stroke="rgba(224,123,76,0.1)" strokeWidth="0.5" />
+        <rect x="88" y="10" width="4" height="4" rx="1" fill="none" stroke="rgba(224,123,76,0.08)" strokeWidth="0.3" />
+      </svg>
+    ),
+    // Solution — grid pattern
+    3: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
+            <circle cx="4" cy="4" r="0.4" fill="rgba(224,123,76,0.08)" />
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+        <defs><radialGradient id="accent3" cx="5%" cy="5%"><stop offset="0%" stopColor="rgba(224,123,76,0.05)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
+        <rect width="100" height="100" fill="url(#accent3)" />
+      </svg>
+    ),
+    // Workflow (dark) — architectural lines
+    4: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs><radialGradient id="glow4" cx="48%" cy="40%"><stop offset="0%" stopColor="rgba(224,123,76,0.10)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
+        <rect width="100" height="100" fill="url(#glow4)" />
+        {/* Subtle horizontal lines */}
+        <line x1="10" y1="28" x2="40" y2="28" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" strokeLinecap="round" />
+        <line x1="60" y1="72" x2="90" y2="72" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" strokeLinecap="round" />
+        {/* Dot grid */}
+        {[15,25,35,55,65,75,85].map((x) => [35,45,55,65].map((y) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r="0.3" fill="rgba(255,255,255,0.04)" />
+        )))}
+      </svg>
+    ),
+    // Differentiator — elegant arcs
+    5: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <circle cx="92" cy="8" r="16" fill="none" stroke="rgba(224,123,76,0.06)" strokeWidth="0.6" />
+        <circle cx="92" cy="8" r="20" fill="none" stroke="rgba(224,123,76,0.04)" strokeWidth="0.4" />
+        <circle cx="8" cy="88" r="12" fill="none" stroke="rgba(0,0,0,0.025)" strokeWidth="0.5" />
+        <line x1="15" y1="18" x2="28" y2="18" stroke="rgba(0,0,0,0.04)" strokeWidth="0.5" strokeLinecap="round" />
+      </svg>
+    ),
+    // Before/After — dual tone
+    6: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <rect x="0" y="0" width="48" height="100" fill="rgba(0,0,0,0.008)" />
+        <rect x="50" y="0" width="50" height="100" fill="rgba(224,123,76,0.02)" />
+        <line x1="49" y1="0" x2="49" y2="100" stroke="rgba(224,123,76,0.08)" strokeWidth="0.3" strokeDasharray="1 2" />
+      </svg>
+    ),
+    // Design process — clean + accent top-right
+    7: (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs><radialGradient id="accent7" cx="95%" cy="5%"><stop offset="0%" stopColor="rgba(224,123,76,0.04)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
+        <rect width="100" height="100" fill="url(#accent7)" />
+        <line x1="0" y1="12" x2="8" y2="12" stroke="rgba(224,123,76,0.12)" strokeWidth="0.6" strokeLinecap="round" />
+        <line x1="92" y1="94" x2="98" y2="94" stroke="rgba(0,0,0,0.04)" strokeWidth="0.4" strokeLinecap="round" />
+      </svg>
+    ),
+  }
+
+  return patterns[variant] || null
 }
 
 /* ── Section label ── */
@@ -32,7 +112,6 @@ function Label({ text }: { text: string }) {
   )
 }
 
-/* ── Stat card for data emphasis ── */
 function StatCard({ icon: Icon, value, label, sub, accent }: { icon: any; value: string; label: string; sub: string; accent?: boolean }) {
   return (
     <div className={`animate-fade-in-up rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 ${accent ? 'bg-accent-500 text-white shadow-lg shadow-accent-500/20' : 'bg-white border border-border-default hover:shadow-md'}`}>
@@ -48,7 +127,7 @@ function StatCard({ icon: Icon, value, label, sub, accent }: { icon: any; value:
 const slides = [
   /* 1 ── Cover */
   {
-    theme: 'dark' as const,
+    theme: 'dark' as const, bgVariant: 0,
     content: (
       <div className="flex flex-col items-center text-center max-w-2xl">
         <div className="animate-scale-in mb-10">
@@ -62,8 +141,7 @@ const slides = [
           电商大促 AI 工作包系统
         </p>
         <p className="text-[15px] text-white/28 max-w-md leading-relaxed animate-fade-in-up" style={{ animationDelay: '250ms' }}>
-          把一次有效的大促分析流程
-          <br />沉淀为团队可复用的 AI 工作包
+          把一次有效的大促分析流程<br />沉淀为团队可复用的 AI 工作包
         </p>
         <div className="flex items-center gap-4 mt-16 text-[11px] text-white/14 animate-fade-in" style={{ animationDelay: '500ms' }}>
           <span>618</span><span className="text-white/08">·</span><span>双 11</span><span className="text-white/08">·</span><span>新品上架</span><span className="text-white/08">·</span><span>爆品复盘</span>
@@ -74,7 +152,7 @@ const slides = [
 
   /* 2 ── Problem */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 1,
     content: (
       <div className="max-w-[680px] w-full">
         <Label text="Why PromoKit AI" />
@@ -84,7 +162,6 @@ const slides = [
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           五个岗位各自收集信息、各自分析、各自输出——<span className="text-accent-600 font-medium">口径不一，结果难以对齐</span>。
         </p>
-
         <div className="grid grid-cols-2 gap-3 mb-8 stagger">
           {[
             { role: '运营', stat: '3h+', desc: '每次手动整理竞品评论表格', icon: Clock },
@@ -104,7 +181,6 @@ const slides = [
             </div>
           ))}
         </div>
-
         <div className="bg-sidebar rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '350ms' }}>
           <p className="text-[15px] text-white/70 leading-relaxed">
             结果：下次大促，<span className="text-accent-400 font-semibold">所有人从零开始再来一遍</span>。
@@ -116,7 +192,7 @@ const slides = [
 
   /* 3 ── Cost */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 2,
     content: (
       <div className="max-w-[680px] w-full">
         <Label text="The Hidden Cost" />
@@ -126,13 +202,11 @@ const slides = [
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           每次大促的分析流程、判断标准和输出模板，都只存在个人脑子里。<span className="text-accent-600 font-medium">人一走，经验就没了</span>。
         </p>
-
         <div className="grid grid-cols-3 gap-4 mb-10 stagger">
           <StatCard icon={Clock} value="12h+" label="每次大促重复耗时" sub="整理资料 + 分析 + 汇总报告" accent />
           <StatCard icon={Users} value="5 岗位" label="各自独立作战" sub="分析口径与输出格式不统一" />
           <StatCard icon={TrendingUp} value="0 积累" label="经验无法沉淀" sub="上次分析成果下次用不上" />
         </div>
-
         <p className="text-[14px] text-text-muted text-center animate-fade-in-up leading-relaxed" style={{ animationDelay: '350ms' }}>
           团队并不缺 AI 工具——<span className="text-accent-600 font-semibold">缺的是把 AI 分析流程化、资产化的系统</span>。
         </p>
@@ -142,7 +216,7 @@ const slides = [
 
   /* 4 ── Solution */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 3,
     content: (
       <div className="max-w-[720px] w-full">
         <Label text="The Solution" />
@@ -152,7 +226,6 @@ const slides = [
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           同一份数据源 → 五个岗位协同分析 → 结构化输出 → <span className="text-accent-600 font-semibold">一键沉淀为可复用工作包</span>
         </p>
-
         <div className="grid grid-cols-3 gap-3 stagger">
           {[
             { num: '01', title: '评论挖掘', desc: '自动聚类用户高频痛点，构建分析矩阵' },
@@ -175,7 +248,7 @@ const slides = [
 
   /* 5 ── Workflow (dark) */
   {
-    theme: 'dark' as const,
+    theme: 'dark' as const, bgVariant: 4,
     content: (
       <div className="max-w-[760px] w-full">
         <div className="flex items-center gap-3 mb-10 animate-fade-in-up">
@@ -185,7 +258,6 @@ const slides = [
         <h2 className="text-[44px] font-light tracking-[-0.02em] text-white mb-12 leading-[1.15] animate-fade-in-up">
           六步完成闭环<br />最后一步才是关键
         </h2>
-
         <div className="flex items-start gap-0 stagger mb-12">
           {[
             { step: '01', label: '创建项目', sub: '设定目标与范围' },
@@ -209,7 +281,6 @@ const slides = [
             </div>
           ))}
         </div>
-
         <div className="bg-white/4 rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '450ms' }}>
           <p className="text-[14px] text-white/55 leading-relaxed">
             第 6 步沉淀的 Work Kit，让下一次的第 1 步<br />从<span className="text-white/35 line-through">"从零开始"</span> 变成 <span className="text-accent-400 font-semibold">"几分钟启动"</span>。
@@ -221,7 +292,7 @@ const slides = [
 
   /* 6 ── Differentiator */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 5,
     content: (
       <div className="max-w-[680px] w-full">
         <Label text="Key Differentiator" />
@@ -231,7 +302,6 @@ const slides = [
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           每个 Work Kit 记录的是<span className="text-accent-600 font-semibold">资料结构、任务模板、Prompt 和报告格式</span>。换一个品类、换一次大促，照样能用。
         </p>
-
         <div className="bg-white rounded-[24px] p-7 border border-border-default shadow-sm mb-6 animate-scale-in" style={{ animationDelay: '150ms' }}>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
@@ -243,23 +313,17 @@ const slides = [
             </div>
             <span className="text-[10px] px-2.5 py-1 rounded-full bg-accent-50 text-accent-600 font-semibold">可复用模板</span>
           </div>
-
           <div className="flex items-center gap-2 mb-5 text-[11px] text-text-muted overflow-x-auto pb-1">
             {['v1.0 初始模板', 'v1.1 客服增强', 'v1.2 首屏优化'].map((v, i, arr) => (
-              <span key={v} className="flex items-center gap-2 shrink-0">
-                {v}
-                {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300" />}
-              </span>
+              <span key={v} className="flex items-center gap-2 shrink-0">{v}{i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300" />}</span>
             ))}
           </div>
-
           <div className="grid grid-cols-4 gap-2 text-[11px]">
             {['资料结构', '岗位配置', '任务 Prompt', '报告格式'].map((t) => (
               <div key={t} className="bg-gray-50 rounded-lg px-3 py-2.5 text-text-secondary text-center font-medium">{t}</div>
             ))}
           </div>
         </div>
-
         <p className="text-[14px] text-text-muted text-center animate-fade-in-up leading-relaxed" style={{ animationDelay: '300ms' }}>
           每次大促后迭代一个版本——<span className="text-accent-600 font-semibold">团队经验永不丢失</span>。
         </p>
@@ -269,38 +333,29 @@ const slides = [
 
   /* 7 ── Before/After */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 6,
     content: (
       <div className="max-w-[680px] w-full">
         <Label text="The Impact" />
-        <h2 className="text-[44px] font-light tracking-[-0.02em] text-text-main mb-8 leading-[1.15] animate-fade-in-up">
-          用数据说话
-        </h2>
-
+        <h2 className="text-[44px] font-light tracking-[-0.02em] text-text-main mb-8 leading-[1.15] animate-fade-in-up">用数据说话</h2>
         <div className="grid grid-cols-2 gap-5 stagger mb-8">
           <div className="animate-fade-in-up bg-gray-50 rounded-2xl p-7 border border-border-default">
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted mb-5">Before</div>
             <div className="space-y-3">
               {['各岗位各自整理资料', '分析口径与格式不统一', 'AI 输出无结构化沉淀', '每次大促从零启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted">
-                  <span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span> {t}
-                </div>
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted"><span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span> {t}</div>
               ))}
             </div>
           </div>
-
           <div className="animate-fade-in-up bg-accent-50/60 rounded-2xl p-7 border border-accent-200">
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent-600 mb-5">With PromoKit AI</div>
             <div className="space-y-3">
               {['统一资料库 · 同源协同', '各岗位结构化 AI 输出', '一键保存为 Work Kit', '下次大促几分钟启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary">
-                  <span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span> {t}
-                </div>
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary"><span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span> {t}</div>
               ))}
             </div>
           </div>
         </div>
-
         <div className="animate-fade-in-up" style={{ animationDelay: '350ms' }}>
           <div className="bg-sidebar rounded-2xl px-8 py-5 flex items-center justify-center gap-8">
             <div className="text-center">
@@ -326,9 +381,9 @@ const slides = [
     ),
   },
 
-  /* 8 ── Design Process Mapping (kept as-is) */
+  /* 8 ── Design Process (kept as-is) */
   {
-    theme: 'light' as const,
+    theme: 'light' as const, bgVariant: 7,
     content: (
       <div className="w-[1160px] max-w-[calc(100vw-84px)] -my-10">
         <div className="flex items-start justify-between mb-4 animate-fade-in-up">
@@ -340,199 +395,52 @@ const slides = [
             </div>
           </div>
           <div className="text-center flex-1 -ml-20">
-            <h2 className="text-[35px] font-semibold tracking-[-0.035em] text-text-main leading-none mb-2">
-              PromoKit AI 的设计过程映射
-            </h2>
-            <p className="text-[13px] text-text-secondary">
-              将抽象需求逐步转化为可落地的系统架构与用户界面，形成可复用的 AI 工作包流程
-            </p>
+            <h2 className="text-[35px] font-semibold tracking-[-0.035em] text-text-main leading-none mb-2">PromoKit AI 的设计过程映射</h2>
+            <p className="text-[13px] text-text-secondary">将抽象需求逐步转化为可落地的系统架构与用户界面，形成可复用的 AI 工作包流程</p>
           </div>
         </div>
-
         <div className="grid grid-cols-4 gap-4 px-1 mb-2 animate-fade-in" style={{ animationDelay: '80ms' }}>
           <div />
           {['需求 → 定义', '策略 → 架构', '架构 → 界面'].map((label) => (
-            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
-              <span>转换</span>
-              <span className="h-px w-12 bg-accent-300" />
-              <ArrowRight className="w-3.5 h-3.5" />
-            </div>
+            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600"><span>转换</span><span className="h-px w-12 bg-accent-300" /><ArrowRight className="w-3.5 h-3.5" /></div>
           ))}
         </div>
-
         <div className="grid grid-cols-4 gap-4 mb-3">
           {[
-            {
-              no: '01',
-              title: '需求池归类',
-              icon: Search,
-              lead: '从实际工作中归纳出关键问题',
-              visual: 'needs',
-              items: [
-                ['资料分散', '评论、商品、客服反馈散落在不同文件'],
-                ['岗位断裂', '各岗位分析口径与输出格式不统一'],
-                ['经验不可交接', 'AI 用法停留在个人经验中'],
-                ['重复整理', '每次大促都从零启动'],
-              ],
-            },
-            {
-              no: '02',
-              title: '定义与策略',
-              icon: Target,
-              lead: '将问题转化为产品定义与核心策略',
-              visual: 'strategy',
-              items: [
-                ['资料结构化', '统一资料类型与字段'],
-                ['岗位任务化', '明确目标、输入与输出格式'],
-                ['AI 可控化', '结构化分析 + 质量检查'],
-                ['流程资产化', '沉淀为 Work Kit'],
-              ],
-            },
-            {
-              no: '03',
-              title: '系统架构设计',
-              icon: Network,
-              lead: '将策略转化为系统结构与功能模块',
-              visual: 'system',
-              items: [
-                ['电商资料库', '集中管理评论、商品、客服、文案'],
-                ['岗位分析任务', '生成任务卡与 Prompt'],
-                ['AI 分析工作台', '承载结果与质量检查'],
-                ['报告与资产库', '汇总并保存流程资产'],
-              ],
-            },
-            {
-              no: '04',
-              title: '界面设计',
-              icon: LayoutDashboard,
-              lead: '将系统结构转化为用户可操作的界面',
-              visual: 'screens',
-              items: [
-                ['Dashboard', '项目总览与进度看板'],
-                ['资料库', '导入与管理电商资料'],
-                ['任务卡', '展示岗位任务和输出要求'],
-                ['AI 工作台', '生成结构化分析结果'],
-                ['报告页', '输出可执行策略报告'],
-              ],
-            },
+            { no: '01', title: '需求池归类', icon: Search, lead: '从实际工作中归纳出关键问题', visual: 'needs', items: [['资料分散', '评论、商品、客服反馈散落在不同文件'], ['岗位断裂', '各岗位分析口径与输出格式不统一'], ['经验不可交接', 'AI 用法停留在个人经验中'], ['重复整理', '每次大促都从零启动']] },
+            { no: '02', title: '定义与策略', icon: Target, lead: '将问题转化为产品定义与核心策略', visual: 'strategy', items: [['资料结构化', '统一资料类型与字段'], ['岗位任务化', '明确目标、输入与输出格式'], ['AI 可控化', '结构化分析 + 质量检查'], ['流程资产化', '沉淀为 Work Kit']] },
+            { no: '03', title: '系统架构设计', icon: Network, lead: '将策略转化为系统结构与功能模块', visual: 'system', items: [['电商资料库', '集中管理评论、商品、客服、文案'], ['岗位分析任务', '生成任务卡与 Prompt'], ['AI 分析工作台', '承载结果与质量检查'], ['报告与资产库', '汇总并保存流程资产']] },
+            { no: '04', title: '界面设计', icon: LayoutDashboard, lead: '将系统结构转化为用户可操作的界面', visual: 'screens', items: [['Dashboard', '项目总览与进度看板'], ['资料库', '导入与管理电商资料'], ['任务卡', '展示岗位任务和输出要求'], ['AI 工作台', '生成结构化分析结果'], ['报告页', '输出可执行策略报告']] },
           ].map((col, colIndex) => (
             <div key={col.no} className="relative animate-fade-in-up" style={{ animationDelay: `${colIndex * 80}ms` }}>
               <div className="h-full rounded-[20px] border border-accent-200 bg-white shadow-[0_14px_38px_rgba(28,28,30,0.06)] overflow-hidden">
                 <div className="h-[56px] bg-gradient-to-r from-accent-50 to-white border-b border-accent-200 flex items-center justify-between px-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-[27px] font-semibold text-accent-600 tracking-[-0.04em]">{col.no}</span>
-                    <span className="text-[18px] font-semibold text-text-main">{col.title}</span>
-                  </div>
-                  <div className="w-8 h-8 rounded-xl bg-white border border-accent-100 flex items-center justify-center">
-                    <col.icon className="w-4 h-4 text-accent-500" />
-                  </div>
+                  <div className="flex items-center gap-2.5"><span className="text-[27px] font-semibold text-accent-600 tracking-[-0.04em]">{col.no}</span><span className="text-[18px] font-semibold text-text-main">{col.title}</span></div>
+                  <div className="w-8 h-8 rounded-xl bg-white border border-accent-100 flex items-center justify-center"><col.icon className="w-4 h-4 text-accent-500" /></div>
                 </div>
                 <div className="p-3">
                   <div className="mb-3 h-[112px] rounded-2xl border border-accent-100 bg-gradient-to-br from-white to-accent-50/55 p-3 overflow-hidden">
-                    {col.visual === 'needs' && (
-                      <div className="h-full flex items-center gap-3">
-                        <div className="w-16 h-16 rounded-2xl bg-white border border-accent-100 flex items-center justify-center shrink-0">
-                          <col.icon className="w-8 h-8 text-accent-500" />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          {['竞品评论', '客服问答', '历史文案'].map((label, i) => (
-                            <div key={label} className="h-6 rounded-lg bg-white border border-border-light flex items-center gap-2 px-2">
-                              <span className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-accent-500' : i === 1 ? 'bg-success' : 'bg-warning'}`} />
-                              <span className="text-[10px] text-text-secondary">{label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {col.visual === 'strategy' && (
-                      <div className="h-full flex items-center justify-center gap-3">
-                        <div className="w-[72px] h-[72px] rounded-full bg-white border border-accent-100 flex items-center justify-center">
-                          <Target className="w-10 h-10 text-accent-500" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {['结构', '任务', '质检', '资产'].map((label) => (
-                            <div key={label} className="w-14 h-8 rounded-lg bg-white border border-border-light text-[10px] text-text-secondary flex items-center justify-center">{label}</div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {col.visual === 'system' && (
-                      <div className="h-full grid grid-cols-2 gap-2">
-                        {[
-                          { icon: Database, label: '资料库', color: 'text-blue-500' },
-                          { icon: ClipboardList, label: '任务卡', color: 'text-success' },
-                          { icon: Bot, label: '工作台', color: 'text-accent-500' },
-                          { icon: Box, label: '资产库', color: 'text-error' },
-                        ].map((item) => (
-                          <div key={item.label} className="rounded-xl bg-white border border-border-light flex items-center gap-2 px-2">
-                            <item.icon className={`w-4 h-4 ${item.color}`} />
-                            <span className="text-[10px] text-text-secondary">{item.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {col.visual === 'screens' && (
-                      <div className="h-full grid grid-cols-2 gap-2">
-                        {[
-                          { icon: LayoutDashboard, label: 'Dashboard' },
-                          { icon: FolderOpen, label: '资料库' },
-                          { icon: Bot, label: '工作台' },
-                          { icon: FileBarChart, label: '报告页' },
-                        ].map((item) => (
-                          <div key={item.label} className="rounded-xl bg-white border border-border-light p-2">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <item.icon className="w-3.5 h-3.5 text-accent-500" />
-                              <span className="text-[9px] text-text-main font-medium">{item.label}</span>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="h-1.5 rounded-full bg-accent-100" />
-                              <div className="h-1.5 rounded-full bg-gray-100 w-4/5" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {col.visual === 'needs' && (<div className="h-full flex items-center gap-3"><div className="w-16 h-16 rounded-2xl bg-white border border-accent-100 flex items-center justify-center shrink-0"><col.icon className="w-8 h-8 text-accent-500" /></div><div className="flex-1 space-y-2">{['竞品评论', '客服问答', '历史文案'].map((label, i) => (<div key={label} className="h-6 rounded-lg bg-white border border-border-light flex items-center gap-2 px-2"><span className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-accent-500' : i === 1 ? 'bg-success' : 'bg-warning'}`} /><span className="text-[10px] text-text-secondary">{label}</span></div>))}</div></div>)}
+                    {col.visual === 'strategy' && (<div className="h-full flex items-center justify-center gap-3"><div className="w-[72px] h-[72px] rounded-full bg-white border border-accent-100 flex items-center justify-center"><Target className="w-10 h-10 text-accent-500" /></div><div className="grid grid-cols-2 gap-2">{['结构', '任务', '质检', '资产'].map((label) => (<div key={label} className="w-14 h-8 rounded-lg bg-white border border-border-light text-[10px] text-text-secondary flex items-center justify-center">{label}</div>))}</div></div>)}
+                    {col.visual === 'system' && (<div className="h-full grid grid-cols-2 gap-2">{[{ icon: Database, label: '资料库', color: 'text-blue-500' }, { icon: ClipboardList, label: '任务卡', color: 'text-success' }, { icon: Bot, label: '工作台', color: 'text-accent-500' }, { icon: Box, label: '资产库', color: 'text-error' }].map((item) => (<div key={item.label} className="rounded-xl bg-white border border-border-light flex items-center gap-2 px-2"><item.icon className={`w-4 h-4 ${item.color}`} /><span className="text-[10px] text-text-secondary">{item.label}</span></div>))}</div>)}
+                    {col.visual === 'screens' && (<div className="h-full grid grid-cols-2 gap-2">{[{ icon: LayoutDashboard, label: 'Dashboard' }, { icon: FolderOpen, label: '资料库' }, { icon: Bot, label: '工作台' }, { icon: FileBarChart, label: '报告页' }].map((item) => (<div key={item.label} className="rounded-xl bg-white border border-border-light p-2"><div className="flex items-center gap-1.5 mb-1"><item.icon className="w-3.5 h-3.5 text-accent-500" /><span className="text-[9px] text-text-main font-medium">{item.label}</span></div><div className="space-y-1"><div className="h-1.5 rounded-full bg-accent-100" /><div className="h-1.5 rounded-full bg-gray-100 w-4/5" /></div></div>))}</div>)}
                   </div>
-
                   <p className="text-[11px] text-text-secondary text-center leading-relaxed mb-2 min-h-[30px]">{col.lead}</p>
-                  <div className="space-y-1.5">
-                    {col.items.map(([name, desc]) => (
-                      <div key={name} className="rounded-lg border border-border-light bg-white px-2.5 py-1.5 flex gap-2">
-                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
-                        <div>
-                          <div className="text-[11.5px] font-semibold text-text-main leading-tight mb-0.5">{name}</div>
-                          <div className="text-[9.5px] leading-snug text-text-muted">{desc}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <div className="space-y-1.5">{col.items.map(([name, desc]) => (<div key={name} className="rounded-lg border border-border-light bg-white px-2.5 py-1.5 flex gap-2"><span className="mt-1 w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" /><div><div className="text-[11.5px] font-semibold text-text-main leading-tight mb-0.5">{name}</div><div className="text-[9.5px] leading-snug text-text-muted">{desc}</div></div></div>))}</div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
         <div className="grid grid-cols-4 gap-4 px-1 mb-3 animate-fade-in" style={{ animationDelay: '360ms' }}>
-          {['归类决策', '定义决策', '架构决策'].map((label) => (
-            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
-              <span>决策</span>
-              <span className="h-px w-12 bg-accent-300" />
-              <ArrowRight className="w-3.5 h-3.5" />
-            </div>
-          ))}
-          <div className="flex items-center justify-center text-[12px] text-text-muted">{'界面落地'}</div>
+          {['归类决策', '定义决策', '架构决策'].map((label) => (<div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600"><span>决策</span><span className="h-px w-12 bg-accent-300" /><ArrowRight className="w-3.5 h-3.5" /></div>))}
+          <div className="flex items-center justify-center text-[12px] text-text-muted">界面落地</div>
         </div>
-
         <div className="mx-auto w-[76%] rounded-2xl border border-accent-200 bg-white px-6 py-3.5 flex items-center gap-5 animate-fade-in-up shadow-[0_12px_36px_rgba(28,28,30,0.06)]" style={{ animationDelay: '420ms' }}>
-          <div className="w-12 h-12 rounded-2xl bg-accent-50 border border-accent-100 flex items-center justify-center shrink-0">
-            <TrendingUp className="w-6 h-6 text-accent-500" />
-          </div>
+          <div className="w-12 h-12 rounded-2xl bg-accent-50 border border-accent-100 flex items-center justify-center shrink-0"><TrendingUp className="w-6 h-6 text-accent-500" /></div>
           <div className="text-[20px] font-semibold text-accent-600 shrink-0">最终目标</div>
           <div className="w-px h-8 bg-accent-200" />
-          <p className="text-[13px] leading-relaxed text-text-main">
-            把一次有效的大促分析流程，转化为团队可复用、可交接、可迭代的 AI 工作包资产，
-            持续提升团队效率与决策质量。
-          </p>
+          <p className="text-[13px] leading-relaxed text-text-main">把一次有效的大促分析流程，转化为团队可复用、可交接、可迭代的 AI 工作包资产，持续提升团队效率与决策质量。</p>
         </div>
       </div>
     ),
@@ -540,7 +448,7 @@ const slides = [
 
   /* 9 ── CTA */
   {
-    theme: 'dark' as const,
+    theme: 'dark' as const, bgVariant: 0,
     content: (
       <div className="flex flex-col items-center text-center max-w-xl">
         <div className="animate-scale-in mb-8">
@@ -549,20 +457,12 @@ const slides = [
             <Logo variant="icon" theme="light" size={52} />
           </div>
         </div>
-
-        <h2 className="text-[48px] font-light tracking-[-0.02em] text-white mb-2 leading-[1.15] animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-          PromoKit AI
-        </h2>
-        <p className="text-[17px] text-white/40 mb-4 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
-          电商大促 AI 工作包系统
-        </p>
-
+        <h2 className="text-[48px] font-light tracking-[-0.02em] text-white mb-2 leading-[1.15] animate-fade-in-up" style={{ animationDelay: '120ms' }}>PromoKit AI</h2>
+        <p className="text-[17px] text-white/40 mb-4 animate-fade-in-up" style={{ animationDelay: '180ms' }}>电商大促 AI 工作包系统</p>
         <div className="w-16 h-px bg-accent-500 mb-8 animate-fade-in-up" style={{ animationDelay: '250ms' }} />
-
         <p className="text-[15px] text-white/35 max-w-sm leading-relaxed mb-10 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
           把一次有效的大促分析流程<br />变成团队下一次可直接复用的起点
         </p>
-
         <div className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white text-[15px] px-8 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10">
             进入产品演示 <ArrowRight className="w-4 h-4" />
@@ -571,10 +471,7 @@ const slides = [
             创建第一个项目 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-
-        <p className="mt-16 text-[11px] text-white/12 animate-fade-in" style={{ animationDelay: '600ms' }}>
-          PromoKit AI · 电商大促 AI 工作包系统
-        </p>
+        <p className="mt-16 text-[11px] text-white/12 animate-fade-in" style={{ animationDelay: '600ms' }}>PromoKit AI · 电商大促 AI 工作包系统</p>
       </div>
     ),
   },
@@ -600,7 +497,7 @@ export default function Slides() {
 
   return (
     <div className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-700 ${slide.theme === 'dark' ? 'bg-sidebar' : 'bg-bg-primary'}`}>
-      <Decors theme={slide.theme} />
+      <Decors theme={slide.theme} variant={slide.bgVariant} />
       <div key={current} className="relative z-10 px-8 py-16 animate-fade-in-up">{slide.content}</div>
 
       <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
