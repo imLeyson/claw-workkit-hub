@@ -1,311 +1,523 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, FileText, MessageSquareText, Palette, Repeat, ChevronLeft, ChevronRight, Clock, Users, TrendingUp, Target, Search, LayoutDashboard, Network } from 'lucide-react'
+import { ArrowRight, Bot, Box, ClipboardList, Database, FileBarChart, FileText, FolderOpen, LayoutDashboard, MessageSquareText, Network, Palette, Repeat, Search, Target, ChevronLeft, ChevronRight, Clock, Users, TrendingUp } from 'lucide-react'
 import Logo from '../components/Logo'
 
-/* ── Background decor ── */
+/* ── Decorative background ── */
 function Decors({ theme }: { theme: 'light' | 'dark' }) {
   if (typeof window === 'undefined') return null
   const w = window.innerWidth
   const h = window.innerHeight
-  const a = theme === 'dark' ? '0.04' : '0.03'
+  const alpha = theme === 'dark' ? '0.03' : '0.02'
+  const accentAlpha = theme === 'dark' ? '0.10' : '0.07'
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      <circle cx={w * 0.95} cy={-h * 0.05} r={h * 0.28} fill={`rgba(224,123,76,${a})`} />
-      <circle cx={w * 0.04} cy={h * 1.02} r={h * 0.22} fill={`rgba(0,0,0,${a})`} />
+      <circle cx={w * 0.93} cy={h * 0.08} r={h * 0.22} fill={`rgba(224,123,76,${accentAlpha})`} />
+      <circle cx={w * 0.06} cy={h * 0.90} r={h * 0.25} fill={`rgba(0,0,0,${alpha})`} />
+      <line x1={w * 0.04} y1={h * 0.40} x2={w * 0.14} y2={h * 0.40} stroke={`rgba(224,123,76,${accentAlpha})`} strokeWidth="2" strokeLinecap="round" />
+      <line x1={w * 0.89} y1={h * 0.58} x2={w * 0.96} y2={h * 0.58} stroke={`rgba(224,123,76,${accentAlpha})`} strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
 
-function Label({ text }: { text: string }) {
+/* ── Section label ── */
+function SlideLabel({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3 mb-8">
-      <div className="w-5 h-px bg-accent-400" />
+      <div className="w-6 h-px bg-accent-400" />
       <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-accent-600">{text}</span>
     </div>
   )
 }
 
-/* ══════════════════════════════════════════
-   Slides
-   ══════════════════════════════════════════ */
+/* ── Slides ── */
 const slides = [
-  // ── 01 TITLE ──
+  // 1. Title
   {
     theme: 'dark' as const,
     content: (
       <div className="flex flex-col items-center text-center max-w-2xl">
-        <div className="animate-scale-in mb-10 relative">
-          <div className="absolute inset-0 rounded-full bg-accent-500/12 scale-[1.7] animate-pulse" style={{ animationDuration: '3.5s' }} />
-          <Logo variant="icon" theme="light" size={80} />
+        <div className="animate-scale-in mb-10">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-accent-500/15 scale-[1.6] animate-pulse" style={{ animationDuration: '3s' }} />
+            <Logo variant="icon" theme="light" size={72} />
+          </div>
         </div>
-        <h1 className="text-[68px] font-light tracking-[-0.03em] text-white leading-none mb-4 animate-fade-in-up">PromoKit AI</h1>
-        <p className="text-[20px] text-white/40 mb-12 animate-fade-in-up" style={{ animationDelay: '120ms' }}>电商大促 AI 工作包系统</p>
-        <div className="w-20 h-px bg-accent-500 mb-12 animate-fade-in-up" style={{ animationDelay: '200ms' }} />
-        <p className="text-[17px] text-white/28 max-w-lg leading-relaxed animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+        <h1 className="text-[64px] font-light tracking-[-0.03em] text-white mb-3 animate-fade-in-up">PromoKit AI</h1>
+        <p className="text-[20px] text-white/45 mb-10 animate-fade-in-up" style={{ animationDelay: '100ms' }}>电商大促 AI 工作包系统</p>
+        <div className="w-24 h-px bg-accent-500 mb-10 animate-fade-in-up" style={{ animationDelay: '200ms' }} />
+        <p className="text-[16px] text-white/30 max-w-lg leading-relaxed animate-fade-in-up" style={{ animationDelay: '300ms' }}>
           把一次有效的大促分析流程<br />沉淀为团队可复用的 AI 工作包
         </p>
-        <div className="flex items-center gap-5 mt-20 text-[13px] text-white/12 tracking-wider animate-fade-in" style={{ animationDelay: '500ms' }}>
-          618 · 双11 · 新品上架 · 爆品复盘 · 竞品分析
+        <div className="flex items-center gap-5 mt-16 text-[12px] text-white/15 animate-fade-in" style={{ animationDelay: '500ms' }}>
+          <span>618</span><span>·</span><span>双 11</span><span>·</span><span>新品上架</span><span>·</span><span>爆品复盘</span><span>·</span><span>竞品分析</span>
         </div>
       </div>
     ),
   },
-  // ── 02 PAIN ──
+  // 2. Pain Point
   {
     theme: 'light' as const,
     content: (
       <div className="max-w-2xl w-full">
-        <Label text="团队困境" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">每次大促前<br />团队都在重复劳动</h2>
+        <SlideLabel text="The Problem" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">
+          每次大促前<br />团队都在重复劳动
+        </h2>
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          运营、商品、文案、客服、设计——每个人都用 AI<br /><span className="text-accent-600 font-medium">但分析口径和输出格式各不相同。</span>
+          运营、商品、文案、客服、设计——每个人都用 AI，但<span className="text-accent-600 font-medium">分析口径和输出格式各不相同</span>。
         </p>
         <div className="grid grid-cols-2 gap-3 mb-8 stagger">
           {[
-            { role: '运营岗', stat: '3h+', desc: '手动整理竞品评论表格', icon: Clock },
-            { role: '文案岗', stat: '0 复用', desc: '凭个人经验重写卖点话术', icon: FileText },
-            { role: '客服岗', stat: '从零开始', desc: '每次梳理高频 FAQ', icon: MessageSquareText },
-            { role: '设计岗', stat: '凭感觉', desc: '无数据支撑调整详情页', icon: Palette },
+            { role: '运营', stat: '3h+', desc: '手动整理竞品表格', icon: Clock },
+            { role: '文案', stat: '0 复用', desc: '凭经验重写话术', icon: FileText },
+            { role: '客服', stat: '从零开始', desc: '梳理 FAQ 知识库', icon: MessageSquareText },
+            { role: '设计', stat: '凭感觉', desc: '调整详情页顺序', icon: Palette },
           ].map((item) => (
-            <div key={item.role} className="animate-fade-in-up bg-white rounded-2xl p-5 border border-border-default hover-lift flex items-start gap-4">
-              <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center shrink-0"><item.icon className="w-5 h-5 text-accent-500" /></div>
+            <div key={item.role} className="animate-fade-in-up bg-white rounded-2xl p-5 border border-border-default flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
+                <item.icon className="w-5 h-5 text-accent-500" />
+              </div>
               <div>
-                <div className="text-[22px] font-light text-text-main leading-none mb-1">{item.stat}</div>
-                <div className="text-[11px] text-text-muted uppercase tracking-wider mb-0.5">{item.role}</div>
+                <div className="text-[20px] font-light text-text-main leading-none mb-1">{item.stat}</div>
+                <div className="text-[11px] text-text-muted uppercase tracking-wider mb-0.5">{item.role}岗</div>
                 <div className="text-[12px] text-text-muted">{item.desc}</div>
               </div>
             </div>
           ))}
         </div>
         <div className="bg-sidebar rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <p className="text-[16px] text-white/70">结果：<span className="text-accent-400 font-medium">下次大促，所有人重新来一遍。</span></p>
-        </div>
-      </div>
-    ),
-  },
-  // ── 03 COST ──
-  {
-    theme: 'dark' as const,
-    content: (
-      <div className="max-w-2xl w-full">
-        <Label text="隐性成本" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-white mb-12 leading-tight animate-fade-in-up">团队经验<br />随人员流失而消失</h2>
-        <div className="grid grid-cols-3 gap-4 mb-10 stagger">
-          {[
-            { icon: Clock, value: '12h+', unit: '每次大促', label: '重复耗时', desc: '整理 + 分析 + 汇总' },
-            { icon: Users, value: '5', unit: '个岗位', label: '各自独立', desc: '口径不一 · 结果无法对齐' },
-            { icon: TrendingUp, value: '0', unit: '次积累', label: '经验流失', desc: '上次分析下次用不上' },
-          ].map((item) => (
-            <div key={item.label} className="animate-fade-in-up bg-white/[0.06] rounded-2xl p-6 text-center border border-white/[0.06]">
-              <item.icon className="w-6 h-6 text-accent-400 mx-auto mb-4" />
-              <div className="text-[36px] font-light text-white leading-none mb-1">{item.value}</div>
-              <div className="text-[11px] text-white/30 uppercase tracking-wider mb-3">{item.unit}</div>
-              <div className="text-[13px] font-medium text-white/70 mb-1">{item.label}</div>
-              <div className="text-[11px] text-white/30">{item.desc}</div>
-            </div>
-          ))}
-        </div>
-        <p className="text-[15px] text-white/35 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          不是缺少 AI ——<span className="text-accent-400 font-medium"> 缺少把 AI 分析流程化的工具。</span>
-        </p>
-      </div>
-    ),
-  },
-  // ── 04 SOLUTION ──
-  {
-    theme: 'light' as const,
-    content: (
-      <div className="max-w-2xl w-full">
-        <Label text="解决方案" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">PromoKit AI</h2>
-        <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          同一份竞品数据源 → 各岗位协同 AI 分析 → <span className="text-accent-600 font-medium">可复用工作包</span>
-        </p>
-        <div className="grid grid-cols-3 gap-3 stagger">
-          {[
-            { num: '01', label: '竞品评论挖掘', desc: '聚类高频痛点 · 构建矩阵' },
-            { num: '02', label: '卖点文案生成', desc: '用户原话 → 可传播卖点' },
-            { num: '03', label: '客服 FAQ', desc: '售前疑虑 · 售后风险话术' },
-            { num: '04', label: '详情页优化', desc: '数据驱动的信息层级重排' },
-            { num: '05', label: '大促策略汇总', desc: '跨岗位整合执行清单' },
-            { num: '06', label: '沉淀为 Work Kit', desc: '版本管理 · 持续迭代 · 反复复用' },
-          ].map((item) => (
-            <div key={item.num} className="animate-fade-in-up bg-white rounded-2xl p-5 border border-border-default hover-lift">
-              <div className="text-[11px] font-semibold text-accent-400 mb-2">{item.num}</div>
-              <div className="text-[14px] font-medium text-text-main mb-1.5">{item.label}</div>
-              <div className="text-[12px] text-text-muted leading-snug">{item.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  // ── 05 WORKFLOW ──
-  {
-    theme: 'dark' as const,
-    content: (
-      <div className="max-w-3xl w-full">
-        <Label text="工作流程" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-white mb-10 leading-tight animate-fade-in-up">6 步完成大促分析</h2>
-        <div className="flex items-start gap-0 stagger mb-12">
-          {[
-            { step: '01', label: '创建项目', sub: '设定目标与竞品' },
-            { step: '02', label: '导入资料', sub: '上传电商数据' },
-            { step: '03', label: '生成任务', sub: 'AI 按岗拆解' },
-            { step: '04', label: 'AI 分析', sub: '结构化输出结果' },
-            { step: '05', label: '汇总报告', sub: '跨岗位整合' },
-            { step: '06', label: '沉淀复用', sub: '保存为 Work Kit' },
-          ].map((item, i, arr) => (
-            <div key={item.step} className="flex-1 flex items-start animate-fade-in-up">
-              <div className="text-center flex-1">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 ${i === 5 ? 'bg-accent-500 text-white' : 'bg-white/8 text-white/50'}`}>
-                  <span className="text-[16px] font-semibold">{item.step}</span>
-                </div>
-                <div className="text-[13px] text-white/75 font-medium">{item.label}</div>
-                <div className="text-[11px] text-white/25 mt-1">{item.sub}</div>
-              </div>
-              {i < arr.length - 1 && <div className="pt-7 -ml-1 mr-1"><ArrowRight className="w-3 h-3 text-white/10" /></div>}
-            </div>
-          ))}
-        </div>
-        <div className="bg-white/[0.04] rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-          <p className="text-[15px] text-white/50">
-            <span className="text-accent-400 font-medium">飞轮效应</span>：第 6 步沉淀的 Work Kit，让下一次大促从<span className="text-white/80">「几小时」变成「几分钟」</span>。
+          <p className="text-[16px] text-white/75">
+            结果：<span className="text-accent-400 font-medium">下次大促，所有人重新来一遍。</span>
           </p>
         </div>
       </div>
     ),
   },
-  // ── 06 WORK KIT ──
+  // 3. The Cost
   {
     theme: 'light' as const,
     content: (
       <div className="max-w-2xl w-full">
-        <Label text="核心差异" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">不保存结果<br />只保存流程</h2>
-        <p className="text-[15px] text-text-muted mb-8 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          Work Kit 保存<span className="text-accent-600 font-medium">资料结构、任务模板、Prompt 和报告格式</span>，而非单次分析结果。
-        </p>
-        <div className="bg-white rounded-[24px] p-8 border border-border-default shadow-sm mb-6 animate-scale-in" style={{ animationDelay: '200ms' }}>
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center"><Repeat className="w-5 h-5 text-accent-500" /></div>
-              <div><div className="text-[16px] font-medium text-text-main">618 竞品评论分析 Work Kit</div><div className="text-[12px] text-text-muted">v1.2 · 已复用 3 次</div></div>
-            </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-600 font-medium">可复用</span>
-          </div>
-          <div className="flex items-center gap-2 mb-5 text-[11px] text-text-muted">
-            {['v1.0 · 初始模板', 'v1.1 · 客服增强', 'v1.2 · 首屏优化'].map((v, i, a) => (
-              <div key={v} className="flex items-center gap-2 shrink-0"><span>{v}</span>{i < a.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300" />}</div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[12px]">
-            {['资料结构 · 4 类数据源', '岗位配置 · 5 个角色', '任务模板 · 5 个 Prompt', '报告格式 · 标准化输出'].map((t) => (
-              <div key={t} className="bg-gray-50 rounded-lg px-3 py-2.5 text-text-secondary">{t}</div>
-            ))}
-          </div>
-        </div>
-        <p className="text-[14px] text-text-secondary text-center leading-relaxed animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          每次大促后迭代——<span className="text-accent-600 font-medium">团队经验不随人员变动而丢失。</span>
-        </p>
-      </div>
-    ),
-  },
-  // ── 07 IMPACT ──
-  {
-    theme: 'light' as const,
-    content: (
-      <div className="max-w-2xl w-full">
-        <Label text="效果对比" />
-        <h2 className="text-[42px] font-light tracking-[-0.02em] text-text-main mb-10 leading-tight animate-fade-in-up">Before & After</h2>
-        <div className="grid grid-cols-2 gap-5 stagger mb-10">
-          <div className="animate-fade-in-up bg-red-50/40 rounded-2xl p-7 border border-red-100">
-            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-red-400 mb-5">Before</div>
-            <div className="space-y-3">
-              {['各岗位各自整理资料', '分析口径不统一', '结果无法复用', '每次大促从零启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[14px] text-text-secondary"><span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-[11px] text-red-400">✕</span>{t}</div>
-              ))}
-            </div>
-          </div>
-          <div className="animate-fade-in-up bg-accent-50/60 rounded-2xl p-7 border border-accent-200">
-            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-accent-600 mb-5">After</div>
-            <div className="space-y-3">
-              {['统一资料库 · 同源分析', '各岗位结构化 AI 输出', '一键沉淀为 Work Kit', '下次大促几分钟启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[14px] text-text-secondary"><span className="w-5 h-5 rounded-full bg-accent-200 flex items-center justify-center shrink-0 text-[11px] text-accent-700">✓</span>{t}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="animate-fade-in-up text-center" style={{ animationDelay: '400ms' }}>
-          <div className="inline-flex items-center gap-5 bg-sidebar rounded-2xl px-8 py-5">
-            <Clock className="w-5 h-5 text-accent-400" />
-            <span className="text-[14px] text-white/50">启动耗时</span>
-            <span className="text-[26px] font-light text-white">3h → 5min</span>
-            <span className="w-px h-6 bg-white/8" />
-            <span className="text-[14px] text-white/50">复用率</span>
-            <span className="text-[26px] font-light text-accent-400">0 → 100%</span>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  // ── 08 DESIGN PROCESS ──
-  {
-    theme: 'dark' as const,
-    content: (
-      <div className="max-w-4xl w-full">
-        <Label text="设计过程" />
-        <h2 className="text-[36px] font-light tracking-[-0.02em] text-white mb-8 leading-tight animate-fade-in-up">从需求到界面<br />设计推导链</h2>
-        <div className="grid grid-cols-4 gap-4 stagger">
+        <SlideLabel text="The Cost" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-10 leading-tight animate-fade-in-up">
+          团队经验<br />随着人员流失而消失
+        </h2>
+        <div className="grid grid-cols-3 gap-5 mb-10 stagger">
           {[
-            { no: '01', label: '需求池归类', icon: Search, items: ['资料分散在不同文件', '岗位分析口径不统一', 'AI 经验无法交接', '每次大促从零启动'] },
-            { no: '02', label: '产品定义', icon: Target, items: ['统一资料类型与字段', '明确岗位任务目标', '结构化输出 + 质检', '沉淀为可复用资产'] },
-            { no: '03', label: '系统架构', icon: Network, items: ['电商资料库模块', '岗位任务卡生成', 'AI 分析工作台', '策略报告与资产库'] },
-            { no: '04', label: '界面设计', icon: LayoutDashboard, items: ['Dashboard 看板', '资料库管理页', '任务卡画廊', 'AI 工作台', '策略报告页'] },
-          ].map((col, i) => (
-            <div key={col.no} className="animate-fade-in-up" style={{ animationDelay: `${i * 80}ms` }}>
-              <div className="h-full rounded-2xl bg-white/[0.04] border border-white/[0.06] p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-[28px] font-light text-accent-400 tracking-[-0.03em]">{col.no}</span>
-                  <span className="text-[15px] font-medium text-white/80">{col.label}</span>
-                </div>
-                <div className="w-8 h-px bg-accent-500/40 mb-4" />
-                <div className="space-y-2">
-                  {col.items.map((t) => (
-                    <div key={t} className="flex items-start gap-2 text-[12px] text-white/45 leading-relaxed">
-                      <span className="w-1 h-1 rounded-full bg-accent-400/60 mt-1.5 shrink-0" />{t}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            { icon: Clock, value: '12h+', label: '每次大促重复耗时', sub: '整理资料 + 分析 + 汇总', accent: true },
+            { icon: Users, value: '5 岗位', label: '各自独立工作', sub: '口径不一、结果无法对齐', accent: false },
+            { icon: TrendingUp, value: '0 积累', label: '经验无法沉淀', sub: '上次分析下次用不上', accent: false },
+          ].map((item) => (
+            <div key={item.label} className={`animate-fade-in-up rounded-2xl p-6 text-center ${item.accent ? 'bg-accent-500 text-white' : 'bg-white border border-border-default'}`}>
+              <item.icon className={`w-6 h-6 mx-auto mb-3 ${item.accent ? 'text-white/80' : 'text-accent-500'}`} />
+              <div className={`text-[28px] font-light leading-none mb-2 ${item.accent ? 'text-white' : 'text-text-main'}`}>{item.value}</div>
+              <div className={`text-[12px] font-medium mb-1 ${item.accent ? 'text-white/80' : 'text-text-main'}`}>{item.label}</div>
+              <div className={`text-[11px] ${item.accent ? 'text-white/50' : 'text-text-muted'}`}>{item.sub}</div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[15px] text-text-muted text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          这些问题不是缺少 AI 造成的——<span className="text-accent-600 font-medium">缺少的是把 AI 分析流程化的工具</span>。
+        </p>
+      </div>
+    ),
+  },
+  // 4. Solution
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="max-w-2xl w-full">
+        <SlideLabel text="The Solution" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">
+          PromoKit AI<br />6 大分析能力
+        </h2>
+        <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          同一份竞品数据源 → 各岗位 AI 协同分析 → 结构化输出 → <span className="text-accent-600 font-medium">可复用工作包</span>
+        </p>
+        <div className="grid grid-cols-3 gap-3 stagger mb-8">
+          {[
+            { num: '01', label: '竞品评论挖掘', desc: '聚类高频痛点，构建矩阵' },
+            { num: '02', label: '卖点文案生成', desc: '用户原话 → 可传播卖点' },
+            { num: '03', label: '客服 FAQ', desc: '售前疑虑 + 售后风险话术' },
+            { num: '04', label: '详情页优化', desc: '数据驱动的信息层级重排' },
+            { num: '05', label: '大促策略汇总', desc: '跨岗位整合执行清单' },
+            { num: '06', label: '沉淀为 Work Kit', desc: '版本管理 · 持续迭代' },
+          ].map((item) => (
+            <div key={item.num} className="animate-fade-in-up bg-white rounded-2xl p-4 border border-border-default hover-lift">
+              <div className="text-[11px] font-semibold text-accent-400 mb-2">{item.num}</div>
+              <div className="text-[14px] font-medium text-text-main mb-1">{item.label}</div>
+              <div className="text-[11px] text-text-muted leading-snug">{item.desc}</div>
             </div>
           ))}
         </div>
       </div>
     ),
   },
-  // ── 09 CTA ──
+  // 5. Design process mapping
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="w-[1160px] max-w-[calc(100vw-84px)] -my-10">
+        <div className="flex items-start justify-between mb-4 animate-fade-in-up">
+          <div className="flex items-center gap-3 shrink-0">
+            <img src="/logo.svg" alt="" className="w-10 h-10" />
+            <div>
+              <div className="text-[20px] font-semibold tracking-[-0.02em] text-text-main leading-tight">PromoKit AI</div>
+              <div className="text-[11px] text-text-muted">电商大促 AI 工作包系统</div>
+            </div>
+          </div>
+          <div className="text-center flex-1 -ml-20">
+            <h2 className="text-[35px] font-semibold tracking-[-0.035em] text-text-main leading-none mb-2">
+              PromoKit AI 的设计过程映射
+            </h2>
+            <p className="text-[13px] text-text-secondary">
+              将抽象需求逐步转化为可落地的系统架构与用户界面，形成可复用的 AI 工作包流程
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 px-1 mb-2 animate-fade-in" style={{ animationDelay: '80ms' }}>
+          <div />
+          {['需求 → 定义', '策略 → 架构', '架构 → 界面'].map((label) => (
+            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
+              <span>转换</span>
+              <span className="h-px w-12 bg-accent-300" />
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 mb-3">
+          {[
+            {
+              no: '01',
+              title: '需求池归类',
+              icon: Search,
+              lead: '从实际工作中归纳出关键问题',
+              visual: 'needs',
+              items: [
+                ['资料分散', '评论、商品、客服反馈散落在不同文件'],
+                ['岗位断裂', '各岗位分析口径与输出格式不统一'],
+                ['经验不可交接', 'AI 用法停留在个人经验中'],
+                ['重复整理', '每次大促都从零启动'],
+              ],
+            },
+            {
+              no: '02',
+              title: '定义与策略',
+              icon: Target,
+              lead: '将问题转化为产品定义与核心策略',
+              visual: 'strategy',
+              items: [
+                ['资料结构化', '统一资料类型与字段'],
+                ['岗位任务化', '明确目标、输入与输出格式'],
+                ['AI 可控化', '结构化分析 + 质量检查'],
+                ['流程资产化', '沉淀为 Work Kit'],
+              ],
+            },
+            {
+              no: '03',
+              title: '系统架构设计',
+              icon: Network,
+              lead: '将策略转化为系统结构与功能模块',
+              visual: 'system',
+              items: [
+                ['电商资料库', '集中管理评论、商品、客服、文案'],
+                ['岗位分析任务', '生成任务卡与 Prompt'],
+                ['AI 分析工作台', '承载结果与质量检查'],
+                ['报告与资产库', '汇总并保存流程资产'],
+              ],
+            },
+            {
+              no: '04',
+              title: '界面设计',
+              icon: LayoutDashboard,
+              lead: '将系统结构转化为用户可操作的界面',
+              visual: 'screens',
+              items: [
+                ['Dashboard', '项目总览与进度看板'],
+                ['资料库', '导入与管理电商资料'],
+                ['任务卡', '展示岗位任务和输出要求'],
+                ['AI 工作台', '生成结构化分析结果'],
+                ['报告页', '输出可执行策略报告'],
+              ],
+            },
+          ].map((col, colIndex) => (
+            <div key={col.no} className="relative animate-fade-in-up" style={{ animationDelay: `${colIndex * 80}ms` }}>
+              <div className="h-full rounded-[20px] border border-accent-200 bg-white shadow-[0_14px_38px_rgba(28,28,30,0.06)] overflow-hidden">
+                <div className="h-[56px] bg-gradient-to-r from-accent-50 to-white border-b border-accent-200 flex items-center justify-between px-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[27px] font-semibold text-accent-600 tracking-[-0.04em]">{col.no}</span>
+                    <span className="text-[18px] font-semibold text-text-main">{col.title}</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-xl bg-white border border-accent-100 flex items-center justify-center">
+                    <col.icon className="w-4 h-4 text-accent-500" />
+                  </div>
+                </div>
+                <div className="p-3">
+                  <div className="mb-3 h-[112px] rounded-2xl border border-accent-100 bg-gradient-to-br from-white to-accent-50/55 p-3 overflow-hidden">
+                    {col.visual === 'needs' && (
+                      <div className="h-full flex items-center gap-3">
+                        <div className="w-16 h-16 rounded-2xl bg-white border border-accent-100 flex items-center justify-center shrink-0">
+                          <col.icon className="w-8 h-8 text-accent-500" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {['竞品评论', '客服问答', '历史文案'].map((label, i) => (
+                            <div key={label} className="h-6 rounded-lg bg-white border border-border-light flex items-center gap-2 px-2">
+                              <span className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-accent-500' : i === 1 ? 'bg-success' : 'bg-warning'}`} />
+                              <span className="text-[10px] text-text-secondary">{label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {col.visual === 'strategy' && (
+                      <div className="h-full flex items-center justify-center gap-3">
+                        <div className="w-[72px] h-[72px] rounded-full bg-white border border-accent-100 flex items-center justify-center">
+                          <Target className="w-10 h-10 text-accent-500" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {['结构', '任务', '质检', '资产'].map((label) => (
+                            <div key={label} className="w-14 h-8 rounded-lg bg-white border border-border-light text-[10px] text-text-secondary flex items-center justify-center">{label}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {col.visual === 'system' && (
+                      <div className="h-full grid grid-cols-2 gap-2">
+                        {[
+                          { icon: Database, label: '资料库', color: 'text-blue-500' },
+                          { icon: ClipboardList, label: '任务卡', color: 'text-success' },
+                          { icon: Bot, label: '工作台', color: 'text-accent-500' },
+                          { icon: Box, label: '资产库', color: 'text-error' },
+                        ].map((item) => (
+                          <div key={item.label} className="rounded-xl bg-white border border-border-light flex items-center gap-2 px-2">
+                            <item.icon className={`w-4 h-4 ${item.color}`} />
+                            <span className="text-[10px] text-text-secondary">{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {col.visual === 'screens' && (
+                      <div className="h-full grid grid-cols-2 gap-2">
+                        {[
+                          { icon: LayoutDashboard, label: 'Dashboard' },
+                          { icon: FolderOpen, label: '资料库' },
+                          { icon: Bot, label: '工作台' },
+                          { icon: FileBarChart, label: '报告页' },
+                        ].map((item) => (
+                          <div key={item.label} className="rounded-xl bg-white border border-border-light p-2">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <item.icon className="w-3.5 h-3.5 text-accent-500" />
+                              <span className="text-[9px] text-text-main font-medium">{item.label}</span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="h-1.5 rounded-full bg-accent-100" />
+                              <div className="h-1.5 rounded-full bg-gray-100 w-4/5" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-[11px] text-text-secondary text-center leading-relaxed mb-2 min-h-[30px]">{col.lead}</p>
+                  <div className="space-y-1.5">
+                    {col.items.map(([name, desc]) => (
+                      <div key={name} className="rounded-lg border border-border-light bg-white px-2.5 py-1.5 flex gap-2">
+                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
+                        <div>
+                          <div className="text-[11.5px] font-semibold text-text-main leading-tight mb-0.5">{name}</div>
+                          <div className="text-[9.5px] leading-snug text-text-muted">{desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 px-1 mb-3 animate-fade-in" style={{ animationDelay: '360ms' }}>
+          {['归类决策', '定义决策', '架构决策'].map((label) => (
+            <div key={label} className="flex items-center justify-center gap-2 text-[12px] font-semibold text-accent-600">
+              <span>决策</span>
+              <span className="h-px w-12 bg-accent-300" />
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          ))}
+          <div className="flex items-center justify-center text-[12px] text-text-muted">{'界面落地'}</div>
+        </div>
+
+        <div className="mx-auto w-[76%] rounded-2xl border border-accent-200 bg-white px-6 py-3.5 flex items-center gap-5 animate-fade-in-up shadow-[0_12px_36px_rgba(28,28,30,0.06)]" style={{ animationDelay: '420ms' }}>
+          <div className="w-12 h-12 rounded-2xl bg-accent-50 border border-accent-100 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6 text-accent-500" />
+          </div>
+          <div className="text-[20px] font-semibold text-accent-600 shrink-0">最终目标</div>
+          <div className="w-px h-8 bg-accent-200" />
+          <p className="text-[13px] leading-relaxed text-text-main">
+            把一次有效的大促分析流程，转化为团队可复用、可交接、可迭代的 AI 工作包资产，
+            持续提升团队效率与决策质量。
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  // 5. Workflow
+  {
+    theme: 'dark' as const,
+    content: (
+      <div className="max-w-3xl w-full">
+        <SlideLabel text="The Workflow" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-white mb-10 leading-tight animate-fade-in-up">
+          从创建到沉淀<br />完整闭环
+        </h2>
+        <div className="flex items-start gap-0 stagger mb-12">
+          {[
+            { step: '01', label: '创建项目', sub: '设定目标' },
+            { step: '02', label: '导入资料', sub: '上传数据' },
+            { step: '03', label: '生成任务', sub: 'AI 拆解' },
+            { step: '04', label: 'AI 分析', sub: '结构化输出' },
+            { step: '05', label: '汇总报告', sub: '跨岗整合' },
+            { step: '06', label: '沉淀复用', sub: 'Work Kit' },
+          ].map((item, i, arr) => (
+            <div key={item.step} className="flex-1 flex items-start animate-fade-in-up">
+              <div className="text-center flex-1">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 transition-colors ${i === 5 ? 'bg-accent-500 text-white' : 'bg-white/8 text-white/60'}`}>
+                  <span className="text-[15px] font-semibold">{item.step}</span>
+                </div>
+                <div className="text-[13px] text-white/80 font-medium">{item.label}</div>
+                <div className="text-[11px] text-white/30 mt-1">{item.sub}</div>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="pt-6 -ml-1 mr-1">
+                  <ArrowRight className="w-3 h-3 text-white/15" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="bg-white/5 rounded-2xl p-5 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+          <p className="text-[15px] text-white/60">
+            <span className="text-accent-400 font-medium">关键</span>：第 6 步沉淀的 Work Kit，让第 1 步从"从零开始"变成<span className="text-white/90">「几分钟启动」</span>。
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  // 6. Work Kit deep dive
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="max-w-2xl w-full">
+        <SlideLabel text="The Differentiator" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-4 leading-tight animate-fade-in-up">
+          不保存结果<br />只保存流程
+        </h2>
+        <p className="text-[15px] text-text-muted mb-8 leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          Work Kit 保存的是<span className="text-accent-600 font-medium">资料结构、任务模板、Prompt 和报告格式</span>，而非单次结果。
+        </p>
+        <div className="bg-white rounded-[24px] p-7 border border-border-default mb-6 animate-scale-in shadow-sm" style={{ animationDelay: '200ms' }}>
+          {/* mini Work Kit card */}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Repeat className="w-5 h-5 text-accent-500" /></div>
+              <div>
+                <div className="text-[15px] font-medium text-text-main">618 竞品评论分析 Work Kit</div>
+                <div className="text-[11px] text-text-muted">v1.2 · 复用 3 次</div>
+              </div>
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-600 font-medium">可复用</span>
+          </div>
+          <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+            {['v1.0 · 初始模板', 'v1.1 · 客服增强', 'v1.2 · 首屏优化'].map((v, i, arr) => (
+              <div key={v} className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] text-text-muted whitespace-nowrap">{v}</span>
+                {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-accent-300 shrink-0" />}
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            {['资料结构 · 4 类数据', '岗位配置 · 5 个角色', '任务模板 · 5 个 Prompt', '报告格式 · 固定输出'].map((t) => (
+              <div key={t} className="bg-gray-50 rounded-lg px-3 py-2 text-text-secondary">{t}</div>
+            ))}
+          </div>
+        </div>
+        <p className="text-[14px] text-text-secondary text-center animate-fade-in-up leading-relaxed" style={{ animationDelay: '400ms' }}>
+          每次大促后迭代，版本持续积累——<span className="text-accent-600 font-medium">团队经验不随人员变动而丢失</span>。
+        </p>
+      </div>
+    ),
+  },
+  // 7. Before/After
+  {
+    theme: 'light' as const,
+    content: (
+      <div className="max-w-2xl w-full">
+        <SlideLabel text="The Impact" />
+        <h2 className="text-[40px] font-light tracking-[-0.02em] text-text-main mb-10 leading-tight animate-fade-in-up">
+          Before & After
+        </h2>
+        <div className="grid grid-cols-2 gap-6 stagger">
+          <div className="animate-fade-in-up bg-gray-50 rounded-2xl p-6 border border-border-default">
+            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-text-muted mb-4">之前</div>
+            <div className="space-y-3">
+              {['各岗位各自整理资料', '分析口径不统一', '结果无法复用', '每次大促从零开始'].map((t) => (
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted">
+                  <span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span>
+                  {t}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="animate-fade-in-up bg-accent-50 rounded-2xl p-6 border border-accent-200">
+            <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-accent-600 mb-4">使用 PromoKit AI</div>
+            <div className="space-y-3">
+              {['统一资料库 · 同源分析', '各岗位结构化 AI 输出', '一键沉淀为 Work Kit', '下次大促几分钟启动'].map((t) => (
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary">
+                  <span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span>
+                  {t}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-10 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <div className="inline-flex items-center gap-4 bg-sidebar rounded-2xl px-6 py-4">
+            <Clock className="w-5 h-5 text-accent-400" />
+            <span className="text-[15px] text-white/70">启动耗时</span>
+            <span className="text-[24px] font-light text-white mx-2">3h → 5min</span>
+            <span className="w-px h-5 bg-white/10" />
+            <span className="text-[15px] text-white/70">复用率</span>
+            <span className="text-[24px] font-light text-accent-400 mx-2">0 → 100%</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  // 8. CTA
   {
     theme: 'dark' as const,
     content: (
       <div className="flex flex-col items-center text-center max-w-2xl">
-        <div className="animate-scale-in mb-8"><Logo variant="icon" theme="light" size={56} /></div>
-        <h2 className="text-[52px] font-light tracking-[-0.02em] text-white mb-5 leading-tight animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+        <div className="animate-scale-in mb-6"><Logo variant="icon" theme="light" size={52} /></div>
+        <h2 className="text-[48px] font-light tracking-[-0.02em] text-white mb-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           准备好沉淀<br />团队的 AI 经验了吗？
         </h2>
-        <p className="text-[17px] text-white/40 mb-12 max-w-md leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          从第一个大促分析项目开始<br />把一次有效的分析流程变成团队可复用的资产
+        <p className="text-[16px] text-white/45 mb-10 max-w-md leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          从第一个大促分析项目开始<br />把一次有效的分析流程变成可复用的团队资产
         </p>
         <div className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white hover-lift text-[15px] px-9 py-3.5">
+          <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white hover-lift text-[15px] px-8 py-3.5">
             进入产品演示 <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/create" className="btn-primary text-white border-white/30 hover:bg-white/8 hover:border-white/50 text-[15px] px-9 py-3.5">
+          <Link to="/create" className="btn-primary text-white border-white/35 hover:bg-white/8 hover:border-white/60 text-[15px] px-8 py-3.5">
             创建分析项目 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <p className="mt-20 text-[13px] text-white/15 tracking-wider animate-fade-in" style={{ animationDelay: '600ms' }}>
+        <p className="mt-16 text-[12px] text-white/18 animate-fade-in" style={{ animationDelay: '600ms' }}>
           PromoKit AI · 电商大促 AI 工作包系统
         </p>
       </div>
@@ -334,31 +546,36 @@ export default function Slides() {
   return (
     <div className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-700 ${slide.theme === 'dark' ? 'bg-sidebar' : 'bg-bg-primary'}`}>
       <Decors theme={slide.theme} />
-      <div key={current} className="relative z-10 px-10 py-20 animate-fade-in-up">{slide.content}</div>
+      <div key={current} className="relative z-10 px-8 py-16 animate-fade-in-up">{slide.content}</div>
 
+      {/* Progress bar */}
       <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/5">
         <div className="h-full bg-accent-500 transition-all duration-500 ease-out" style={{ width: `${((current + 1) / total) * 100}%` }} />
       </div>
-      <div className={`absolute bottom-6 left-10 text-[11px] tracking-wider ${slide.theme === 'dark' ? 'text-white/18' : 'text-text-muted'}`}>
+
+      {/* Page number */}
+      <div className={`absolute bottom-6 left-8 text-[11px] font-medium tracking-wider ${slide.theme === 'dark' ? 'text-white/20' : 'text-text-muted'}`}>
         {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </div>
 
+      {/* Nav arrows */}
       <button onClick={goPrev} disabled={current === 0}
-        className={`absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-black/2 hover:bg-black/5'}`}>
-        <ChevronLeft className={`w-4.5 h-4.5 ${slide.theme === 'dark' ? 'text-white/40' : 'text-text-muted'}`} />
+        className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
+        <ChevronLeft className={`w-4 h-4 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
       </button>
       <button onClick={goNext} disabled={current === total - 1}
-        className={`absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-black/2 hover:bg-black/5'}`}>
-        <ChevronRight className={`w-4.5 h-4.5 ${slide.theme === 'dark' ? 'text-white/40' : 'text-text-muted'}`} />
+        className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-0 ${slide.theme === 'dark' ? 'bg-white/5 hover:bg-white/12' : 'bg-black/3 hover:bg-black/6'}`}>
+        <ChevronRight className={`w-4 h-4 ${slide.theme === 'dark' ? 'text-white/50' : 'text-text-muted'}`} />
       </button>
 
-      <div className="absolute bottom-6 right-10 flex items-center gap-2">
+      {/* Dots */}
+      <div className="absolute bottom-6 right-8 flex items-center gap-2">
         {slides.map((_, i) => (
           <button key={i} onClick={() => setCurrent(i)}
             className={`rounded-full transition-all duration-300 ${
               i === current
                 ? `w-6 h-[8px] ${slide.theme === 'dark' ? 'bg-white' : 'bg-accent-500'}`
-                : `w-[8px] h-[8px] ${slide.theme === 'dark' ? 'bg-white/12 hover:bg-white/25' : 'bg-gray-300 hover:bg-gray-400'}`
+                : `w-[8px] h-[8px] ${slide.theme === 'dark' ? 'bg-white/15 hover:bg-white/30' : 'bg-gray-300 hover:bg-gray-400'}`
             }`} />
         ))}
       </div>
