@@ -27,8 +27,8 @@ const typeIcons: Record<string, typeof FileSpreadsheet> = {
 export default function MaterialLibrary() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = mockProjects.find((p) => p.slug === projectSlug)
-  const materials = mockMaterials[projectSlug ?? ''] ?? []
-  const tasks = mockTaskCards[projectSlug ?? ''] ?? []
+  const materials = mockMaterials[project?.id ?? ''] ?? []
+  const tasks = mockTaskCards[project?.id ?? ''] ?? []
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeQuickType, setActiveQuickType] = useState<string | null>(null)

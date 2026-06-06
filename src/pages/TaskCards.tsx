@@ -14,8 +14,8 @@ const sourceColorMap: Record<string, string> = {
 export default function TaskCards() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = mockProjects.find((p) => p.slug === projectSlug)
-  const [tasks, setTasks] = useState(mockTaskCards[projectSlug ?? ''] ?? [])
-  const materials = mockMaterials[projectSlug ?? ''] ?? []
+  const [tasks, setTasks] = useState(mockTaskCards[project?.id ?? ''] ?? [])
+  const materials = mockMaterials[project?.id ?? ''] ?? []
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
 

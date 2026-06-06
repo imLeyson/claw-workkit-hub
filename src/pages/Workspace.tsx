@@ -7,9 +7,9 @@ import { useToast } from '../components/Toast'
 export default function Workspace() {
   const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
   const project = mockProjects.find((p) => p.slug === projectSlug)
-  const task = mockTaskCards[projectSlug ?? '']?.find((t) => t.id === taskId)
+  const task = mockTaskCards[project?.id ?? '']?.find((t) => t.id === taskId)
   const result = mockAIResults[taskId ?? '']
-  const materials = mockMaterials[projectSlug ?? ''] ?? []
+  const materials = mockMaterials[project?.id ?? ''] ?? []
   const { showToast } = useToast()
 
   const [submitted, setSubmitted] = useState(result?.submitted ?? false)

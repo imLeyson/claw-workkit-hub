@@ -9,7 +9,7 @@ export default function Report() {
   const navigate = useNavigate()
   const { showToast } = useToast()
   const project = mockProjects.find((p) => p.slug === projectSlug)
-  const tasks = mockTaskCards[projectSlug ?? ''] ?? []
+  const tasks = mockTaskCards[project?.id ?? ''] ?? []
   const [activeTab, setActiveTab] = useState(tasks[0]?.role ?? 'merchandise')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saved, setSaved] = useState(false)
