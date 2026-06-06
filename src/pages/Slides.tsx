@@ -543,22 +543,36 @@ const slides = [
     theme: 'dark' as const,
     content: (
       <div className="flex flex-col items-center text-center max-w-xl">
-        <div className="animate-scale-in mb-6"><Logo variant="icon" theme="light" size={48} /></div>
-        <h2 className="text-[48px] font-light tracking-[-0.02em] text-white mb-4 leading-[1.15] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          准备好沉淀<br />团队的 AI 经验了吗
+        <div className="animate-scale-in mb-8">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-accent-500/10 scale-[1.4] animate-pulse" style={{ animationDuration: '2.5s' }} />
+            <Logo variant="icon" theme="light" size={52} />
+          </div>
+        </div>
+
+        <h2 className="text-[48px] font-light tracking-[-0.02em] text-white mb-2 leading-[1.15] animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+          PromoKit AI
         </h2>
-        <p className="text-[16px] text-white/40 mb-10 max-w-md leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          从第一个大促分析项目开始<br />把流程变成团队可复用的资产
+        <p className="text-[17px] text-white/40 mb-4 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
+          电商大促 AI 工作包系统
         </p>
-        <div className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '350ms' }}>
-          <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white text-[15px] px-8 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+
+        <div className="w-16 h-px bg-accent-500 mb-8 animate-fade-in-up" style={{ animationDelay: '250ms' }} />
+
+        <p className="text-[15px] text-white/35 max-w-sm leading-relaxed mb-10 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          把一次有效的大促分析流程<br />变成团队下一次可直接复用的起点
+        </p>
+
+        <div className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white text-[15px] px-8 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10">
             进入产品演示 <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/create" className="btn-primary text-white border-white/30 hover:bg-white/8 hover:border-white/60 text-[15px] px-8 py-3.5">
-            创建分析项目 <ArrowRight className="w-4 h-4" />
+          <Link to="/create" className="btn-primary text-white border-white/25 hover:bg-white/8 hover:border-white/50 text-[15px] px-8 py-3.5 transition-all duration-300">
+            创建第一个项目 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <p className="mt-14 text-[11px] text-white/15 animate-fade-in" style={{ animationDelay: '500ms' }}>
+
+        <p className="mt-16 text-[11px] text-white/12 animate-fade-in" style={{ animationDelay: '600ms' }}>
           PromoKit AI · 电商大促 AI 工作包系统
         </p>
       </div>
