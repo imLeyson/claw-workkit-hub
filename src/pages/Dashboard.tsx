@@ -1,20 +1,25 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Target } from 'lucide-react'
-import { mockProjects } from '../data/mock'
+import { mockProjects, mockTaskCards, mockAIResults, mockWorkKits } from '../data/mock'
 import { roleLabels } from '../data/mock'
 import { useCountUp } from '../components/useCountUp'
-
-const project = mockProjects[0]
 
 export default function Dashboard() {
   const [show, setShow] = useState(false)
   useEffect(() => { setShow(true) }, [])
 
-  const stat1 = useCountUp(String(project.competitors.length), 1000, show)
-  const stat2 = useCountUp('1286', 1400, show)
-  const stat3 = useCountUp('5', 800, show)
-  const stat4 = useCountUp('2', 600, show)
+  // Aggregate stats across all projects
+  const totalCompetitors = mockProjects.reduce((s, p) => s + p.competitors.length, 0)
+  const totalReviews = mockProjects.reduce((s, p) => s + p.competitors.reduce((a, c) => a + c.reviewCount, 0), 0)
+  const totalTasks = Object.values(mockTaskCards).flat().length
+  const submittedTasks = Object.values(mockTaskCards).flat().filter((t) => mockAIResults[t.id]?.submitted).length
+  const totalKits = mockWorkKits.length
+
+  const stat1 = useCountUp(String(totalCompetitors), 1000, show)
+  const stat2 = useCountUp(String(totalReviews), 1400, show)
+  const stat3 = useCountUp(String(totalTasks), 800, show)
+  const stat4 = useCountUp(String(totalKits), 600, show)
 
   return (
     <div className="max-w-5xl">
@@ -28,7 +33,7 @@ export default function Dashboard() {
         </h1>
         <p className="text-[17px] text-text-secondary leading-relaxed mb-2 animate-fade-in-up" style={{ animationDelay: '150ms' }}>电商大促 AI 工作包系统</p>
         <p className="text-[14px] text-text-muted leading-relaxed max-w-[460px] mb-8 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          围绕竞品评论、商品卖点、客服反馈和历史文案，生成可复用的大促分析流程。覆盖 {project.competitors.length} 个竞品品牌、{project.competitors.reduce((s, c) => s + c.reviewCount, 0)} 条用户评论。
+          围绕竞品评论、商品卖点、客服反馈和历史文案，生成可复用的大促分析流程。已覆盖 {totalCompetitors} 个竞品品牌、{totalReviews.toLocaleString()} 条用户评论。
         </p>
       </div>
 
@@ -36,10 +41,10 @@ export default function Dashboard() {
       <div className="border-t border-border-default pt-16 mb-20">
         <div className="grid grid-cols-4 gap-8 stagger">
           {[
-            { number: stat1, label: '竞品商品', sub: '3 款高速吹风机' },
-            { number: stat2, label: '评论样本', sub: `好评率 ${Math.round(project.competitors.reduce((s, c) => s + c.rating, 0) / 3)}%` },
-            { number: stat3, label: '分析任务', sub: '1 张已提交结果' },
-            { number: stat4, label: '可复用模板', sub: 'Work Kit 资产库' },
+            { number: stat1, label: '竞品商品', sub: `覆盖 ${mockProjects.length} 个品类的 ${totalCompetitors} 款产品` },
+            { number: stat2, label: '评论样本', sub: `${totalReviews.toLocaleString()} 条真实用户反馈` },
+            { number: stat3, label: '分析任务', sub: `${submittedTasks} 张已提交，${totalTasks} 张总量` },
+            { number: stat4, label: '可复用模板', sub: `${totalKits} 个 Work Kit 资产` },
           ].map((stat) => (
             <div key={stat.label} className="animate-fade-in-up">
               <div className="stat-number mb-2">{stat.number}</div>
