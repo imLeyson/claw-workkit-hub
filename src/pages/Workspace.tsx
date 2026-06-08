@@ -100,6 +100,17 @@ export default function Workspace() {
               </ul>
             </div>
           )}
+          <div className="bg-accent-50/40 rounded-2xl p-4 border border-accent-100">
+            <span className="section-title">竞品对比智能体</span>
+            <p className="mt-2 text-[11px] text-text-muted leading-relaxed">
+              系统可引入小型智能体（如话术对比、卖点验证），自动将分析结果与市场竞品进行横向对比，标记差异点与优化建议。
+            </p>
+            <div className="mt-3 flex items-center gap-2 text-[10px]">
+              <span className="px-2 py-1 rounded-md bg-white border border-accent-100 text-accent-600">话术对比</span>
+              <span className="px-2 py-1 rounded-md bg-white border border-border-light text-text-muted">卖点验证</span>
+              <span className="px-2 py-1 rounded-md bg-white border border-border-light text-text-muted">竞品对标</span>
+            </div>
+          </div>
         </div>
 
         {/* Main content */}

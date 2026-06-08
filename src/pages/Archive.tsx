@@ -1,27 +1,69 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight } from 'lucide-react'
+import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search } from 'lucide-react'
 import { mockWorkKits, roleLabels } from '../data/mock'
 
 export default function Archive() {
   const navigate = useNavigate()
   const [reuseKit, setReuseKit] = useState<string | null>(null)
   const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({})
+  const [filterTag, setFilterTag] = useState<string | null>(null)
 
   const toggleHistory = (id: string) => {
     setExpandedHistory((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
+  const allTags = [...new Set(mockWorkKits.flatMap((k) => k.tags))]
+  const filteredKits = filterTag ? mockWorkKits.filter((k) => k.tags.includes(filterTag)) : mockWorkKits
+  const successKits = mockWorkKits.filter((k) => k.rating >= 4.8)
+
   return (
     <div className="max-w-4xl">
-      <div className="mb-14">
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
+          <span className="section-title">KNOWLEDGE BASE · 知识库</span>
+        </div>
         <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">PromoKit AI 工作包资产库</h1>
-        <p className="text-[14px] text-text-secondary max-w-md leading-relaxed">
-          沉淀可复用的大促分析流程，减少下一次活动的重复整理成本。
+        <p className="text-[14px] text-text-secondary max-w-lg leading-relaxed">
+          新项目启动前，可在此浏览成功案例、学习历史经验。系统会根据你的项目自动关联相关知识。
         </p>
       </div>
 
-      {mockWorkKits.length === 0 ? (
+      {/* Success highlights */}
+      {successKits.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <span className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em]">成功案例 · 已验证</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {successKits.map((k) => (
+              <div key={k.id} className="bg-white rounded-2xl p-4 border border-amber-200 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => setReuseKit(k.id)}>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-semibold text-text-main truncate">{k.name}</div>
+                  <div className="text-[11px] text-text-muted">评分 {k.rating} · 复用 {k.reuseCount} 次 · {k.version}</div>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium shrink-0">成功案例</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filter tags */}
+      <div className="flex items-center gap-2 mb-8 flex-wrap">
+        <span className="text-[11px] text-text-muted mr-1 flex items-center gap-1"><Search className="w-3 h-3" />筛选：</span>
+        <button onClick={() => setFilterTag(null)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${!filterTag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-gray-100'}`}>全部</button>
+        {allTags.map((tag) => (
+          <button key={tag} onClick={() => setFilterTag(filterTag === tag ? null : tag)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${filterTag === tag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-gray-100'}`}>{tag}</button>
+        ))}
+      </div>
+
+      {filteredKits.length === 0 ? (
         <div className="text-center py-24">
           <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
             <Package className="w-7 h-7 text-text-muted" />
@@ -31,7 +73,7 @@ export default function Archive() {
         </div>
       ) : (
         <div className="space-y-6 stagger">
-          {mockWorkKits.map((wk) => {
+          {filteredKits.map((wk) => {
             const showHistory = expandedHistory[wk.id] ?? false
             return (
               <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden animate-fade-in-up">

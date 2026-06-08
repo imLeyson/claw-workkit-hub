@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowRight, UserCircle, Loader2, Sparkles } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockMaterials, roleLabels } from '../data/mock'
+import { mockProjects, mockTaskCards, mockMaterials, roleLabels, mockWorkKits } from '../data/mock'
 import { useToast } from '../components/Toast'
 
 const sourceColorMap: Record<string, string> = {
@@ -62,12 +62,34 @@ export default function TaskCards() {
       </div>
 
       {/* Context bar */}
-      <div className="flex items-center gap-6 text-[12px] text-text-muted mb-10 pb-6 border-b border-border-default">
+      <div className="flex items-center gap-6 text-[12px] text-text-muted mb-6 pb-6 border-b border-border-default">
         <span>{project.competitors.length} 个竞品</span>
         <span className="text-border-default">·</span>
         <span>{materials.length} 份资料</span>
         <span className="text-border-default">·</span>
         <span>{project.team.length} 个岗位</span>
+      </div>
+
+      {/* Smart association — knowledge base suggestions */}
+      <div className="mb-10 bg-accent-50/40 rounded-2xl p-5 border border-accent-100">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-3.5 h-3.5 text-accent-500" />
+          <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 为你关联 5 个相关经验</span>
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {mockWorkKits.slice(0, 2).map((k) => (
+            <div key={k.id} className="bg-white rounded-xl p-3 border border-accent-100 text-[11px]">
+              <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 10)}...</div>
+              <div className="text-text-muted">v{k.version} · {k.reuseCount} 次复用</div>
+            </div>
+          ))}
+          {[{ label: '吹风机竞品分析', tag: '评论挖掘' }, { label: '直播话术框架', tag: '文案生成' }, { label: '详情页优化模板', tag: '设计参考' }].map((item) => (
+            <div key={item.label} className="bg-white rounded-xl p-3 border border-border-light text-[11px]">
+              <div className="font-medium text-text-main mb-0.5 truncate">{item.label}</div>
+              <div className="text-text-muted">{item.tag}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Task card grid */}

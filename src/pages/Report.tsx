@@ -117,8 +117,36 @@ export default function Report() {
         </div>
       </div>
 
+      {/* Verification review */}
+      <div className="mt-12 bg-accent-50/40 rounded-2xl p-6 border border-accent-100">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-xl bg-accent-100 flex items-center justify-center">
+            <CheckCircle2 className="w-4 h-4 text-accent-600" />
+          </div>
+          <div>
+            <span className="text-[12px] font-semibold text-accent-600 uppercase tracking-[0.06em]">验证审核 · 知识库对标准入</span>
+            <p className="text-[11px] text-text-muted mt-0.5">设置验证角色，判断分析结果与市场竞品的优劣，确定保留和修改内容</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-[11px]">
+          {[
+            { label: '内部知识库对比', status: '已通过', pass: true },
+            { label: '市场竞品对标', status: '待验证', pass: false },
+            { label: '审核角色确认', status: '待分配', pass: false },
+          ].map((item) => (
+            <div key={item.label} className={`rounded-xl p-3 ${item.pass ? 'bg-success-soft border border-success/20' : 'bg-white border border-border-light'}`}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-text-main">{item.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.pass ? 'bg-success/10 text-success' : 'bg-gray-100 text-text-muted'}`}>{item.status}</span>
+              </div>
+              <div className="text-text-muted text-[10px]">{item.pass ? '公司知识库已验证通过' : '需分配审核人员进行验证'}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Next steps */}
-      <div className="mt-16">
+      <div className="mt-12">
         <span className="section-title">下一步执行清单</span>
         <div className="mt-5 space-y-3">
           {(reportNextSteps[project.id] || reportNextSteps['p1']).map((item, i) => (
