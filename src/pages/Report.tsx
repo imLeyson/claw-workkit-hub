@@ -1,8 +1,18 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { CheckCircle2, ArrowRight, Package } from 'lucide-react'
+import { CheckCircle2, ArrowRight, Package, Circle } from 'lucide-react'
 import { mockProjects, mockTaskCards, mockAIResults, roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
 import { useToast } from '../components/Toast'
+
+function CheckItem({ text }: { text: string }) {
+  const [done, setDone] = useState(false)
+  return (
+    <button onClick={() => setDone(!done)} className="flex items-center gap-4 text-[14px] text-text-secondary text-left w-full hover:text-text-main transition-colors">
+      {done ? <CheckCircle2 className="w-4 h-4 text-success shrink-0" /> : <Circle className="w-4 h-4 text-text-muted shrink-0" />}
+      <span className={done ? 'line-through text-text-muted' : ''}>{text}</span>
+    </button>
+  )
+}
 
 export default function Report() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
@@ -149,12 +159,9 @@ export default function Report() {
       <div className="mt-12">
         <span className="section-title">下一步执行清单</span>
         <div className="mt-5 space-y-3">
-          {(reportNextSteps[project.id] || reportNextSteps['p1']).map((item, i) => (
-            <div key={i} className="flex items-center gap-4 text-[14px] text-text-secondary">
-              <span className="text-[11px] font-medium text-text-muted w-5">{i + 1}.</span>
-              {item}
-            </div>
-          ))}
+          {(reportNextSteps[project.id] || reportNextSteps['p1']).map((item, i) => {
+            return <CheckItem key={i} text={item} />
+          })}
         </div>
       </div>
 

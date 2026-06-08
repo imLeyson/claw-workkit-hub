@@ -7,7 +7,6 @@ import {
   LayoutGrid,
   BarChart3,
   Archive,
-  Presentation,
 } from 'lucide-react'
 import Logo from './Logo'
 
@@ -35,7 +34,6 @@ export default function Sidebar() {
     { to: `/tasks/${slug}`, label: '任务卡', icon: LayoutGrid, flow: true },
     { to: `/report/${slug}`, label: '报告', icon: BarChart3, flow: true },
     { to: '/archive', label: '资产库', icon: Archive },
-    { to: '/slides', label: '幻灯片', icon: Presentation },
   ]
 
   const visibleLinks = links.filter((l) => {

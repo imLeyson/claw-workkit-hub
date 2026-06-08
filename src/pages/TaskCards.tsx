@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowRight, UserCircle, Loader2, Sparkles } from 'lucide-react'
+import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp } from 'lucide-react'
 import { mockProjects, mockTaskCards, mockMaterials, roleLabels, mockWorkKits } from '../data/mock'
 import { useToast } from '../components/Toast'
 
@@ -18,6 +18,8 @@ export default function TaskCards() {
   const materials = mockMaterials[project?.id ?? ''] ?? []
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
+  const [showAssociation, setShowAssociation] = useState(true)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
@@ -70,13 +72,17 @@ export default function TaskCards() {
         <span>{project.team.length} 个岗位</span>
       </div>
 
-      {/* Smart association — knowledge base suggestions */}
-      <div className="mb-10 bg-accent-50/40 rounded-2xl p-5 border border-accent-100">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-          <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 为你关联 5 个相关经验</span>
-        </div>
-        <div className="grid grid-cols-5 gap-2">
+      {/* Smart association — collapsible */}
+      <div className="mb-10 bg-accent-50/40 rounded-2xl border border-accent-100 overflow-hidden">
+        <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-accent-500" />
+            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 为你关联 5 个相关经验</span>
+          </div>
+          {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
+        </button>
+        {showAssociation && (
+        <div className="px-4 pb-4 grid grid-cols-5 gap-2">
           {mockWorkKits.slice(0, 2).map((k) => (
             <div key={k.id} className="bg-white rounded-xl p-3 border border-accent-100 text-[11px]">
               <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 10)}...</div>
@@ -90,6 +96,7 @@ export default function TaskCards() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Task card grid */}
@@ -130,8 +137,17 @@ export default function TaskCards() {
               </div>
 
               <div className={`${isFirst ? 'px-8' : 'px-6'} py-3 bg-gray-50/50 border-t border-border-light flex items-center justify-between`}>
-                <div className="flex items-center gap-2 text-[12px] text-text-muted">
-                  <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-[12px] text-text-muted">
+                    <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
+                  </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(task.promptPreview); setCopiedId(task.id); setTimeout(() => setCopiedId(null), 2000); showToast('Prompt 已复制', 'success') }}
+                    className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1"
+                  >
+                    <Copy className="w-3 h-3" />
+                    {copiedId === task.id ? '已复制' : '复制 Prompt'}
+                  </button>
                 </div>
                 <Link
                   to={`/workspace/${projectSlug}/${task.id}`}
@@ -139,7 +155,7 @@ export default function TaskCards() {
                     task.status === 'submitted' ? 'text-gray-400' : 'text-accent-600 group-hover:gap-2'
                   }`}
                 >
-                  {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '继续编辑' : task.status === 'ready' ? '进入分析' : '待生成'}
+                  {task.status === 'submitted' ? '查看结果' : task.status === 'generated' ? '继续编辑' : task.status === 'ready' ? '进入分析' : '待生成'}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

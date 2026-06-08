@@ -63,8 +63,12 @@ export default function App() {
             </div>
           </header>
 
-          <main className="flex-1 px-10 py-10 overflow-auto">
-            <Routes>
+          <main className="flex-1 overflow-auto">
+            <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
+              Demo 模式 · 模拟数据演示 · 非生产环境
+            </div>
+            <div className="px-10 py-10">
+              <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/create" element={<CreateProject />} />
               <Route path="/materials/:projectSlug" element={<MaterialLibrary />} />
@@ -73,6 +77,7 @@ export default function App() {
               <Route path="/report/:projectSlug" element={<Report />} />
               <Route path="/archive" element={<Archive />} />
             </Routes>
+            </div>
           </main>
         </div>
       </div>

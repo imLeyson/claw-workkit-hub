@@ -39,7 +39,10 @@ export default function MaterialLibrary() {
     <div className="max-w-4xl">
       <div className="flex items-start justify-between mb-14">
         <div>
-          <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">资料库</h1>
+          <div className="flex items-center gap-3 mb-3">
+            <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main">资料库</h1>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-text-muted font-medium">Demo</span>
+          </div>
           <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录的统一管理。</p>
         </div>
         <Link to={`/tasks/${projectSlug}`} className="btn-primary">
@@ -57,7 +60,7 @@ export default function MaterialLibrary() {
         </div>
         <p className="text-[15px] font-medium text-text-main mb-2">导入电商数据</p>
         <p className="text-[13px] text-text-muted mb-6">支持 Excel · CSV · PDF — 单文件最大 20MB</p>
-        <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.pdf,.txt" onChange={() => showToast('资料导入功能将在正式版上线', 'info')} className="hidden" />
+        <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.pdf,.txt" onChange={() => showToast('Demo 模式：模拟资料已加入列表', 'success')} className="hidden" />
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {['导入评论表', '导入商品信息', '导入客服记录', '导入历史文案'].map((label) => (
             <span
