@@ -78,18 +78,18 @@ function AppContent() {
 
         <main className="flex-1 overflow-auto">
           {!isSupabaseConfigured && (
-            <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
-              本地 Demo 模式 · 数据保存在当前浏览器 · 可随时恢复默认演示数据
+            <div className="text-center py-1 bg-accent-50/30 border-b border-accent-500/10 text-[10px] text-accent-400 font-medium">
+              本地 Demo · 数据保存在浏览器
             </div>
           )}
           {isSupabaseConfigured && !user && (
-            <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
-              Demo 模式 · 游客访问 · 数据持久化存储 · <Link to="/login" className="underline">登录开启云端同步</Link>
+            <div className="text-center py-1 bg-accent-50/30 border-b border-accent-500/10 text-[10px] text-accent-400 font-medium">
+              Demo 模式 · <Link to="/login" className="underline hover:text-accent-300">登录开启云端同步</Link>
             </div>
           )}
           {isSupabaseConfigured && user && (
-            <div className="text-center py-1.5 bg-success-soft/50 border-b border-success/10 text-[11px] text-success font-medium">
-              {user.email} · 已登录 · 数据云端同步
+            <div className="text-center py-1 bg-ai-400/5 border-b border-ai-400/10 text-[10px] text-ai-400 font-medium">
+              {user.email} · 已连接
             </div>
           )}
           <div className="px-4 lg:px-10 py-6 lg:py-10">

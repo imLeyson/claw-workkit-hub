@@ -60,14 +60,14 @@ export default function Dashboard() {
                 {p.status === 'in_progress' && <div className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full bg-accent-500" />}
                 <div className={`p-6 flex-1 ${p.status === 'in_progress' ? 'pt-7' : ''}`}>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-gray-50 px-2 py-1 rounded-md">{p.category}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-white/3 px-2 py-1 rounded-md">{p.category}</span>
                     {p.status === 'in_progress' && <span className="w-[6px] h-[6px] rounded-full bg-accent-500 pulse-dot" />}
                     {p.status === 'completed' && <span className="w-[6px] h-[6px] rounded-full bg-success" />}
                   </div>
                   <h3 className="text-[15px] font-semibold text-text-main mb-2 leading-snug">{p.name}</h3>
                   <p className="text-[12px] text-text-muted leading-relaxed line-clamp-2 mb-4">{p.description}</p>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-accent-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-[10px] font-medium text-text-muted">{done}/{tasks.length}</span>
@@ -77,7 +77,7 @@ export default function Dashboard() {
                     <span>{p.createdAt}</span>
                   </div>
                 </div>
-                <div className="px-6 py-3 bg-gray-50/50 border-t border-border-light flex items-center justify-between">
+                <div className="px-6 py-3 bg-white/3/50 border-t border-border-light flex items-center justify-between">
                   <span className="text-[11px] text-text-muted">{p.team.map((t) => roleLabels[t.role]).join(' · ')}</span>
                   <span className="text-[11px] font-medium text-accent-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                     {p.status === 'in_progress' ? '进入' : p.status === 'completed' ? '查看' : '开始'}
