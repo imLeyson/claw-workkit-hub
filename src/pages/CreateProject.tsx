@@ -2,8 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getWorkKitById, addProject } from '../services/db'
-import { updateTask } from '../services/db'
+import { getWorkKitById, addProject, addTask } from '../services/db'
 import type { Project, Competitor, TaskCard } from '../types'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
@@ -123,7 +122,7 @@ export default function CreateProject() {
             judgmentCriteria: [],
             sourceTags: workKit.tags.slice(0, 2),
           }
-          updateTask(taskCard)
+          addTask(taskCard)
         }
       }
       const msg = workKit

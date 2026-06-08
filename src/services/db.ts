@@ -77,6 +77,13 @@ export function getTasks(projectId: string): TaskCard[] {
   return all[projectId] ?? []
 }
 
+export function addTask(task: TaskCard) {
+  const all = read<Record<string, TaskCard[]>>('promokit_tasks', mockTaskCards)
+  if (!all[task.projectId]) all[task.projectId] = []
+  all[task.projectId].push(task)
+  write('promokit_tasks', all)
+}
+
 export function updateTask(task: TaskCard) {
   const all = read<Record<string, TaskCard[]>>('promokit_tasks', mockTaskCards)
   const list = all[task.projectId]
@@ -84,6 +91,15 @@ export function updateTask(task: TaskCard) {
     const idx = list.findIndex((t) => t.id === task.id)
     if (idx >= 0) { list[idx] = task; write('promokit_tasks', all) }
   }
+}
+
+export function deleteProjectData(projectId: string) {
+  const allMats = read<Record<string, Material[]>>('promokit_materials', mockMaterials)
+  delete allMats[projectId]
+  write('promokit_materials', allMats)
+  const allTasks = read<Record<string, TaskCard[]>>('promokit_tasks', mockTaskCards)
+  delete allTasks[projectId]
+  write('promokit_tasks', allTasks)
 }
 
 // ── AI Results ─────────────────────────────────────────────

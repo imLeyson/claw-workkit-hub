@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Target, Trash2 } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getTasks, getAIResult, getWorkKits } from '../services/db'
+import { getProjects, getTasks, getAIResult, getWorkKits, deleteProjectData } from '../services/db'
 
 export default function Dashboard() {
   const [projects, setProjects] = useState(getProjects())
@@ -12,6 +12,7 @@ export default function Dashboard() {
     const updated = projects.filter((p) => p.id !== id)
     setProjects(updated)
     localStorage.setItem('promokit_projects', JSON.stringify(updated))
+    deleteProjectData(id)
     setDeleteId(null)
   }
 
@@ -38,7 +39,12 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="mb-5"><span className="section-title">分析项目</span></div>
+      <div className="flex items-center justify-between mb-5">
+        <span className="section-title">分析项目 · {projects.length}</span>
+        <Link to="/create" className="text-[11px] font-medium text-accent-600 hover:text-accent-700 flex items-center gap-1">
+          + 新建项目
+        </Link>
+      </div>
 
       <div className="grid grid-cols-3 gap-5">
         {projects.map((p) => {
