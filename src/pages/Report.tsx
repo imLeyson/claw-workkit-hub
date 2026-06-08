@@ -123,10 +123,10 @@ export default function Report() {
                             <ul className="space-y-1.5">{section.items.map((item: string, j: number) => <li key={j} className="text-[12px] text-text-secondary flex items-start gap-2"><span className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-1.5 shrink-0" />{item}</li>)}</ul>
                           )}
                           {section.type === 'qa' && section.qa && (
-                            <div className="space-y-2">{section.qa.map((item: { q: string; a: string }, j: number) => <div key={j} className="bg-gray-50 rounded-xl p-3"><p className="text-[12px] font-medium text-text-main mb-1">Q: {item.q}</p><p className="text-[12px] text-text-secondary">A: {item.a}</p></div>)}</div>
+                            <div className="space-y-2">{section.qa.map((item: { q: string; a: string }, j: number) => <div key={j} className="bg-white/5 rounded-xl p-3"><p className="text-[12px] font-medium text-text-main mb-1">Q: {item.q}</p><p className="text-[12px] text-text-secondary">A: {item.a}</p></div>)}</div>
                           )}
                           {section.type === 'quotes' && section.quotes && (
-                            <div className="space-y-2">{section.quotes.map((q: { text: string; source: string }, j: number) => <div key={j} className="bg-gray-50 rounded-lg p-3 italic text-[12px] text-text-secondary">"{q.text}"<p className="text-[10px] text-text-muted mt-1 not-italic">—— {q.source}</p></div>)}</div>
+                            <div className="space-y-2">{section.quotes.map((q: { text: string; source: string }, j: number) => <div key={j} className="bg-white/5 rounded-lg p-3 italic text-[12px] text-text-secondary">"{q.text}"<p className="text-[10px] text-text-muted mt-1 not-italic">—— {q.source}</p></div>)}</div>
                           )}
                           {section.type === 'text' && section.body && (
                             <p className="text-[12px] text-text-secondary leading-relaxed">{section.body}</p>
@@ -196,7 +196,7 @@ export default function Report() {
                 <p className="text-[12px] text-text-muted">保存流程和模板，下次大促直接复用。</p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-4 mb-5 text-[12px] space-y-1.5">
+            <div className="bg-white/5 rounded-2xl p-4 mb-5 text-[12px] space-y-1.5">
               <div className="flex justify-between"><span className="text-text-muted">项目</span><span className="font-medium">{project.name}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>

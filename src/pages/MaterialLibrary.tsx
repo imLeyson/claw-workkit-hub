@@ -288,7 +288,7 @@ export default function MaterialLibrary() {
             下载 CSV 模板
           </button>
         </div>
-        <div className="mx-auto mb-4 max-w-2xl rounded-2xl border border-border-light bg-white/70 px-4 py-3 text-left">
+        <div className="mx-auto mb-4 max-w-2xl rounded-2xl border border-border-light bg-bg-surface/70 px-4 py-3 text-left">
           <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
           <div className="flex flex-wrap gap-1.5">
             {['类型', '竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容'].map((field) => (
@@ -301,7 +301,7 @@ export default function MaterialLibrary() {
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {['导入评论表', '导入商品参数', '导入客服记录', '导入历史文案'].map((label) => (
             <span key={label} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}
-              className="text-[11px] px-3 py-1.5 rounded-[10px] cursor-pointer bg-gray-50 text-text-muted hover:bg-accent-50 hover:text-accent-600 transition-colors"
+              className="text-[11px] px-3 py-1.5 rounded-[10px] cursor-pointer bg-white/5 text-text-muted hover:bg-accent-50 hover:text-accent-600 transition-colors"
             >{label}</span>
           ))}
         </div>
@@ -368,7 +368,7 @@ export default function MaterialLibrary() {
                 <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">品牌</label><input type="text" value={compForm.brand} onChange={(e) => setCompForm({ ...compForm, brand: e.target.value })} placeholder="例：小米米家" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">平台</label><select value={compForm.platform} onChange={(e) => setCompForm({ ...compForm, platform: e.target.value })} className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-white">{PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">平台</label><select value={compForm.platform} onChange={(e) => setCompForm({ ...compForm, platform: e.target.value })} className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-bg-surface">{PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>
                 <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">价格</label><input type="text" value={compForm.price} onChange={(e) => setCompForm({ ...compForm, price: e.target.value })} placeholder="¥499" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
                 <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">评论数</label><input type="number" value={compForm.reviewCount} onChange={(e) => setCompForm({ ...compForm, reviewCount: e.target.value })} placeholder="426" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
               </div>
@@ -390,7 +390,7 @@ export default function MaterialLibrary() {
           const Icon = typeIcons[m.type] || FileSpreadsheet
           return (
             <div key={m.id} className="card-surface rounded-[16px] p-4 flex items-center gap-4 group cursor-default hover:border-accent-500/20 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
-              <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
+              <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
               <div className="flex-1 min-w-0"><div className="text-[13px] font-medium text-text-main truncate">{m.label}</div><div className="text-[10px] text-text-muted">{m.fileName} · {m.uploadedAt}</div></div>
               <span className={`tag ${typeColorMap[m.type] || 'bg-gray-50 text-text-muted'}`}>{materialTypeLabels[m.type]}</span>
               <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${aiStatusConfig[m.aiStatus]}`}>{aiStatusLabels[m.aiStatus]}</span>

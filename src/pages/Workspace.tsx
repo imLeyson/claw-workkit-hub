@@ -326,7 +326,7 @@ export default function Workspace() {
                   {section.type === 'qa' && section.qa && (
                     <div className="space-y-3">
                       {section.qa.map((item, j) => (
-                        <div key={j} className="bg-gray-50 rounded-2xl p-4">
+                        <div key={j} className="bg-white/5 rounded-2xl p-4">
                           <p className="text-[13px] font-medium text-text-main mb-2">Q: {item.q}</p>
                           <p className="text-[13px] text-text-secondary leading-relaxed">A: {item.a}</p>
                         </div>
@@ -337,7 +337,7 @@ export default function Workspace() {
                   {section.type === 'quotes' && section.quotes && (
                     <div className="space-y-2">
                       {section.quotes.map((q, j) => (
-                        <div key={j} className="bg-gray-50 rounded-xl p-4">
+                        <div key={j} className="bg-white/5 rounded-xl p-4">
                           <p className="text-[13px] text-text-secondary leading-relaxed italic">"{q.text}"</p>
                           <p className="text-[11px] text-text-muted mt-1.5">—— {q.source}</p>
                         </div>

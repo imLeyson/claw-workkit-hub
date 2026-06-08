@@ -320,7 +320,7 @@ const slides = [
           </div>
           <div className="grid grid-cols-4 gap-2 text-[11px]">
             {['资料结构', '岗位配置', '任务 Prompt', '报告格式'].map((t) => (
-              <div key={t} className="bg-gray-50 rounded-lg px-3 py-2.5 text-text-secondary text-center font-medium">{t}</div>
+              <div key={t} className="bg-white/5 rounded-lg px-3 py-2.5 text-text-secondary text-center font-medium">{t}</div>
             ))}
           </div>
         </div>
@@ -339,7 +339,7 @@ const slides = [
         <Label text="The Impact" />
         <h2 className="text-[44px] font-light tracking-[-0.02em] text-text-main mb-8 leading-[1.15] animate-fade-in-up">用数据说话</h2>
         <div className="grid grid-cols-2 gap-5 stagger mb-8">
-          <div className="animate-fade-in-up bg-gray-50 rounded-2xl p-7 border border-border-default">
+          <div className="animate-fade-in-up bg-white/5 rounded-2xl p-7 border border-border-default">
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted mb-5">Before</div>
             <div className="space-y-3">
               {['各岗位各自整理资料', '分析口径与格式不统一', 'AI 输出无结构化沉淀', '每次大促从零启动'].map((t) => (

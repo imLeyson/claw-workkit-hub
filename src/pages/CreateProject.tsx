@@ -229,19 +229,19 @@ export default function CreateProject() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 text-[12px]">
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-white/5 rounded-xl p-3">
               <div className="text-text-muted mb-0.5">资料结构</div>
               <div className="text-text-secondary leading-snug">{workKit.materialStructure}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-white/5 rounded-xl p-3">
               <div className="text-text-muted mb-0.5">包含岗位</div>
               <div className="text-text-secondary">{workKit.includedRoles.map((r) => roleLabels[r]).join('、')}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-white/5 rounded-xl p-3">
               <div className="text-text-muted mb-0.5">适用场景</div>
               <div className="text-text-secondary">{workKit.scenario}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-white/5 rounded-xl p-3">
               <div className="text-text-muted mb-0.5">任务模板</div>
               <div className="text-text-secondary">{workKit.sections.length} 个任务</div>
             </div>

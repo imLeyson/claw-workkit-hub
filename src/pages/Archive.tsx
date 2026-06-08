@@ -95,7 +95,7 @@ export default function Archive() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="搜索 Work Kit 名称、描述、标签..."
-            className="w-full pl-9 pr-3 py-2 border border-border-default rounded-xl text-[12px] focus:outline-none focus:border-accent-400 bg-white"
+            className="w-full pl-9 pr-3 py-2 border border-border-default rounded-xl text-[12px] focus:outline-none focus:border-accent-400 bg-transparent"
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -133,7 +133,7 @@ export default function Archive() {
       {/* Work Kit List */}
       {filteredKits.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Package className="w-7 h-7 text-text-muted" />
           </div>
           <p className="text-[14px] text-text-muted">{searchText ? '没有匹配的 Work Kit' : '暂无 AI 工作包'}</p>
@@ -165,7 +165,7 @@ export default function Archive() {
                   <p className="text-[13px] text-text-secondary leading-relaxed mb-4">{wk.description}</p>
                   <div className="flex flex-wrap items-center gap-2 mb-5">
                     {wk.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-gray-50 text-text-muted">{tag}</span>
+                      <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-text-muted">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -284,7 +284,7 @@ export default function Archive() {
                   <p className="text-[12px] text-text-muted">基于此模板创建新的大促分析项目</p>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-4 mb-4 space-y-2 text-[12px]">
+              <div className="bg-bg-primary rounded-2xl p-4 mb-4 space-y-2 text-[12px]">
                 <div className="flex justify-between"><span className="text-text-muted">模板版本</span><span className="font-medium text-text-main">{wk.version} · 复用 {wk.reuseCount} 次</span></div>
                 <div className="flex justify-between"><span className="text-text-muted">预填岗位</span><span className="font-medium text-text-main">{wk.includedRoles.map((r) => roleLabels[r]).join('、')}</span></div>
                 <div className="flex justify-between"><span className="text-text-muted">任务模板</span><span className="font-medium text-text-main">{wk.sections.length} 个</span></div>
