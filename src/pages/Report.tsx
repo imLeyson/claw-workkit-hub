@@ -5,10 +5,12 @@ import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
 import { getProjectBySlug, getTasks, getAIResult } from '../services/db'
 import { useToast } from '../components/Toast'
 
-function CheckItem({ text }: { text: string }) {
-  const [done, setDone] = useState(false)
+function CheckItem({ text, id }: { text: string; id: string }) {
+  const key = `checklist_${id}`
+  const [done, setDone] = useState(() => localStorage.getItem(key) === '1')
+  const toggle = () => { const v = !done; setDone(v); localStorage.setItem(key, v ? '1' : '0') }
   return (
-    <button onClick={() => setDone(!done)} className="flex items-center gap-4 text-[14px] text-text-secondary text-left w-full hover:text-text-main transition-colors">
+    <button onClick={toggle} className="flex items-center gap-4 text-[14px] text-text-secondary text-left w-full hover:text-text-main transition-colors">
       {done ? <CheckCircle2 className="w-4 h-4 text-success shrink-0" /> : <Circle className="w-4 h-4 text-text-muted shrink-0" />}
       <span className={done ? 'line-through text-text-muted' : ''}>{text}</span>
     </button>
@@ -161,7 +163,7 @@ export default function Report() {
         <span className="section-title">下一步执行清单</span>
         <div className="mt-5 space-y-3">
           {(reportNextSteps[project.id] || reportNextSteps['p1']).map((item, i) => {
-            return <CheckItem key={i} text={item} />
+            return <CheckItem key={i} text={item} id={`${project.id}-${i}`} />
           })}
         </div>
       </div>

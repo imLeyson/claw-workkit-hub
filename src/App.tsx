@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { Sparkles, LogOut } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import Sidebar from './components/Sidebar'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -107,7 +108,9 @@ export default function App() {
   return (
     <ToastProvider>
       <AuthProvider>
-        <AppContent />
+        <ErrorBoundary>
+          <AppContent />
+        </ErrorBoundary>
       </AuthProvider>
     </ToastProvider>
   )

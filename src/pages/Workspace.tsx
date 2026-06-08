@@ -138,7 +138,7 @@ export default function Workspace() {
                   <ShoppingBag className="w-4 h-4 text-accent-500 shrink-0" />
                   <div>
                     <div className="text-text-main font-medium">{m.label.split(' ')[0]}</div>
-                    <div className="text-[11px] text-text-muted">{m.reviewCount} 条 · {m.rating}%</div>
+                    <div className="text-[11px] text-text-muted">{m.fileName || m.platform || ''}</div>
                   </div>
                 </div>
               ))}

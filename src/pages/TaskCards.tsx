@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjectBySlug, getMaterials, getTasks, getWorkKits } from '../services/db'
+import { getProjectBySlug, getMaterials, getTasks, getWorkKits, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
 
 const sourceColorMap: Record<string, string> = {
@@ -39,7 +39,12 @@ export default function TaskCards() {
     let delay = 0
     pending.forEach((t) => {
       setTimeout(() => {
-        setTasks((prev) => prev.map((x) => x.id === t.id ? { ...x, status: 'ready' as const } : x))
+        setTasks((prev) => {
+          const updated = prev.map((x) => x.id === t.id ? { ...x, status: 'ready' as const } : x)
+          const changed = updated.find((x) => x.id === t.id)
+          if (changed) updateTask(changed)
+          return updated
+        })
       }, delay)
       delay += 300
     })
