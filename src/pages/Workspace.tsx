@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag } from 'lucide-react'
 import { mockProjects, mockTaskCards, mockAIResults, mockMaterials, roleLabels } from '../data/mock'
 import { useToast } from '../components/Toast'
+import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey } from '../services/ai'
+import type { AISection } from '../types'
 
 export default function Workspace() {
   const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
@@ -18,19 +20,43 @@ export default function Workspace() {
   const [feedbackItems, setFeedbackItems] = useState<string[]>([])
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [feedbackText, setFeedbackText] = useState('')
+  const [aiSections, setAiSections] = useState<AISection[] | null>(null)
+  const [realAI, setRealAI] = useState(hasApiKey())
+  const [showKeyInput, setShowKeyInput] = useState(false)
+  const [apiKeyInput, setApiKeyInput] = useState('')
 
   if (!project || !task) return <div className="text-text-muted text-sm p-8">任务不存在</div>
 
   const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
   const reviewMats = inputMats.filter((m) => m.type === 'review')
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setGenerating(true)
-    setTimeout(() => {
-      setGenerating(false)
-      setShowResult(true)
-      showToast('AI 分析完成', 'success')
-    }, 3000)
+    if (hasApiKey()) {
+      try {
+        const matContents = inputMats.map((m) => m.content)
+        const sections = await generateAnalysis(task.promptPreview, matContents, roleLabels[task.role])
+        setAiSections(sections)
+        setGenerating(false)
+        setShowResult(true)
+        showToast('AI 分析完成（真实调用）', 'success')
+      } catch (e: any) {
+        setGenerating(false)
+        if (e.message === 'NO_API_KEY') {
+          setRealAI(false)
+          showToast('未配置 API Key，使用模拟数据', 'info')
+        } else {
+          showToast(`分析失败：${e.message.slice(0, 50)}`, 'error')
+        }
+      }
+    } else {
+      // Fallback: mock delay
+      setTimeout(() => {
+        setGenerating(false)
+        setShowResult(true)
+        showToast('模拟 AI 分析完成（配置 API Key 可启用真实分析）', 'info')
+      }, 3000)
+    }
   }
 
   const handleSubmit = () => { setSubmitted(true); showToast('已提交到策略报告', 'success') }
@@ -54,6 +80,28 @@ export default function Workspace() {
           </Link>
           <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">{task.title}</h1>
           <p className="text-[14px] text-text-secondary">{project.name} · {roleLabels[task.role]}岗位 · {task.assignedTo}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className={`w-[6px] h-[6px] rounded-full ${realAI ? 'bg-success' : 'bg-gray-300'}`} />
+            <span className="text-[11px] text-text-muted">
+              {realAI ? 'Claude API 已连接' : '模拟模式'}{' '}
+              <button onClick={() => setShowKeyInput(!showKeyInput)} className="text-accent-600 hover:underline ml-1">
+                {realAI ? '更换' : '配置 API Key'}
+              </button>
+            </span>
+          </div>
+          {showKeyInput && (
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="password"
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                placeholder="sk-ant-api03-..."
+                className="text-[12px] px-3 py-1.5 border border-border-default rounded-lg w-60"
+              />
+              <button onClick={() => { saveApiKey(apiKeyInput); setRealAI(true); setShowKeyInput(false); setApiKeyInput(''); showToast('API Key 已保存', 'success') }} className="text-[11px] px-3 py-1.5 bg-accent-500 text-white rounded-lg font-medium">保存</button>
+              {realAI && <button onClick={() => { clearApiKey(); setRealAI(false); setShowKeyInput(false); showToast('API Key 已清除') }} className="text-[11px] text-text-muted hover:text-error">清除</button>}
+            </div>
+          )}
         </div>
         {showResult && !submitted && (
           <div className="flex items-center gap-3">
@@ -153,7 +201,7 @@ export default function Workspace() {
                 </button>
               </div>
 
-              {result.sections.map((section, i) => (
+              {(aiSections || result.sections).map((section, i) => (
                 <div key={i} className="card-surface rounded-[24px] p-6">
                   <h4 className="text-[15px] font-medium text-text-main mb-5">{section.title}</h4>
 
