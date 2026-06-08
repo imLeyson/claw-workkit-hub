@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowRight, Package, Circle } from 'lucide-react'
 import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult } from '../services/db'
+import { getProjectBySlug, getTasks, getAIResult, getWorkKits } from '../services/db'
+import type { WorkKit } from '../types'
 import { useToast } from '../components/Toast'
 
 function CheckItem({ text, id }: { text: string; id: string }) {
@@ -100,19 +101,31 @@ export default function Report() {
                   </div>
                   {result?.submitted ? (
                     <div className="space-y-3">
-                      {result.sections.slice(0, 2).map((section, i) => (
+                      {result.sections.map((section, i) => (
                         <div key={i} className="card-surface rounded-[20px] p-5">
                           <h4 className="text-[13px] font-medium text-text-main mb-3">{section.title}</h4>
                           {section.type === 'matrix' && section.headers && section.rows && (
                             <div className="overflow-x-auto">
                               <table className="w-full text-[12px]">
-                                <thead><tr className="border-b border-border-light">{section.headers.map((h) => <th key={h} className="text-left py-2 px-2 text-[10px] font-medium uppercase tracking-[0.06em] text-text-muted">{h}</th>)}</tr></thead>
-                                <tbody>{section.rows.slice(0, 4).map((row, ri) => <tr key={ri}>{row.map((cell, ci) => <td key={ci} className={`py-2 px-2 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>)}</tr>)}</tbody>
+                                <thead><tr className="border-b border-border-light">{section.headers.map((h: string) => <th key={h} className="text-left py-2 px-2 text-[10px] font-medium uppercase tracking-[0.06em] text-text-muted">{h}</th>)}</tr></thead>
+                                <tbody>{section.rows.map((row: string[], ri: number) => <tr key={ri}>{row.map((cell: string, ci: number) => <td key={ci} className={`py-2 px-2 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>)}</tr>)}</tbody>
                               </table>
                             </div>
                           )}
                           {section.type === 'list' && section.items && (
-                            <ul className="space-y-1.5">{section.items.slice(0, 3).map((item, j) => <li key={j} className="text-[12px] text-text-secondary">— {item}</li>)}</ul>
+                            <ul className="space-y-1.5">{section.items.map((item: string, j: number) => <li key={j} className="text-[12px] text-text-secondary">— {item}</li>)}</ul>
+                          )}
+                          {section.type === 'bullet' && section.items && (
+                            <ul className="space-y-1.5">{section.items.map((item: string, j: number) => <li key={j} className="text-[12px] text-text-secondary flex items-start gap-2"><span className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-1.5 shrink-0" />{item}</li>)}</ul>
+                          )}
+                          {section.type === 'qa' && section.qa && (
+                            <div className="space-y-2">{section.qa.map((item: { q: string; a: string }, j: number) => <div key={j} className="bg-gray-50 rounded-xl p-3"><p className="text-[12px] font-medium text-text-main mb-1">Q: {item.q}</p><p className="text-[12px] text-text-secondary">A: {item.a}</p></div>)}</div>
+                          )}
+                          {section.type === 'quotes' && section.quotes && (
+                            <div className="space-y-2">{section.quotes.map((q: { text: string; source: string }, j: number) => <div key={j} className="bg-gray-50 rounded-lg p-3 italic text-[12px] text-text-secondary">"{q.text}"<p className="text-[10px] text-text-muted mt-1 not-italic">—— {q.source}</p></div>)}</div>
+                          )}
+                          {section.type === 'text' && section.body && (
+                            <p className="text-[12px] text-text-secondary leading-relaxed">{section.body}</p>
                           )}
                         </div>
                       ))}
@@ -143,16 +156,16 @@ export default function Report() {
         </div>
         <div className="grid grid-cols-3 gap-3 text-[11px]">
           {[
-            { label: '内部知识库对比', status: '已通过', pass: true },
-            { label: '市场竞品对标', status: '待验证', pass: false },
-            { label: '审核角色确认', status: '待分配', pass: false },
+            { label: 'AI 结果完整性', status: submittedCount > 0 ? '已通过' : '无数据', pass: submittedCount > 0, desc: submittedCount > 0 ? `${submittedCount} 个岗位已提交` : '暂无岗位提交分析结果' },
+            { label: '跨岗位覆盖', status: roleTabs.length >= 3 ? '已通过' : '待完善', pass: roleTabs.length >= 3, desc: roleTabs.length >= 3 ? `覆盖 ${roleTabs.length} 个岗位角色` : `仅覆盖 ${roleTabs.length} 个岗位` },
+            { label: '竞品对标验证', status: '待分配', pass: false, desc: '需指定审核人进行竞品对比验证' },
           ].map((item) => (
             <div key={item.label} className={`rounded-xl p-3 ${item.pass ? 'bg-success-soft border border-success/20' : 'bg-white border border-border-light'}`}>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-text-main">{item.label}</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.pass ? 'bg-success/10 text-success' : 'bg-gray-100 text-text-muted'}`}>{item.status}</span>
               </div>
-              <div className="text-text-muted text-[10px]">{item.pass ? '公司知识库已验证通过' : '需分配审核人员进行验证'}</div>
+              <div className="text-text-muted text-[10px]">{item.desc}</div>
             </div>
           ))}
         </div>
@@ -186,7 +199,30 @@ export default function Report() {
             </div>
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => setShowSaveDialog(false)} className="btn-ghost">取消</button>
-              <button onClick={() => { setSaved(true); setShowSaveDialog(false); showToast('Work Kit 已保存到资产库', 'success') }} className="btn-primary-filled">确认保存</button>
+              <button onClick={() => {
+                const kits = getWorkKits()
+                const newKit: WorkKit = {
+                  id: 'wk' + Date.now(),
+                  name: project.name + ' Work Kit',
+                  version: 'v1.0',
+                  basedOnProjectId: project.id,
+                  basedOnProjectName: project.name,
+                  description: `基于「${project.name}」项目沉淀的分析流程。`,
+                  scenario: project.campaign || '大促分析',
+                  includedRoles: roleTabs,
+                  materialStructure: '竞品评论 · 商品参数 · 客服记录',
+                  sections: tasks.filter((t) => getAIResult(t.id)?.submitted).map((t) => ({ title: t.title, role: t.role, content: getAIResult(t.id)?.sections || [] })),
+                  createdAt: new Date().toISOString().split('T')[0],
+                  tags: [project.category, project.campaign].filter(Boolean),
+                  feedback: '',
+                  versionHistory: [{ version: 'v1.0', date: new Date().toISOString().split('T')[0], changes: '初始版本：基于' + project.name + '项目沉淀' }],
+                  reuseCount: 0, rating: 0,
+                }
+                kits.push(newKit)
+                localStorage.setItem('promokit_kits', JSON.stringify(kits))
+                setSaved(true); setShowSaveDialog(false)
+                showToast('Work Kit 已保存到资产库，可在资产库查看', 'success')
+              }} className="btn-primary-filled">确认保存</button>
             </div>
           </div>
         </div>
@@ -195,8 +231,8 @@ export default function Report() {
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-[24px] p-8 w-[400px] shadow-xl text-center">
             <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center mx-auto mb-4"><CheckCircle2 className="w-7 h-7 text-success" /></div>
-            <h3 className="text-[18px] font-medium text-text-main mb-2">618 Work Kit v1 已沉淀</h3>
-            <p className="text-[13px] text-text-muted mb-6">已将「{project.name}」保存为可复用工作包，可在资产库中查看和复用。</p>
+            <h3 className="text-[18px] font-medium text-text-main mb-2">Work Kit 已沉淀</h3>
+            <p className="text-[13px] text-text-muted mb-6">已将「{project.name}」的分析流程保存为可复用工作包。</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setSaved(false)} className="btn-ghost">关闭</button>
               <button onClick={() => navigate('/archive')} className="btn-primary-filled">查看资产库 <ArrowRight className="w-4 h-4" /></button>
