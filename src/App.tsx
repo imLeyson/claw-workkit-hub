@@ -1,8 +1,9 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
-import { Sparkles, LogOut } from 'lucide-react'
+import { Sparkles, LogOut, Sun, Moon } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
+import { ThemeProvider, useTheme } from './components/ThemeProvider'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import CommandPalette, { useCommandPalette } from './components/CommandPalette'
 import AIAssistant from './components/AIAssistant'
@@ -49,6 +50,7 @@ function Breadcrumb() {
 function AppContent() {
   const location = useLocation()
   const { user, loading, logout } = useAuth()
+  const { theme, toggle: toggleTheme } = useTheme()
   const cmd = useCommandPalette()
 
   // ⌘K / Ctrl+K shortcut
@@ -73,7 +75,10 @@ function AppContent() {
       <div className="flex-1 flex flex-col min-h-screen">
         <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-4 lg:px-10">
           <div className="max-lg:hidden"><Breadcrumb /></div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button onClick={toggleTheme} className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-main hover:bg-white/5 transition-colors" title={theme === 'dark' ? '切换浅色模式' : '切换深色模式'}>
+              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            </button>
             <Link to="/slides" className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />幻灯片
             </Link>
@@ -131,11 +136,13 @@ function AppContent() {
 export default function App() {
   return (
     <ToastProvider>
-      <AuthProvider>
-        <ErrorBoundary>
-          <AppContent />
-        </ErrorBoundary>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ErrorBoundary>
+            <AppContent />
+          </ErrorBoundary>
+        </AuthProvider>
+      </ThemeProvider>
     </ToastProvider>
   )
 }

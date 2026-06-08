@@ -8,6 +8,12 @@
     <title>PromoKit AI | 电商大促 AI 工作包系统</title>
   </head>
   <body>
+    <script>
+      (function() {
+        var theme = localStorage.getItem('promokit_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
