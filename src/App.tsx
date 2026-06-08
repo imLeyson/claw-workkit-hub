@@ -12,6 +12,7 @@ import Report from './pages/Report'
 import Archive from './pages/Archive'
 import Slides from './pages/Slides'
 import Login from './pages/Login'
+import NotFound from './pages/NotFound'
 
 function Breadcrumb() {
   const location = useLocation()
@@ -77,6 +78,7 @@ function AppContent() {
               <Route path="/workspace/:projectSlug/:taskId" element={<Workspace />} />
               <Route path="/report/:projectSlug" element={<Report />} />
               <Route path="/archive" element={<Archive />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </main>

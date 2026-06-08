@@ -1,7 +1,7 @@
 import type { AISection } from '../types'
 
 const STORAGE_KEY = 'promokit_ai_key'
-const DEFAULT_KEY = 'sk-46e88687139f4a28ab8de6a3f83e9aa7'
+const DEFAULT_KEY = import.meta.env.VITE_DEEPSEEK_KEY || ''
 const API_BASE = 'https://api.deepseek.com/v1/chat/completions'
 const MODEL = 'deepseek-chat'
 
