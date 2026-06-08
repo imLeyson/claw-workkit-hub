@@ -5,6 +5,7 @@ import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import CommandPalette, { useCommandPalette } from './components/CommandPalette'
+import AIAssistant from './components/AIAssistant'
 import Sidebar from './components/Sidebar'
 import { isSupabaseConfigured } from './services/supabase'
 
@@ -122,6 +123,7 @@ function AppContent() {
         </main>
       </div>
       <CommandPalette open={cmd.open} onClose={cmd.close} />
+      <AIAssistant />
     </div>
   )
 }
