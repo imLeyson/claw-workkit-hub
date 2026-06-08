@@ -31,7 +31,7 @@ export default function Login() {
         setSuccess('注册成功！请检查邮箱确认链接。确认后返回此页面登录。')
       } else {
         await signIn(email, password)
-        navigate('/', { replace: true })
+        window.location.href = '/'
       }
     } catch (err: any) {
       setError(err.message || '操作失败，请重试')
