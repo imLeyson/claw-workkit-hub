@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Target, Trash2, RotateCcw } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getTasks, getAIResult, getWorkKits, deleteProjectData, resetAllData } from '../services/db'
+import { getProjects, getTasks, getAIResult, getWorkKits, deleteProject, resetAllData } from '../services/db'
 
 export default function Dashboard() {
   const [projects, setProjects] = useState(getProjects())
@@ -10,10 +10,8 @@ export default function Dashboard() {
   const [showReset, setShowReset] = useState(false)
 
   const handleDelete = (id: string) => {
-    const updated = projects.filter((p) => p.id !== id)
-    setProjects(updated)
-    localStorage.setItem('promokit_projects', JSON.stringify(updated))
-    deleteProjectData(id)
+    deleteProject(id)
+    setProjects(getProjects())
     setDeleteId(null)
   }
 

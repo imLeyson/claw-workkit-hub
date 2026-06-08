@@ -1,24 +1,60 @@
 import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil } from 'lucide-react'
+import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil, Download } from 'lucide-react'
 import { materialTypeLabels, aiStatusLabels, platformColors } from '../data/mock'
-import { getProjectBySlug, getMaterials, addMaterial, getProjects } from '../services/db'
+import { getProjectBySlug, getMaterials, addMaterial, getProjects, refreshTaskMaterialLinks } from '../services/db'
 import { supabase } from '../services/supabase'
 import { useToast } from '../components/Toast'
 import type { Material, Competitor } from '../types'
 
 type ImportRow = Record<string, string>
 
+const CSV_TEMPLATE_HEADERS = ['类型', '竞品品牌', '商品名称', '平台', '价格', '评论数', '好评率', '高频问题', '评论内容', '客服问题', '风险等级', '文案内容', '来源']
+const REQUIRED_STRUCTURED_HEADERS = ['类型']
+const RECOMMENDED_STRUCTURED_HEADERS = ['竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容']
+
+function parseCSVLine(line: string): string[] {
+  const cols: string[] = []
+  let current = ''
+  let inQuotes = false
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i]
+    const next = line[i + 1]
+    if (char === '"' && next === '"') {
+      current += '"'
+      i += 1
+    } else if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === ',' && !inQuotes) {
+      cols.push(current.trim())
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  cols.push(current.trim())
+  return cols
+}
+
 function parseCSV(text: string): ImportRow[] {
   const lines = text.trim().split('\n')
   if (lines.length < 2) return []
-  const headers = lines[0].split(',').map((h) => h.trim())
+  const headers = parseCSVLine(lines[0]).map((h) => h.trim())
   return lines.slice(1).map((line) => {
-    const cols = line.split(',')
+    const cols = parseCSVLine(line)
     const row: ImportRow = {}
     headers.forEach((h, i) => { row[h] = (cols[i] || '').trim() })
     return row
   })
+}
+
+function getCSVHeaders(text: string): string[] {
+  const firstLine = text.trim().split('\n')[0] || ''
+  return parseCSVLine(firstLine).map((h) => h.trim()).filter(Boolean)
+}
+
+function toCSVValue(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`
 }
 
 const aiStatusConfig: Record<string, string> = {
@@ -81,7 +117,27 @@ export default function MaterialLibrary() {
     const updated = materials.filter((m) => m.id !== matId)
     setMaterials(updated)
     if (project) { const all = JSON.parse(localStorage.getItem('promokit_materials') || '{}'); if (all[project.id]) all[project.id] = updated; localStorage.setItem('promokit_materials', JSON.stringify(all)) }
+    if (project) refreshTaskMaterialLinks(project.id)
     showToast('资料已删除', 'success')
+  }
+
+  const downloadTemplate = () => {
+    const rows = [
+      CSV_TEMPLATE_HEADERS,
+      ['竞品评论', '小米米家', '米家高速吹风机 H700', '京东', '¥499', '426', '91.4', '噪音偏大|风嘴松动|发热明显', '风速快，但最大档声音有点尖。', '', '', '', '京东评论'],
+      ['商品参数', '飞科', '飞科高速吹风机 F8', '天猫', '¥329', '389', '88.7', '风力不足|塑料感强', '马达转速、功率、重量、温度档位对比。', '', '', '', '商品参数表'],
+      ['客服记录', '', '', '', '', '', '', '', '', '噪音多大？会吵到家人吗？', '正常', '', '客服高频问题'],
+      ['历史文案', '', '', '', '', '', '', '', '', '', '', '高速数码马达，3 分钟速干长发。', '详情页文案'],
+    ]
+    const csv = rows.map((row) => row.map(toCSVValue).join(',')).join('\n')
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'promokit-import-template.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+    showToast('CSV 导入模板已下载', 'success')
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,10 +148,21 @@ export default function MaterialLibrary() {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const text = ev.target?.result as string
+      const headers = getCSVHeaders(text)
       const rows = parseCSV(text)
       let compAdded = 0; let matAdded = 0
 
       if (rows.length > 0 && rows[0]['类型']) {
+        const missingRequired = REQUIRED_STRUCTURED_HEADERS.filter((h) => !headers.includes(h))
+        if (missingRequired.length > 0) {
+          setUploading(false)
+          showToast(`CSV 模板字段缺失：${missingRequired.join('、')}`, 'error')
+          return
+        }
+        const missingRecommended = RECOMMENDED_STRUCTURED_HEADERS.filter((h) => !headers.includes(h))
+        if (missingRecommended.length > 0) {
+          showToast(`已识别标准导入，但缺少建议字段：${missingRecommended.join('、')}`, 'info')
+        }
         // Structured CSV with type column
         const compMap = new Map<string, Competitor>()
         const typeGroups: Record<string, string[]> = { review: [], spec: [], faq: [], copy_asset: [] }
@@ -157,6 +224,9 @@ export default function MaterialLibrary() {
         }
       } else {
         // Simple file — fallback
+        if (file.name.toLowerCase().endsWith('.csv') && headers.length > 0 && !headers.includes('类型')) {
+          showToast('未识别为标准导入模板，将作为普通资料导入；建议先下载 CSV 模板整理字段', 'info')
+        }
         let type: Material['type'] = 'review'
         if (file.name.includes('参数') || file.name.includes('spec')) type = 'spec'
         else if (file.name.includes('客服') || file.name.includes('faq')) type = 'faq'
@@ -171,6 +241,7 @@ export default function MaterialLibrary() {
         addMaterial(project.id, mat); matAdded++
       }
 
+      refreshTaskMaterialLinks(project.id)
       setMaterials(getMaterials(project.id))
       setUploading(false)
       const parts: string[] = []
@@ -207,6 +278,26 @@ export default function MaterialLibrary() {
         <p className="text-[15px] font-medium text-text-main mb-1">{uploading ? '正在解析数据...' : '导入电商数据'}</p>
         <p className="text-[12px] text-text-muted mb-4">支持 CSV 格式 · 自动识别竞品商品和资料分类 · 一键同步更新</p>
         <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.txt" onChange={handleFileUpload} className="hidden" />
+        <div className="mb-4 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); downloadTemplate() }}
+            className="inline-flex items-center gap-2 rounded-xl border border-accent-200 bg-white px-4 py-2 text-[12px] font-medium text-accent-700 shadow-sm shadow-accent-100/40 transition-colors hover:border-accent-300 hover:bg-accent-50"
+          >
+            <Download className="h-3.5 w-3.5" />
+            下载 CSV 模板
+          </button>
+        </div>
+        <div className="mx-auto mb-4 max-w-2xl rounded-2xl border border-border-light bg-white/70 px-4 py-3 text-left">
+          <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
+          <div className="flex flex-wrap gap-1.5">
+            {['类型', '竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容'].map((field) => (
+              <span key={field} className={`rounded-lg px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-700' : 'bg-gray-50 text-text-muted'}`}>
+                {field}
+              </span>
+            ))}
+          </div>
+        </div>
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {['导入评论表', '导入商品参数', '导入客服记录', '导入历史文案'].map((label) => (
             <span key={label} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}

@@ -4,6 +4,7 @@ const STORAGE_KEY = 'promokit_ai_key'
 const DEFAULT_KEY = import.meta.env.VITE_DEEPSEEK_KEY || ''
 const API_BASE = 'https://api.deepseek.com/v1/chat/completions'
 const MODEL = 'deepseek-chat'
+export const isRealAIEnabled = import.meta.env.VITE_ENABLE_REAL_AI === 'true'
 
 export function getApiKey(): string {
   return localStorage.getItem(STORAGE_KEY) || DEFAULT_KEY
@@ -18,7 +19,7 @@ export function clearApiKey() {
 }
 
 export function hasApiKey(): boolean {
-  return true // Always available with default key
+  return isRealAIEnabled && getApiKey().trim().length > 0
 }
 
 const systemPrompt = `你是一个电商大促 AI 分析助手。你必须用 JSON 数组格式输出结构化分析结果。

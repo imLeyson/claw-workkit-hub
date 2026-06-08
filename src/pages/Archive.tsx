@@ -2,21 +2,26 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getWorkKits } from '../services/db'
+import { getProjects, getWorkKits, incrementWorkKitReuse } from '../services/db'
 
 export default function Archive() {
   const navigate = useNavigate()
   const [reuseKit, setReuseKit] = useState<string | null>(null)
   const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({})
   const [filterTag, setFilterTag] = useState<string | null>(null)
+  const [kits, setKits] = useState(getWorkKits())
 
   const toggleHistory = (id: string) => {
     setExpandedHistory((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
-  const allTags = [...new Set(getWorkKits().flatMap((k) => k.tags))]
-  const filteredKits = filterTag ? getWorkKits().filter((k) => k.tags.includes(filterTag)) : getWorkKits()
-  const successKits = getWorkKits().filter((k) => k.rating >= 4.8)
+  const allTags = [...new Set(kits.flatMap((k) => k.tags))]
+  const filteredKits = filterTag ? kits.filter((k) => k.tags.includes(filterTag)) : kits
+  const successKits = kits.filter((k) => k.rating >= 4.8)
+  const projectReportPath = (projectIdOrSlug: string) => {
+    const project = getProjects().find((p) => p.id === projectIdOrSlug || p.slug === projectIdOrSlug)
+    return `/report/${project?.slug || projectIdOrSlug}`
+  }
 
   return (
     <div className="max-w-4xl">
@@ -201,11 +206,11 @@ export default function Archive() {
                 {/* Footer actions */}
                 <div className="px-6 py-4 mt-5 bg-gray-50/50 border-t border-border-light flex items-center justify-between">
                   <div className="text-[11px] text-text-muted">
-                    来源项目：<button onClick={() => navigate(`/report/${wk.basedOnProjectId}`)} className="text-accent-600 hover:text-accent-700 transition-colors font-medium">{wk.basedOnProjectName}</button>
+                    来源项目：<button onClick={() => navigate(projectReportPath(wk.basedOnProjectId))} className="text-accent-600 hover:text-accent-700 transition-colors font-medium">{wk.basedOnProjectName}</button>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => navigate(`/report/${wk.basedOnProjectId}`)}
+                      onClick={() => navigate(projectReportPath(wk.basedOnProjectId))}
                       className="btn-ghost text-[12px]"
                     >
                       查看来源报告 <ArrowRight className="w-3.5 h-3.5" />
@@ -226,7 +231,7 @@ export default function Archive() {
 
       {/* Reuse confirmation dialog */}
       {reuseKit && (() => {
-        const wk = getWorkKits().find((k) => k.id === reuseKit)
+        const wk = kits.find((k) => k.id === reuseKit)
         if (!wk) return null
         return (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
@@ -270,7 +275,12 @@ export default function Archive() {
               <div className="flex items-center gap-2 justify-end">
                 <button onClick={() => setReuseKit(null)} className="btn-ghost text-[13px]">取消</button>
                 <button
-                  onClick={() => { setReuseKit(null); navigate(`/create?from=archive&kit=${wk.id}`) }}
+                  onClick={() => {
+                    incrementWorkKitReuse(wk.id)
+                    setKits(getWorkKits())
+                    setReuseKit(null)
+                    navigate(`/create?from=archive&kit=${wk.id}`)
+                  }}
                   className="btn-primary-filled text-[13px]"
                 >
                   确认，开始创建

@@ -4,8 +4,51 @@ import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, Shoppi
 import { roleLabels } from '../data/mock'
 import { getProjectBySlug, getTasks, getAIResult, getMaterials, saveAIResult, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
-import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey } from '../services/ai'
-import type { AISection } from '../types'
+import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey, isRealAIEnabled } from '../services/ai'
+import type { AIResult, AISection, TaskCard } from '../types'
+
+function buildMockSections(task: TaskCard, materialCount: number): AISection[] {
+  const roleLabel = roleLabels[task.role]
+  return [
+    {
+      title: `${roleLabel}分析摘要`,
+      type: 'bullet',
+      items: [
+        `已读取 ${materialCount} 份关联资料，围绕「${task.title}」完成结构化归纳。`,
+        `核心判断：优先处理高频用户痛点，再转化为可执行的岗位动作。`,
+        `建议下一步由${roleLabel}负责人复核关键结论，并提交到策略报告沉淀。`,
+      ],
+    },
+    {
+      title: '关键发现矩阵',
+      type: 'matrix',
+      headers: ['维度', '结论', '动作建议'],
+      rows: [
+        ['用户问题', '评论与资料中存在可聚类的高频诉求', '按频次和转化影响排序'],
+        ['岗位产出', `${roleLabel}岗需要形成可复用输出`, `整理为${task.outputFormat || '结构化清单'}`],
+        ['复用价值', '本次分析可沉淀为后续大促模板', '保存到 Work Kit 资产库'],
+      ],
+    },
+    {
+      title: '执行清单',
+      type: 'list',
+      items: task.judgmentCriteria.length > 0
+        ? task.judgmentCriteria.map((item) => `复核：${item}`)
+        : ['补充资料样本', '确认分析口径', '提交到策略报告'],
+    },
+  ]
+}
+
+function buildAIResult(task: TaskCard, sections: AISection[]): AIResult {
+  return {
+    id: 'r' + Date.now(),
+    taskId: task.id,
+    title: task.title,
+    sections,
+    generatedAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+    submitted: false,
+  }
+}
 
 export default function Workspace() {
   const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
@@ -16,6 +59,7 @@ export default function Workspace() {
   const { showToast } = useToast()
 
   const [submitted, setSubmitted] = useState(result?.submitted ?? false)
+  const [currentResult, setCurrentResult] = useState<AIResult | undefined>(result)
   const [generating, setGenerating] = useState(false)
   const [showResult, setShowResult] = useState(!!result?.generatedAt)
   const [feedbackItems, setFeedbackItems] = useState<string[]>([])
@@ -38,6 +82,10 @@ export default function Workspace() {
         const matContents = inputMats.map((m) => m.content)
         const sections = await generateAnalysis(task.promptPreview, matContents, roleLabels[task.role])
         setAiSections(sections)
+        const generated = buildAIResult(task, sections)
+        setCurrentResult(generated)
+        saveAIResult(generated)
+        updateTask({ ...task, status: 'generated' })
         setGenerating(false)
         setShowResult(true)
         showToast('AI 分析完成（真实调用）', 'success')
@@ -53,22 +101,30 @@ export default function Workspace() {
     } else {
       // Fallback: mock delay
       setTimeout(() => {
+        const sections = buildMockSections(task, inputMats.length)
+        const generated = buildAIResult(task, sections)
+        setAiSections(sections)
+        setCurrentResult(generated)
+        saveAIResult(generated)
+        updateTask({ ...task, status: 'generated' })
         setGenerating(false)
         setShowResult(true)
-        showToast('模拟 AI 分析完成（配置 API Key 可启用真实分析）', 'info')
+        showToast('模拟 AI 分析完成', 'info')
       }, 3000)
     }
   }
 
   const handleSubmit = () => {
-    setSubmitted(true)
-    if (result) {
-      result.submitted = true
-      saveAIResult(result)
+    if (!currentResult) {
+      showToast('请先生成分析结果', 'error')
+      return
     }
+    const submittedResult = { ...currentResult, submitted: true }
+    setSubmitted(true)
+    setCurrentResult(submittedResult)
+    saveAIResult(submittedResult)
     if (task) {
-      task.status = 'submitted'
-      updateTask(task)
+      updateTask({ ...task, status: 'submitted' })
     }
     showToast('已提交到策略报告', 'success')
   }
@@ -95,22 +151,28 @@ export default function Workspace() {
           <div className="flex items-center gap-2 mt-2">
             <span className={`w-[6px] h-[6px] rounded-full ${realAI ? 'bg-success' : 'bg-gray-300'}`} />
             <span className="text-[11px] text-text-muted">
-              {realAI ? 'Claude API 已连接' : '模拟模式'}{' '}
-              <button onClick={() => setShowKeyInput(!showKeyInput)} className="text-accent-600 hover:underline ml-1">
-                {realAI ? '更换' : '配置 API Key'}
-              </button>
+              {realAI ? 'DeepSeek API 已连接' : '模拟模式'}
+              {isRealAIEnabled && (
+                <button onClick={() => setShowKeyInput(!showKeyInput)} className="text-accent-600 hover:underline ml-1">
+                  {realAI ? '更换' : '配置 API Key'}
+                </button>
+              )}
             </span>
           </div>
-          {showKeyInput && (
+          {isRealAIEnabled && showKeyInput && (
             <div className="mt-3 flex items-center gap-2">
               <input
                 type="password"
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
-                placeholder="sk-ant-api03-..."
+                placeholder="输入 DeepSeek API Key"
                 className="text-[12px] px-3 py-1.5 border border-border-default rounded-lg w-60"
               />
-              <button onClick={() => { saveApiKey(apiKeyInput); setRealAI(true); setShowKeyInput(false); setApiKeyInput(''); showToast('API Key 已保存', 'success') }} className="text-[11px] px-3 py-1.5 bg-accent-500 text-white rounded-lg font-medium">保存</button>
+              <button onClick={() => {
+                const key = apiKeyInput.trim()
+                if (!key) { showToast('请输入 API Key', 'error'); return }
+                saveApiKey(key); setRealAI(true); setShowKeyInput(false); setApiKeyInput(''); showToast('API Key 已保存', 'success')
+              }} className="text-[11px] px-3 py-1.5 bg-accent-500 text-white rounded-lg font-medium">保存</button>
               {realAI && <button onClick={() => { clearApiKey(); setRealAI(false); setShowKeyInput(false); showToast('API Key 已清除') }} className="text-[11px] text-text-muted hover:text-error">清除</button>}
             </div>
           )}
@@ -202,7 +264,7 @@ export default function Workspace() {
             </div>
           )}
 
-          {showResult && result && (
+          {showResult && currentResult && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-[16px] font-medium text-text-main flex items-center gap-2">
@@ -213,7 +275,7 @@ export default function Workspace() {
                 </button>
               </div>
 
-              {(aiSections || result?.sections || []).map((section, i) => (
+              {(aiSections || currentResult.sections || []).map((section, i) => (
                 <div key={i} className="card-surface rounded-[24px] p-6">
                   <h4 className="text-[15px] font-medium text-text-main mb-5">{section.title}</h4>
 

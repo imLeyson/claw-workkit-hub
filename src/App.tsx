@@ -5,6 +5,7 @@ import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import Sidebar from './components/Sidebar'
+import { isSupabaseConfigured } from './services/supabase'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const CreateProject = lazy(() => import('./pages/CreateProject'))
@@ -62,24 +63,31 @@ function AppContent() {
             <Link to="/slides" className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />幻灯片
             </Link>
-            {user ? (
+            {isSupabaseConfigured && user ? (
               <button onClick={logout} className="text-[11px] text-text-muted hover:text-error transition-colors flex items-center gap-1.5">
                 <LogOut className="w-3 h-3" />退出
               </button>
-            ) : (
+            ) : isSupabaseConfigured ? (
               <Link to="/login" className="text-[11px] text-accent-600 hover:text-accent-700 transition-colors">登录</Link>
+            ) : (
+              <span className="text-[11px] text-text-muted">本地 Demo</span>
             )}
             <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
           </div>
         </header>
 
         <main className="flex-1 overflow-auto">
-          {!user && (
+          {!isSupabaseConfigured && (
             <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
-              Demo 模式 · 游客访问 · 数据持久化存储 · <Link to="/login" className="underline">登录</Link>
+              本地 Demo 模式 · 数据保存在当前浏览器 · 可随时恢复默认演示数据
             </div>
           )}
-          {user && (
+          {isSupabaseConfigured && !user && (
+            <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
+              Demo 模式 · 游客访问 · 数据持久化存储 · <Link to="/login" className="underline">登录开启云端同步</Link>
+            </div>
+          )}
+          {isSupabaseConfigured && user && (
             <div className="text-center py-1.5 bg-success-soft/50 border-b border-success/10 text-[11px] text-success font-medium">
               {user.email} · 已登录 · 数据云端同步
             </div>

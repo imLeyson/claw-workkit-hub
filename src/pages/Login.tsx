@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { signIn, signUp } from '../services/auth'
 import { useAuth } from '../components/AuthProvider'
 import Logo from '../components/Logo'
+import { isSupabaseConfigured } from '../services/supabase'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -18,6 +19,32 @@ export default function Login() {
   if (user) {
     navigate('/', { replace: true })
     return null
+  }
+
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
+        <div className="w-full max-w-[420px] text-center">
+          <div className="flex justify-center mb-4">
+            <Logo variant="icon" theme="light" size={40} />
+          </div>
+          <h1 className="text-[22px] font-light tracking-[-0.02em] text-text-main mb-2">PromoKit AI</h1>
+          <p className="text-[13px] text-text-muted mb-6">当前运行在本地 Demo 模式</p>
+          <div className="card-surface rounded-2xl p-6 text-left">
+            <h2 className="text-[16px] font-medium text-text-main mb-2">账号登录未启用</h2>
+            <p className="text-[13px] text-text-secondary leading-relaxed mb-4">
+              这个原型默认使用浏览器本地数据，不连接真实后端。配置 Supabase 环境变量后，登录和云端同步入口会自动启用。
+            </p>
+            <div className="rounded-xl bg-accent-50/60 border border-accent-100 px-4 py-3 text-[12px] text-accent-700 leading-relaxed">
+              你仍然可以完整体验创建项目、导入资料、生成任务卡、提交报告和沉淀 Work Kit。
+            </div>
+          </div>
+          <button onClick={() => navigate('/')} className="mt-5 text-[12px] text-text-muted hover:text-text-secondary transition-colors">
+            ← 返回首页
+          </button>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

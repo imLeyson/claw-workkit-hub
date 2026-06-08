@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getWorkKitById, addProject, addTask } from '../services/db'
+import { getWorkKitById, addProject, addTask, refreshTaskMaterialLinks } from '../services/db'
 import type { Project, Competitor, TaskCard } from '../types'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
@@ -11,11 +11,60 @@ const normalSteps = ['基础信息', '参与岗位', '竞品设置']
 const templateSteps = ['基础信息', '参与岗位', '活动信息']
 
 const defaultRoles = [
+  { role: 'merchandise', label: '商品', checked: true, desc: '竞品评论挖掘、痛点矩阵、产品机会判断' },
   { role: 'operations', label: '运营', checked: true, desc: '用户痛点挖掘、数据分析、竞品洞察' },
   { role: 'copywriting', label: '文案', checked: true, desc: '卖点转译、文案输出、直播话术生成' },
   { role: 'customer_service', label: '客服', checked: true, desc: 'FAQ 生成、用户应答知识库' },
   { role: 'design', label: '设计', checked: true, desc: '详情页优化、视觉层级建议' },
 ]
+
+const defaultTaskTemplates: Record<Role, Omit<TaskCard, 'id' | 'projectId' | 'assignedTo' | 'inputMaterials' | 'status'>> = {
+  merchandise: {
+    role: 'merchandise',
+    title: '竞品评论痛点矩阵',
+    description: '从竞品评论和商品参数中归纳用户高频问题，形成痛点矩阵、机会点和选品建议。',
+    promptPreview: '你是一位电商选品经理。请基于竞品评论和商品参数，识别TOP5用户痛点、功能机会和差异化选品建议，按频次、严重度和转化影响排序。',
+    outputFormat: '痛点矩阵 · 功能机会 · 选品建议',
+    judgmentCriteria: ['问题分类是否清晰', '是否有评论或参数依据', '建议是否可落地'],
+    sourceTags: ['竞品评论', '商品参数'],
+  },
+  copywriting: {
+    role: 'copywriting',
+    title: '卖点文案转译',
+    description: '将用户痛点和真实评论转化为详情页、直播和种草内容中的卖点表达。',
+    promptPreview: '你是一位资深电商文案。请把竞品评论中的用户原话和痛点转译为可感知、可量化、可传播的卖点文案，并给出标题方向。',
+    outputFormat: '卖点文案库 · 用户原话摘录 · 标题方向',
+    judgmentCriteria: ['卖点是否可量化', '是否引用真实用户语言', '表达是否适合大促转化'],
+    sourceTags: ['竞品评论', '商品参数', '历史文案'],
+  },
+  customer_service: {
+    role: 'customer_service',
+    title: '客服 FAQ 与风险话术',
+    description: '整理售前疑虑和售后风险，生成可直接用于客服培训和详情页说明的 FAQ。',
+    promptPreview: '你是一位客服培训主管。请基于用户高频问题、差评风险和客服记录，生成包含风险等级标注的客服应答模板。',
+    outputFormat: '客服 FAQ · 风险话术 · 售后解释',
+    judgmentCriteria: ['是否覆盖售前售后', '是否标注风险等级', '应答是否专业且口语化'],
+    sourceTags: ['竞品评论', '客服记录'],
+  },
+  design: {
+    role: 'design',
+    title: '详情页信息结构优化',
+    description: '根据用户关注点和痛点优先级，重排详情页模块顺序和首屏表达重点。',
+    promptPreview: '你是一位电商详情页 UX 专家。请基于用户评论、历史文案和商品参数，规划详情页模块顺序、首屏信息结构和视觉表达重点。',
+    outputFormat: '详情页模块建议 · 首屏信息结构 · 图示化建议',
+    judgmentCriteria: ['首屏是否包含决策信息', '信息层级是否匹配用户关注热度', '是否降低决策门槛'],
+    sourceTags: ['竞品评论', '商品参数', '历史文案'],
+  },
+  operations: {
+    role: 'operations',
+    title: '大促策略汇总',
+    description: '汇总各岗位分析结果，判断主推策略、价格表达和核心卖点排序，输出执行清单。',
+    promptPreview: '你是一位电商运营负责人。请综合商品、文案、客服和设计的分析结果，提炼本次大促主推策略、价格表达、核心卖点排序和执行清单。',
+    outputFormat: '大促策略摘要 · 执行清单 · 风险提醒',
+    judgmentCriteria: ['策略是否有数据支撑', '执行清单是否可落地', '是否识别关键风险'],
+    sourceTags: ['竞品评论', '商品参数', '客服记录', '历史文案'],
+  },
+}
 
 export default function CreateProject() {
   const navigate = useNavigate()
@@ -103,9 +152,11 @@ export default function CreateProject() {
         team: team as any,
       }
       await addProject(newProject)
+      const selectedRoles = roles.filter((r) => r.checked).map((r) => r.role as Role)
+      let createdTaskCount = 0
+
       // Clone task cards from template
       if (workKit) {
-        const selectedRoles = roles.filter((r) => r.checked).map((r) => r.role)
         for (const section of workKit.sections) {
           if (!selectedRoles.includes(section.role)) continue
           const taskCard: TaskCard = {
@@ -123,11 +174,27 @@ export default function CreateProject() {
             sourceTags: workKit.tags.slice(0, 2),
           }
           addTask(taskCard)
+          createdTaskCount += 1
+        }
+      } else {
+        for (const role of selectedRoles) {
+          const template = defaultTaskTemplates[role]
+          const taskCard: TaskCard = {
+            ...template,
+            id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
+            projectId: id,
+            status: 'pending',
+            assignedTo: roleLabels[role] + '负责人',
+            inputMaterials: [],
+          }
+          addTask(taskCard)
+          createdTaskCount += 1
         }
       }
+      refreshTaskMaterialLinks(id)
       const msg = workKit
-        ? `基于「${workKit.name}」模板创建成功 · ${workKit.sections.length} 张任务卡已生成`
-        : '项目创建成功'
+        ? `基于「${workKit.name}」模板创建成功 · ${createdTaskCount} 张任务卡已生成`
+        : `项目创建成功 · ${createdTaskCount} 张岗位任务卡已生成`
       showToast(msg, 'success')
       navigate(`/materials/${slug}`)
     } else {

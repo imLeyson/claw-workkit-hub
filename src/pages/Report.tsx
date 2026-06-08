@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowRight, Package, Circle } from 'lucide-react'
 import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult, getWorkKits } from '../services/db'
+import { getProjectBySlug, getTasks, getAIResult, getWorkKits, upsertWorkKitFromProject } from '../services/db'
 import type { WorkKit } from '../types'
 import { useToast } from '../components/Toast'
 
@@ -27,12 +27,16 @@ export default function Report() {
   const [activeTab, setActiveTab] = useState(tasks[0]?.role ?? 'merchandise')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedMode, setSavedMode] = useState<'created' | 'updated'>('created')
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
   const roleOrder = ['operations', 'merchandise', 'copywriting', 'customer_service', 'design']
   const roleTabs = [...new Set(tasks.map((t) => t.role))].sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b))
   const submittedCount = tasks.filter((t) => getAIResult(t.id)?.submitted).length
+  const existingKit = getWorkKits().find((k) => k.basedOnProjectId === project.id)
+  const nextVersionLabel = existingKit ? '自动升级版本' : 'v1.0'
+  const submittedTasks = tasks.filter((t) => getAIResult(t.id)?.submitted)
 
   return (
     <div className="max-w-4xl">
@@ -194,13 +198,13 @@ export default function Report() {
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 mb-5 text-[12px] space-y-1.5">
               <div className="flex justify-between"><span className="text-text-muted">项目</span><span className="font-medium">{project.name}</span></div>
-              <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">v1.0</span></div>
-              <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{tasks.length} 个任务模板 · {roleTabs.length} 个岗位</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>
+              {existingKit && <div className="flex justify-between"><span className="text-text-muted">已有版本</span><span className="font-medium">{existingKit.version} · {existingKit.versionHistory.length} 条历史</span></div>}
             </div>
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => setShowSaveDialog(false)} className="btn-ghost">取消</button>
               <button onClick={() => {
-                const kits = getWorkKits()
                 const newKit: WorkKit = {
                   id: 'wk' + Date.now(),
                   name: project.name + ' Work Kit',
@@ -211,17 +215,17 @@ export default function Report() {
                   scenario: project.campaign || '大促分析',
                   includedRoles: roleTabs,
                   materialStructure: '竞品评论 · 商品参数 · 客服记录',
-                  sections: tasks.filter((t) => getAIResult(t.id)?.submitted).map((t) => ({ title: t.title, role: t.role, content: getAIResult(t.id)?.sections || [] })),
+                  sections: submittedTasks.map((t) => ({ title: t.title, role: t.role, content: getAIResult(t.id)?.sections || [] })),
                   createdAt: new Date().toISOString().split('T')[0],
                   tags: [project.category, project.campaign].filter(Boolean),
                   feedback: '',
                   versionHistory: [{ version: 'v1.0', date: new Date().toISOString().split('T')[0], changes: '初始版本：基于' + project.name + '项目沉淀' }],
                   reuseCount: 0, rating: 0,
                 }
-                kits.push(newKit)
-                localStorage.setItem('promokit_kits', JSON.stringify(kits))
+                const savedResult = upsertWorkKitFromProject(newKit)
+                setSavedMode(savedResult.mode)
                 setSaved(true); setShowSaveDialog(false)
-                showToast('Work Kit 已保存到资产库，可在资产库查看', 'success')
+                showToast(savedResult.mode === 'created' ? 'Work Kit 已保存到资产库' : `Work Kit 已更新为 ${savedResult.kit.version}`, 'success')
               }} className="btn-primary-filled">确认保存</button>
             </div>
           </div>
@@ -231,8 +235,8 @@ export default function Report() {
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-[24px] p-8 w-[400px] shadow-xl text-center">
             <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center mx-auto mb-4"><CheckCircle2 className="w-7 h-7 text-success" /></div>
-            <h3 className="text-[18px] font-medium text-text-main mb-2">Work Kit 已沉淀</h3>
-            <p className="text-[13px] text-text-muted mb-6">已将「{project.name}」的分析流程保存为可复用工作包。</p>
+            <h3 className="text-[18px] font-medium text-text-main mb-2">{savedMode === 'created' ? 'Work Kit 已沉淀' : 'Work Kit 已更新'}</h3>
+            <p className="text-[13px] text-text-muted mb-6">{savedMode === 'created' ? `已将「${project.name}」的分析流程保存为可复用工作包。` : `已将「${project.name}」的最新报告结果同步到原工作包版本历史。`}</p>
             <div className="flex items-center justify-center gap-3">
               <button onClick={() => setSaved(false)} className="btn-ghost">关闭</button>
               <button onClick={() => navigate('/archive')} className="btn-primary-filled">查看资产库 <ArrowRight className="w-4 h-4" /></button>
