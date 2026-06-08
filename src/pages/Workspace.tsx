@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult, getMaterials, saveAIResult } from '../services/db'
+import { getProjectBySlug, getTasks, getAIResult, getMaterials, saveAIResult, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
 import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey } from '../services/ai'
 import type { AISection } from '../types'
@@ -66,7 +66,11 @@ export default function Workspace() {
       result.submitted = true
       saveAIResult(result)
     }
-    showToast('已提交到策略报告，看板进度已同步更新', 'success')
+    if (task) {
+      task.status = 'submitted'
+      updateTask(task)
+    }
+    showToast('已提交到策略报告', 'success')
   }
 
   const confirmFeedback = () => {
