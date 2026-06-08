@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-5xl">
-      <div className="grid grid-cols-4 gap-6 mb-14">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10 lg:mb-14">
         {[
           { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: '/materials/618-hair-dryer' },
           { value: totalReviews.toLocaleString(), label: '评论样本', sub: '三个项目聚合数据', to: '/materials/618-hair-dryer' },
@@ -46,7 +46,7 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
         {projects.map((p) => {
           const tasks = getTasks(p.id)
           const done = tasks.filter((t) => getAIResult(t.id)?.submitted).length

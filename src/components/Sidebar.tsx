@@ -1,12 +1,8 @@
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  PlusCircle,
-  FolderOpen,
-  LayoutGrid,
-  BarChart3,
-  Archive,
+  LayoutDashboard, PlusCircle, FolderOpen, LayoutGrid, BarChart3,
+  Archive, Menu, X,
 } from 'lucide-react'
 import Logo from './Logo'
 
@@ -26,6 +22,7 @@ export default function Sidebar() {
   const inFlow = isInFlow(pathname)
   const slug = extractSlug(pathname)
   const [expanded, setExpanded] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const links = [
     { to: '/', label: '看板', icon: LayoutDashboard, end: true },
@@ -42,13 +39,24 @@ export default function Sidebar() {
   })
 
   return (
-    <aside
-      className={`shrink-0 bg-sidebar min-h-screen flex flex-col transition-all duration-300 ease-out overflow-hidden ${
-        expanded ? 'w-[220px]' : 'w-[56px]'
-      }`}
-      onMouseEnter={() => setExpanded(true)}
-      onMouseLeave={() => setExpanded(false)}
-    >
+    <>
+      {/* Mobile toggle */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="lg:hidden fixed top-3 left-3 z-50 w-9 h-9 rounded-xl bg-sidebar flex items-center justify-center"
+      >
+        {mobileOpen ? <X className="w-4 h-4 text-white" /> : <Menu className="w-4 h-4 text-white" />}
+      </button>
+      {/* Overlay */}
+      {mobileOpen && <div className="lg:hidden fixed inset-0 bg-black/40 z-30" onClick={() => setMobileOpen(false)} />}
+      <aside
+        className={`shrink-0 bg-sidebar min-h-screen flex flex-col transition-all duration-300 ease-out overflow-hidden z-40
+          ${mobileOpen ? 'fixed left-0 top-0 bottom-0 w-[220px]' : 'max-lg:hidden'}
+          ${expanded ? 'w-[220px]' : 'w-[56px]'}
+        `}
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
+      >
       {/* Brand */}
       <div className="h-14 flex items-center px-[14px] border-b border-white/[0.06] shrink-0 overflow-hidden">
         <div className="flex items-center">
@@ -101,5 +109,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   )
 }

@@ -1,18 +1,24 @@
+import { Suspense, lazy } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { Sparkles, LogOut } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
 import Sidebar from './components/Sidebar'
-import Dashboard from './pages/Dashboard'
-import CreateProject from './pages/CreateProject'
-import MaterialLibrary from './pages/MaterialLibrary'
-import TaskCards from './pages/TaskCards'
-import Workspace from './pages/Workspace'
-import Report from './pages/Report'
-import Archive from './pages/Archive'
-import Slides from './pages/Slides'
-import Login from './pages/Login'
-import NotFound from './pages/NotFound'
+
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const CreateProject = lazy(() => import('./pages/CreateProject'))
+const MaterialLibrary = lazy(() => import('./pages/MaterialLibrary'))
+const TaskCards = lazy(() => import('./pages/TaskCards'))
+const Workspace = lazy(() => import('./pages/Workspace'))
+const Report = lazy(() => import('./pages/Report'))
+const Archive = lazy(() => import('./pages/Archive'))
+const Slides = lazy(() => import('./pages/Slides'))
+const Login = lazy(() => import('./pages/Login'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+
+function Loading() {
+  return <div className="min-h-[60vh] flex items-center justify-center text-[13px] text-text-muted">加载中...</div>
+}
 
 function Breadcrumb() {
   const location = useLocation()
@@ -48,8 +54,8 @@ function AppContent() {
     <div className="flex min-h-screen bg-bg-primary">
       <Sidebar />
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-10">
-          <Breadcrumb />
+        <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-4 lg:px-10">
+          <div className="max-lg:hidden"><Breadcrumb /></div>
           <div className="flex items-center gap-4">
             <Link to="/slides" className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />幻灯片
@@ -69,7 +75,8 @@ function AppContent() {
           <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
             {user ? `${user.email} · ` : 'Demo 模式 · 游客访问 · '}数据持久化存储
           </div>
-          <div className="px-10 py-10">
+          <div className="px-4 lg:px-10 py-6 lg:py-10">
+            <Suspense fallback={<Loading />}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/create" element={<CreateProject />} />
@@ -80,6 +87,7 @@ function AppContent() {
               <Route path="/archive" element={<Archive />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </div>
         </main>
       </div>
