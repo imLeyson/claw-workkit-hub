@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
-import { mockWorkKits, roleLabels } from '../data/mock'
+import { roleLabels } from '../data/mock'
+import { getWorkKitById } from '../services/db'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
 
@@ -23,7 +24,7 @@ export default function CreateProject() {
   const kitId = searchParams.get('kit')
 
   const workKit = useMemo(
-    () => (fromArchive && kitId ? mockWorkKits.find((k) => k.id === kitId) : null),
+    () => (fromArchive && kitId ? getWorkKitById(kitId) : null),
     [fromArchive, kitId],
   )
 

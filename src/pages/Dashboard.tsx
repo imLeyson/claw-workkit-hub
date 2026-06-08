@@ -1,23 +1,25 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Target } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockAIResults, mockWorkKits } from '../data/mock'
 import { roleLabels } from '../data/mock'
+import { getProjects, getTasks, getAIResult, getWorkKits } from '../services/db'
 
 export default function Dashboard() {
-  const totalCompetitors = mockProjects.reduce((s, p) => s + p.competitors.length, 0)
-  const totalReviews = mockProjects.reduce((s, p) => s + p.competitors.reduce((a, c) => a + c.reviewCount, 0), 0)
-  const totalTasks = Object.values(mockTaskCards).flat().length
-  const submittedTasks = Object.values(mockTaskCards).flat().filter((t) => mockAIResults[t.id]?.submitted).length
+  const projects = getProjects()
+  const totalCompetitors = projects.reduce((s, p) => s + p.competitors.length, 0)
+  const totalReviews = projects.reduce((s, p) => s + p.competitors.reduce((a, c) => a + c.reviewCount, 0), 0)
+  const allTasks = projects.flatMap((p) => getTasks(p.id))
+  const totalTasks = allTasks.length
+  const submittedTasks = allTasks.filter((t) => getAIResult(t.id)?.submitted).length
 
   return (
     <div className="max-w-5xl">
       {/* Stats row — clickable */}
       <div className="grid grid-cols-4 gap-6 mb-14">
         {[
-          { value: String(totalCompetitors), label: '竞品覆盖', sub: `${mockProjects.length} 品类 · ${totalCompetitors} 产品`, to: '/materials/618-hair-dryer' },
+          { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: '/materials/618-hair-dryer' },
           { value: totalReviews.toLocaleString(), label: '评论样本', sub: '三个项目聚合数据', to: '/materials/618-hair-dryer' },
           { value: `${submittedTasks}/${totalTasks}`, label: '分析任务', sub: '已提交 / 总量', to: '/tasks/618-hair-dryer' },
-          { value: String(mockWorkKits.length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
+          { value: String(getWorkKits().length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
         ].map((s) => (
           <Link key={s.label} to={s.to} className="card-surface rounded-2xl p-6 card-hover">
             <div className="text-[36px] font-light tracking-[-0.03em] text-text-main leading-none mb-2">{s.value}</div>
@@ -34,9 +36,9 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-3 gap-5">
-        {mockProjects.map((p) => {
-          const tasks = mockTaskCards[p.id] ?? []
-          const done = tasks.filter((t) => mockAIResults[t.id]?.submitted).length
+        {projects.map((p) => {
+          const tasks = getTasks(p.id)
+          const done = tasks.filter((t) => getAIResult(t.id)?.submitted).length
           const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0
           return (
             <Link key={p.id} to={p.status === 'in_progress' ? `/materials/${p.slug}` : p.status === 'completed' ? `/report/${p.slug}` : `/tasks/${p.slug}`} className="card-surface rounded-[24px] card-hover overflow-hidden group flex flex-col relative">

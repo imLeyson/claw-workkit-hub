@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip } from 'lucide-react'
-import { mockProjects, mockMaterials, mockTaskCards, materialTypeLabels, roleLabels, aiStatusLabels, platformColors } from '../data/mock'
+import { materialTypeLabels, roleLabels, aiStatusLabels, platformColors } from '../data/mock'
+import { getProjectBySlug, getMaterials, getTasks } from '../services/db'
 import { useToast } from '../components/Toast'
 
 const aiStatusConfig: Record<string, string> = {
@@ -26,9 +27,9 @@ const typeIcons: Record<string, typeof FileSpreadsheet> = {
 
 export default function MaterialLibrary() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
-  const project = mockProjects.find((p) => p.slug === projectSlug)
-  const materials = mockMaterials[project?.id ?? ''] ?? []
-  const tasks = mockTaskCards[project?.id ?? ''] ?? []
+  const project = getProjectBySlug(projectSlug!)
+  const materials = project ? getMaterials(project.id) : []
+  const tasks = project ? getTasks(project.id) : []
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeQuickType, setActiveQuickType] = useState<string | null>(null)

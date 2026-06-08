@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search } from 'lucide-react'
-import { mockWorkKits, roleLabels } from '../data/mock'
+import { roleLabels } from '../data/mock'
+import { getWorkKits } from '../services/db'
 
 export default function Archive() {
   const navigate = useNavigate()
@@ -13,9 +14,9 @@ export default function Archive() {
     setExpandedHistory((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
-  const allTags = [...new Set(mockWorkKits.flatMap((k) => k.tags))]
-  const filteredKits = filterTag ? mockWorkKits.filter((k) => k.tags.includes(filterTag)) : mockWorkKits
-  const successKits = mockWorkKits.filter((k) => k.rating >= 4.8)
+  const allTags = [...new Set(getWorkKits().flatMap((k) => k.tags))]
+  const filteredKits = filterTag ? getWorkKits().filter((k) => k.tags.includes(filterTag)) : getWorkKits()
+  const successKits = getWorkKits().filter((k) => k.rating >= 4.8)
 
   return (
     <div className="max-w-4xl">
@@ -225,7 +226,7 @@ export default function Archive() {
 
       {/* Reuse confirmation dialog */}
       {reuseKit && (() => {
-        const wk = mockWorkKits.find((k) => k.id === reuseKit)
+        const wk = getWorkKits().find((k) => k.id === reuseKit)
         if (!wk) return null
         return (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">

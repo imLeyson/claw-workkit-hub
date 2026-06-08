@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockAIResults, mockMaterials, roleLabels } from '../data/mock'
+import { roleLabels } from '../data/mock'
+import { getProjectBySlug, getTasks, getAIResult, getMaterials } from '../services/db'
 import { useToast } from '../components/Toast'
 import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey } from '../services/ai'
 import type { AISection } from '../types'
 
 export default function Workspace() {
   const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
-  const project = mockProjects.find((p) => p.slug === projectSlug)
-  const task = mockTaskCards[project?.id ?? '']?.find((t) => t.id === taskId)
-  const result = mockAIResults[taskId ?? '']
-  const materials = mockMaterials[project?.id ?? ''] ?? []
+  const project = getProjectBySlug(projectSlug!)
+  const task = project ? getTasks(project.id).find((t) => t.id === taskId) : undefined
+  const result = getAIResult(taskId ?? '')
+  const materials = project ? getMaterials(project.id) : []
   const { showToast } = useToast()
 
   const [submitted, setSubmitted] = useState(result?.submitted ?? false)

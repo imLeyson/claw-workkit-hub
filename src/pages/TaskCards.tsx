@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockMaterials, roleLabels, mockWorkKits } from '../data/mock'
+import { roleLabels } from '../data/mock'
+import { getProjectBySlug, getMaterials, getTasks, getWorkKits } from '../services/db'
 import { useToast } from '../components/Toast'
 
 const sourceColorMap: Record<string, string> = {
@@ -13,9 +14,9 @@ const sourceColorMap: Record<string, string> = {
 
 export default function TaskCards() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
-  const project = mockProjects.find((p) => p.slug === projectSlug)
-  const [tasks, setTasks] = useState(mockTaskCards[project?.id ?? ''] ?? [])
-  const materials = mockMaterials[project?.id ?? ''] ?? []
+  const project = getProjectBySlug(projectSlug!)
+  const [tasks, setTasks] = useState(project ? getTasks(project.id) : [])
+  const materials = project ? getMaterials(project.id) : []
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [showAssociation, setShowAssociation] = useState(true)
@@ -83,7 +84,7 @@ export default function TaskCards() {
         </button>
         {showAssociation && (
         <div className="px-4 pb-4 grid grid-cols-5 gap-2">
-          {mockWorkKits.slice(0, 2).map((k) => (
+          {getWorkKits().slice(0, 2).map((k) => (
             <div key={k.id} className="bg-white rounded-xl p-3 border border-accent-100 text-[11px]">
               <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 10)}...</div>
               <div className="text-text-muted">v{k.version} · {k.reuseCount} 次复用</div>

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowRight, Package, Circle } from 'lucide-react'
-import { mockProjects, mockTaskCards, mockAIResults, roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
+import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
+import { getProjectBySlug, getTasks, getAIResult } from '../services/db'
 import { useToast } from '../components/Toast'
 
 function CheckItem({ text }: { text: string }) {
@@ -18,8 +19,8 @@ export default function Report() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const navigate = useNavigate()
   const { showToast } = useToast()
-  const project = mockProjects.find((p) => p.slug === projectSlug)
-  const tasks = mockTaskCards[project?.id ?? ''] ?? []
+  const project = getProjectBySlug(projectSlug!)
+  const tasks = project ? getTasks(project.id) : []
   const [activeTab, setActiveTab] = useState(tasks[0]?.role ?? 'merchandise')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -28,7 +29,7 @@ export default function Report() {
 
   const roleOrder = ['operations', 'merchandise', 'copywriting', 'customer_service', 'design']
   const roleTabs = [...new Set(tasks.map((t) => t.role))].sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b))
-  const submittedCount = tasks.filter((t) => mockAIResults[t.id]?.submitted).length
+  const submittedCount = tasks.filter((t) => getAIResult(t.id)?.submitted).length
 
   return (
     <div className="max-w-4xl">
@@ -84,7 +85,7 @@ export default function Report() {
           {roleTabs.map((role) => {
             if (role !== activeTab) return null
             return tasks.filter((t) => t.role === role).map((task) => {
-              const result = mockAIResults[task.id]
+              const result = getAIResult(task.id)
               return (
                 <div key={task.id}>
                   <div className="flex items-center gap-3 mb-4">
