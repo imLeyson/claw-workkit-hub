@@ -21,14 +21,15 @@ export default function Dashboard() {
   const totalReviews = projects.reduce((s, p) => s + p.competitors.reduce((a, c) => a + c.reviewCount, 0), 0)
   const allTasks = projects.flatMap((p) => getTasks(p.id))
   const submittedTasks = allTasks.filter((t) => getAIResult(t.id)?.submitted).length
+  const firstSlug = projects[0]?.slug || '618-hair-dryer'
 
   return (
     <div className="max-w-5xl">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10 lg:mb-14">
         {[
-          { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: '/materials/618-hair-dryer' },
-          { value: totalReviews.toLocaleString(), label: '评论样本', sub: '三个项目聚合数据', to: '/materials/618-hair-dryer' },
-          { value: `${submittedTasks}/${allTasks.length}`, label: '分析任务', sub: '已提交 / 总量', to: '/tasks/618-hair-dryer' },
+          { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: `/materials/${firstSlug}` },
+          { value: totalReviews.toLocaleString(), label: '评论样本', sub: '全项目聚合数据', to: `/materials/${firstSlug}` },
+          { value: `${submittedTasks}/${allTasks.length}`, label: '分析任务', sub: '已提交 / 总量', to: `/tasks/${firstSlug}` },
           { value: String(getWorkKits().length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
         ].map((s) => (
           <Link key={s.label} to={s.to} className="card-surface rounded-2xl p-6 card-hover">

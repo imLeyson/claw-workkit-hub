@@ -213,7 +213,7 @@ export default function Workspace() {
                 </button>
               </div>
 
-              {(aiSections || result.sections).map((section, i) => (
+              {(aiSections || result?.sections || []).map((section, i) => (
                 <div key={i} className="card-surface rounded-[24px] p-6">
                   <h4 className="text-[15px] font-medium text-text-main mb-5">{section.title}</h4>
 

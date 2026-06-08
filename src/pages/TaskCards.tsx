@@ -121,10 +121,10 @@ export default function TaskCards() {
                   </div>
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
-                    task.status === 'generated' ? 'bg-accent-50 text-accent-600' :
+                    task.status === 'generated' ? 'bg-kit-50 text-kit-600' :
                     task.status === 'ready' ? 'bg-accent-50 text-accent-600' : 'bg-gray-100 text-gray-500'
                   }`}>
-                    {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '可分析' : '待生成'}
+                    {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '待分析' : '待生成'}
                   </span>
                 </div>
                 <p className={`text-text-muted leading-relaxed mb-4 ${isFirst ? 'text-[14px]' : 'text-[13px]'}`}>{task.description}</p>
@@ -148,7 +148,17 @@ export default function TaskCards() {
                     <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
                   </div>
                   <button
-                    onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(task.promptPreview); setCopiedId(task.id); setTimeout(() => setCopiedId(null), 2000); showToast('Prompt 已复制', 'success') }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      const text = task.promptPreview
+                      if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(() => { setCopiedId(task.id); setTimeout(() => setCopiedId(null), 2000); showToast('Prompt 已复制', 'success') }).catch(() => showToast('复制失败', 'error'))
+                      } else {
+                        // Fallback for older browsers
+                        const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta)
+                        setCopiedId(task.id); setTimeout(() => setCopiedId(null), 2000); showToast('Prompt 已复制', 'success')
+                      }
+                    }}
                     className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1"
                   >
                     <Copy className="w-3 h-3" />

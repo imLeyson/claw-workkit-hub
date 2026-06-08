@@ -28,6 +28,9 @@
   --color-border-default: #EBEBEB;
   --color-border-light: #F2F2F2;
 
+  --color-kit-50: #F5F3FF;
+  --color-kit-600: #7C3AED;
+
   /* ── Semantic ── */
   --color-success: #5B9A8B;
   --color-success-soft: #F2F8F6;

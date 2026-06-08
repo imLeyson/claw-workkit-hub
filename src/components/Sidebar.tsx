@@ -103,9 +103,9 @@ export default function Sidebar() {
         <div className={`border-t border-white/[0.06] pt-3 transition-opacity ${expanded ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center gap-2">
             <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
-            <span className="text-[11px] text-white/40 whitespace-nowrap">演示项目 · 进行中</span>
+            <span className="text-[11px] text-white/40 whitespace-nowrap">PromoKit AI</span>
           </div>
-          <div className="text-[10px] text-white/25 mt-1 whitespace-nowrap">618 竞品评论分析</div>
+          <div className="text-[10px] text-white/25 mt-1 whitespace-nowrap">电商大促 AI 工作包系统</div>
         </div>
       </div>
     </aside>

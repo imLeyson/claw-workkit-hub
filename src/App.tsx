@@ -27,6 +27,7 @@ function Breadcrumb() {
   const labels: Record<string, string> = {
     create: '新建项目', materials: '资料库', tasks: '任务卡',
     workspace: 'AI 工作台', report: '策略报告', archive: '资产库',
+    login: '登录', slides: '幻灯片',
   }
   return (
     <div className="flex items-center gap-2 text-[11px] text-text-muted">
@@ -72,9 +73,16 @@ function AppContent() {
         </header>
 
         <main className="flex-1 overflow-auto">
-          <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
-            {user ? `${user.email} · ` : 'Demo 模式 · 游客访问 · '}数据持久化存储
-          </div>
+          {!user && (
+            <div className="text-center py-1.5 bg-accent-50/60 border-b border-accent-100 text-[11px] text-accent-600 font-medium">
+              Demo 模式 · 游客访问 · 数据持久化存储 · <Link to="/login" className="underline">登录</Link>
+            </div>
+          )}
+          {user && (
+            <div className="text-center py-1.5 bg-success-soft/50 border-b border-success/10 text-[11px] text-success font-medium">
+              {user.email} · 已登录 · 数据云端同步
+            </div>
+          )}
           <div className="px-4 lg:px-10 py-6 lg:py-10">
             <Suspense fallback={<Loading />}>
             <Routes>
