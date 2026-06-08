@@ -147,3 +147,8 @@ export function deleteProjectData(projectId: string) {
   const allMats = read<Record<string, Material[]>>('promokit_materials', mockMaterials); delete allMats[projectId]; write('promokit_materials', allMats)
   const allTasks = read<Record<string, TaskCard[]>>('promokit_tasks', mockTaskCards); delete allTasks[projectId]; write('promokit_tasks', allTasks)
 }
+
+export function resetAllData() {
+  localStorage.removeItem(SEEDED_KEY)
+  ensureSeeded()
+}

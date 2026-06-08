@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Target, Trash2 } from 'lucide-react'
+import { ArrowRight, Target, Trash2, RotateCcw } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getTasks, getAIResult, getWorkKits, deleteProjectData } from '../services/db'
+import { getProjects, getTasks, getAIResult, getWorkKits, deleteProjectData, resetAllData } from '../services/db'
 
 export default function Dashboard() {
   const [projects, setProjects] = useState(getProjects())
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [showReset, setShowReset] = useState(false)
 
   const handleDelete = (id: string) => {
     const updated = projects.filter((p) => p.id !== id)
@@ -107,6 +108,31 @@ export default function Dashboard() {
             <div className="flex items-center gap-3 justify-center">
               <button onClick={() => setDeleteId(null)} className="btn-ghost">取消</button>
               <button onClick={() => handleDelete(deleteId)} className="px-5 py-2.5 bg-error text-white text-sm font-medium rounded-xl hover:bg-red-600 transition-colors">确认删除</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset data */}
+      <div className="mt-12 text-center">
+        <button onClick={() => setShowReset(true)} className="text-[11px] text-text-muted hover:text-accent-600 transition-colors flex items-center gap-1.5 mx-auto">
+          <RotateCcw className="w-3 h-3" />恢复默认演示数据
+        </button>
+      </div>
+
+      {showReset && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-[380px] shadow-xl text-center">
+            <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center mx-auto mb-4">
+              <RotateCcw className="w-5 h-5 text-accent-500" />
+            </div>
+            <h3 className="text-[16px] font-medium text-text-main mb-2">恢复默认演示数据？</h3>
+            <p className="text-[13px] text-text-muted mb-6">将清除所有修改，恢复为初始的 3 个演示项目和完整示例数据。此操作不可撤销。</p>
+            <div className="flex items-center gap-3 justify-center">
+              <button onClick={() => setShowReset(false)} className="btn-ghost">取消</button>
+              <button onClick={() => { resetAllData(); setProjects(getProjects()); setShowReset(false); window.location.reload() }} className="btn-primary-filled">
+                确认恢复
+              </button>
             </div>
           </div>
         </div>
