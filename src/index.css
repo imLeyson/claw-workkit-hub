@@ -4,14 +4,14 @@
 @theme {
   /* ── Surface ── */
   --color-bg-primary: #0D0D0D;
-  --color-bg-surface: #1A1A1B;
+  --color-bg-surface: #1C1C1E;
 
   /* ── Accent ── */
-  --color-accent-50: #1F1410;
-  --color-accent-100: #2D1B12;
-  --color-accent-200: #3D2418;
-  --color-accent-300: #5C3522;
-  --color-accent-400: #C96F3F;
+  --color-accent-50: #241510;
+  --color-accent-100: #341D14;
+  --color-accent-200: #4A281A;
+  --color-accent-300: #693820;
+  --color-accent-400: #D47A4A;
   --color-accent-500: #E07B4C;
   --color-accent-600: #E8946C;
   --color-accent-700: #F0B088;
@@ -21,17 +21,17 @@
   --color-ai-500: #00E6B8;
 
   /* ── Sidebar ── */
-  --color-sidebar: #0A0A0B;
+  --color-sidebar: #09090A;
 
   /* ── Text ── */
-  --color-text-main: #F0F0F0;
-  --color-text-secondary: #A0A0A0;
-  --color-text-muted: #6B6B6B;
-  --color-text-placeholder: #4A4A4A;
+  --color-text-main: #F5F5F5;
+  --color-text-secondary: #B0B0B0;
+  --color-text-muted: #888888;
+  --color-text-placeholder: #5A5A5A;
 
   /* ── Border ── */
-  --color-border-default: rgba(255,255,255,0.06);
-  --color-border-light: rgba(255,255,255,0.04);
+  --color-border-default: rgba(255,255,255,0.08);
+  --color-border-light: rgba(255,255,255,0.05);
 
   --color-kit-50: #1A1530;
   --color-kit-600: #8B7CF6;
@@ -94,8 +94,8 @@ body {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 [data-theme="dark"] .card-hover:hover {
-  border-color: rgba(255,255,255,0.10);
-  background: #1E1E20;
+  border-color: rgba(255,255,255,0.14);
+  background: #222225;
 }
 [data-theme="light"] .card-hover:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
