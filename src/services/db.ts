@@ -63,6 +63,13 @@ export function getMaterials(projectId: string): Material[] {
   return all[projectId] ?? []
 }
 
+export function addMaterial(projectId: string, m: Material) {
+  const all = read<Record<string, Material[]>>('promokit_materials', mockMaterials)
+  if (!all[projectId]) all[projectId] = []
+  all[projectId].push(m)
+  write('promokit_materials', all)
+}
+
 // ── Task Cards ─────────────────────────────────────────────
 
 export function getTasks(projectId: string): TaskCard[] {

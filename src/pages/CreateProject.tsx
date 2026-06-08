@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getWorkKitById } from '../services/db'
+import { getWorkKitById, addProject } from '../services/db'
+import { updateTask } from '../services/db'
+import type { Project, Competitor, TaskCard } from '../types'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
 
@@ -77,7 +79,7 @@ export default function CreateProject() {
     if (validateStep(step)) setStep(step + 1)
   }
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const errs: Record<string, string> = {}
     if (name.trim().length < 2) errs.name = '项目名称至少需要 2 个字符'
     if (!roles.some((r) => r.checked)) errs.roles = '请至少选择 1 个参与岗位'
@@ -85,11 +87,50 @@ export default function CreateProject() {
     if (workKit && campaign.trim().length < 2) errs.campaign = '请填写活动名称'
     if (Object.keys(errs).length === 0) {
       setErrors({})
+      // Build real project
+      const id = 'p' + Date.now()
+      const slug = name.trim().replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9一-鿿-]/g, '')
+      const comps: Competitor[] = competitors.map((c) => ({
+        name: c, brand: c, platform: '天猫', price: '¥0', reviewCount: 0, rating: 0, topIssues: [],
+      }))
+      const team = roles.filter((r) => r.checked).map((r) => ({
+        name: roleLabels[r.role] + '负责人', role: r.role,
+      }))
+      const newProject: Project = {
+        id, slug, name: name.trim(), description,
+        category: category || '未分类', campaign: campaign || name.trim(),
+        competitors: comps, status: 'in_progress',
+        createdAt: new Date().toISOString().split('T')[0],
+        team: team as any,
+      }
+      await addProject(newProject)
+      // Clone task cards from template
+      if (workKit) {
+        const selectedRoles = roles.filter((r) => r.checked).map((r) => r.role)
+        for (const section of workKit.sections) {
+          if (!selectedRoles.includes(section.role)) continue
+          const taskCard: TaskCard = {
+            id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
+            projectId: id,
+            role: section.role,
+            title: section.title,
+            description: `基于「${workKit.name}」模板生成`,
+            status: 'ready',
+            assignedTo: roleLabels[section.role] + '负责人',
+            inputMaterials: [],
+            promptPreview: section.content.map((c) => c.title).join('；'),
+            outputFormat: '',
+            judgmentCriteria: [],
+            sourceTags: workKit.tags.slice(0, 2),
+          }
+          updateTask(taskCard)
+        }
+      }
       const msg = workKit
-        ? `基于「${workKit.name}」模板创建成功，跳转到资料库`
-        : '项目创建成功，跳转到资料库'
+        ? `基于「${workKit.name}」模板创建成功 · ${workKit.sections.length} 张任务卡已生成`
+        : '项目创建成功'
       showToast(msg, 'success')
-      navigate('/materials/618-hair-dryer')
+      navigate(`/materials/${slug}`)
     } else {
       setErrors(errs)
       setStep(goToErrorStep(errs))

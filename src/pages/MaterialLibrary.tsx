@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip } from 'lucide-react'
 import { materialTypeLabels, roleLabels, aiStatusLabels, platformColors } from '../data/mock'
-import { getProjectBySlug, getMaterials, getTasks } from '../services/db'
+import { getProjectBySlug, getMaterials, getTasks, addMaterial } from '../services/db'
 import { useToast } from '../components/Toast'
+import type { Material } from '../types'
 
 const aiStatusConfig: Record<string, string> = {
   readable: 'bg-success-soft text-success',
@@ -28,11 +29,40 @@ const typeIcons: Record<string, typeof FileSpreadsheet> = {
 export default function MaterialLibrary() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = getProjectBySlug(projectSlug!)
-  const materials = project ? getMaterials(project.id) : []
+  const [materials, setMaterials] = useState(project ? getMaterials(project.id) : [])
   const tasks = project ? getTasks(project.id) : []
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeQuickType, setActiveQuickType] = useState<string | null>(null)
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !project) return
+    // Determine type from filename
+    let type: Material['type'] = 'review'
+    if (file.name.includes('参数') || file.name.includes('spec')) type = 'spec'
+    else if (file.name.includes('客服') || file.name.includes('faq') || file.name.includes('问题')) type = 'faq'
+    else if (file.name.includes('文案') || file.name.includes('copy') || file.name.includes('素材')) type = 'copy_asset'
+
+    const newMat: Material = {
+      id: 'm' + Date.now(),
+      projectId: project.id,
+      type,
+      label: file.name.replace(/\.[^.]+$/, ''),
+      fileName: file.name,
+      content: `用户上传文件：${file.name}（${(file.size / 1024).toFixed(1)} KB）`,
+      uploadedAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      aiStatus: 'readable',
+      sensitivity: 'normal',
+      responsibleRole: 'merchandise',
+      referencedBy: [],
+    }
+    addMaterial(project.id, newMat)
+    setMaterials(getMaterials(project.id))
+    showToast(`已上传：${file.name}`, 'success')
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
@@ -61,7 +91,7 @@ export default function MaterialLibrary() {
         </div>
         <p className="text-[15px] font-medium text-text-main mb-2">导入电商数据</p>
         <p className="text-[13px] text-text-muted mb-6">支持 Excel · CSV · PDF — 单文件最大 20MB</p>
-        <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.pdf,.txt" onChange={() => showToast('Demo 模式：模拟资料已加入列表', 'success')} className="hidden" />
+        <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.pdf,.txt" onChange={handleFileUpload} className="hidden" />
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {['导入评论表', '导入商品信息', '导入客服记录', '导入历史文案'].map((label) => (
             <span
