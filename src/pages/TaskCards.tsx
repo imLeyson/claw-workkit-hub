@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp } from 'lucide-react'
 import { roleLabels } from '../data/mock'
@@ -17,6 +17,11 @@ export default function TaskCards() {
   const project = getProjectBySlug(projectSlug!)
   const [tasks, setTasks] = useState(project ? getTasks(project.id) : [])
   const materials = project ? getMaterials(project.id) : []
+
+  // Sync from localStorage on mount and when projectSlug changes
+  useEffect(() => {
+    if (project) setTasks(getTasks(project.id))
+  }, [projectSlug])
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [showAssociation, setShowAssociation] = useState(true)
