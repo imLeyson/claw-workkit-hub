@@ -1,15 +1,6 @@
-// Supabase client — ready when API key is available
-// Current mode: localStorage (via db.ts)
-// To switch: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY env vars
+import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://ptzudoptwfldycersdax.supabase.co'
-// Anon key needed — get from Supabase Dashboard → Settings → API
-const SUPABASE_ANON_KEY = ''
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0enVkb3B0d2ZsZHljZXJzZGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MDk3ODcsImV4cCI6MjA5NjQ4NTc4N30.0jtLN4bkCm5rRc9Stx8ILWVXSaOIF4n3f-t8OO76UqM'
 
-export function isSupabaseReady(): boolean {
-  return !!SUPABASE_ANON_KEY
-}
-
-export function getSupabaseConfig() {
-  return { url: SUPABASE_URL, key: SUPABASE_ANON_KEY }
-}
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
