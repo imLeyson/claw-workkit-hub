@@ -41,7 +41,7 @@ export default function Dashboard() {
 
       <div className="flex items-center justify-between mb-5">
         <span className="section-title">分析项目 · {projects.length}</span>
-        <Link to="/create" className="text-[11px] font-medium text-accent-600 hover:text-accent-700 flex items-center gap-1">
+        <Link to="/create" className="text-[11px] font-medium text-accent-600 hover:text-accent-500 flex items-center gap-1">
           + 新建项目
         </Link>
       </div>
@@ -87,7 +87,7 @@ export default function Dashboard() {
               </Link>
               <button
                 onClick={(e) => { e.preventDefault(); setDeleteId(p.id) }}
-                className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white border border-border-light flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-50 hover:border-red-200"
+                className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-500/10 hover:border-red-200"
               >
                 <Trash2 className="w-3.5 h-3.5 text-text-muted" />
               </button>
@@ -98,7 +98,7 @@ export default function Dashboard() {
 
       {deleteId && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[360px] shadow-xl text-center">
+          <div className="bg-bg-surface rounded-2xl p-6 w-[360px] shadow-xl text-center">
             <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-5 h-5 text-error" />
             </div>
@@ -121,7 +121,7 @@ export default function Dashboard() {
 
       {showReset && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[380px] shadow-xl text-center">
+          <div className="bg-bg-surface rounded-2xl p-6 w-[380px] shadow-xl text-center">
             <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center mx-auto mb-4">
               <RotateCcw className="w-5 h-5 text-accent-500" />
             </div>

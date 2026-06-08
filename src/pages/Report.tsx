@@ -137,7 +137,7 @@ export default function Report() {
                   ) : (
                     <div className="card-surface rounded-[20px] p-6 text-center">
                       <p className="text-[13px] text-text-muted mb-2">尚未生成分析结果</p>
-                      <Link to={`/workspace/${projectSlug}/${task.id}`} className="text-[12px] font-medium text-accent-600 hover:text-accent-700">前往 AI 工作台 <ArrowRight className="w-3.5 h-3.5 inline" /></Link>
+                      <Link to={`/workspace/${projectSlug}/${task.id}`} className="text-[12px] font-medium text-accent-600 hover:text-accent-500">前往 AI 工作台 <ArrowRight className="w-3.5 h-3.5 inline" /></Link>
                     </div>
                   )}
                 </div>
@@ -148,9 +148,9 @@ export default function Report() {
       </div>
 
       {/* Verification review */}
-      <div className="mt-12 bg-accent-50/40 rounded-2xl p-6 border border-accent-100">
+      <div className="mt-12 bg-accent-500/[0.04] rounded-2xl p-6 border border-accent-500/15">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-xl bg-accent-100 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-accent-500/15 flex items-center justify-center">
             <CheckCircle2 className="w-4 h-4 text-accent-600" />
           </div>
           <div>
@@ -164,10 +164,10 @@ export default function Report() {
             { label: '跨岗位覆盖', status: roleTabs.length >= 3 ? '已通过' : '待完善', pass: roleTabs.length >= 3, desc: roleTabs.length >= 3 ? `覆盖 ${roleTabs.length} 个岗位角色` : `仅覆盖 ${roleTabs.length} 个岗位` },
             { label: '竞品对标验证', status: '待分配', pass: false, desc: '需指定审核人进行竞品对比验证' },
           ].map((item) => (
-            <div key={item.label} className={`rounded-xl p-3 ${item.pass ? 'bg-success-soft border border-success/20' : 'bg-white border border-border-light'}`}>
+            <div key={item.label} className={`rounded-xl p-3 ${item.pass ? 'bg-success-soft border border-success/20' : 'bg-bg-surface border border-border-light'}`}>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium text-text-main">{item.label}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.pass ? 'bg-success/10 text-success' : 'bg-gray-100 text-text-muted'}`}>{item.status}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.pass ? 'bg-success/10 text-success' : 'bg-white/[0.06] text-text-muted'}`}>{item.status}</span>
               </div>
               <div className="text-text-muted text-[10px]">{item.desc}</div>
             </div>
@@ -188,7 +188,7 @@ export default function Report() {
       {/* Save dialog */}
       {showSaveDialog && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[24px] p-6 w-[420px] shadow-xl">
+          <div className="bg-bg-surface rounded-[24px] p-6 w-[420px] shadow-xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Package className="w-5 h-5 text-accent-500" /></div>
               <div>
@@ -233,7 +233,7 @@ export default function Report() {
       )}
       {saved && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[24px] p-8 w-[400px] shadow-xl text-center">
+          <div className="bg-bg-surface rounded-[24px] p-8 w-[400px] shadow-xl text-center">
             <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center mx-auto mb-4"><CheckCircle2 className="w-7 h-7 text-success" /></div>
             <h3 className="text-[18px] font-medium text-text-main mb-2">{savedMode === 'created' ? 'Work Kit 已沉淀' : 'Work Kit 已更新'}</h3>
             <p className="text-[13px] text-text-muted mb-6">{savedMode === 'created' ? `已将「${project.name}」的分析流程保存为可复用工作包。` : `已将「${project.name}」的最新报告结果同步到原工作包版本历史。`}</p>

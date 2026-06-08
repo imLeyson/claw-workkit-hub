@@ -31,7 +31,7 @@ const iconMap: Record<ToastType, typeof CheckCircle2> = {
 const colorMap: Record<ToastType, string> = {
   success: 'border-success/30 bg-success-soft',
   error: 'border-error/30 bg-error-soft',
-  info: 'border-accent-200 bg-accent-50',
+  info: 'border-accent-500/20 bg-accent-50',
 }
 
 const iconColorMap: Record<ToastType, string> = {
@@ -76,7 +76,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg bg-white backdrop-blur-sm transition-all duration-300 min-w-[280px] max-w-[420px] ${
+              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg bg-bg-surface backdrop-blur-sm transition-all duration-300 min-w-[280px] max-w-[420px] ${
                 toast.leaving ? 'opacity-0 translate-x-4 scale-95' : 'opacity-100 translate-x-0 scale-100'
               } ${colorMap[toast.type]}`}
             >

@@ -35,7 +35,7 @@ export default function Login() {
             <p className="text-[13px] text-text-secondary leading-relaxed mb-4">
               这个原型默认使用浏览器本地数据，不连接真实后端。配置 Supabase 环境变量后，登录和云端同步入口会自动启用。
             </p>
-            <div className="rounded-xl bg-accent-50/60 border border-accent-100 px-4 py-3 text-[12px] text-accent-700 leading-relaxed">
+            <div className="rounded-xl bg-accent-500/[0.06] border border-accent-500/15 px-4 py-3 text-[12px] text-accent-500 leading-relaxed">
               你仍然可以完整体验创建项目、导入资料、生成任务卡、提交报告和沉淀 Work Kit。
             </div>
           </div>

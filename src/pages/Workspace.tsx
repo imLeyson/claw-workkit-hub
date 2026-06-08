@@ -191,7 +191,7 @@ export default function Workspace() {
 
       <div className="grid grid-cols-12 gap-10">
         {/* Sidebar context */}
-        <div className="col-span-3 space-y-6 bg-gray-50/50 rounded-[24px] p-5 -m-2">
+        <div className="col-span-3 space-y-6 bg-white/[0.03] rounded-[24px] p-5 -m-2">
           <div>
             <span className="section-title">竞品数据</span>
             <div className="mt-3 space-y-2">
@@ -222,15 +222,15 @@ export default function Workspace() {
               </ul>
             </div>
           )}
-          <div className="bg-accent-50/40 rounded-2xl p-4 border border-accent-100">
+          <div className="bg-accent-500/[0.04] rounded-2xl p-4 border border-accent-500/15">
             <span className="section-title">竞品对比智能体</span>
             <p className="mt-2 text-[11px] text-text-muted leading-relaxed">
               系统可引入小型智能体（如话术对比、卖点验证），自动将分析结果与市场竞品进行横向对比，标记差异点与优化建议。
             </p>
             <div className="mt-3 flex items-center gap-2 text-[10px]">
-              <span className="px-2 py-1 rounded-md bg-white border border-accent-100 text-accent-600">话术对比</span>
-              <span className="px-2 py-1 rounded-md bg-white border border-border-light text-text-muted">卖点验证</span>
-              <span className="px-2 py-1 rounded-md bg-white border border-border-light text-text-muted">竞品对标</span>
+              <span className="px-2 py-1 rounded-md bg-bg-surface border border-accent-500/15 text-accent-600">话术对比</span>
+              <span className="px-2 py-1 rounded-md bg-bg-surface border border-border-light text-text-muted">卖点验证</span>
+              <span className="px-2 py-1 rounded-md bg-bg-surface border border-border-light text-text-muted">竞品对标</span>
             </div>
           </div>
         </div>
@@ -346,7 +346,7 @@ export default function Workspace() {
                   )}
 
                   {section.type === 'text' && section.body && (
-                    <div className="bg-accent-50/50 rounded-2xl p-5">
+                    <div className="bg-accent-500/[0.05] rounded-2xl p-5">
                       <p className="text-[13px] text-text-secondary leading-relaxed">{section.body}</p>
                     </div>
                   )}
@@ -373,7 +373,7 @@ export default function Workspace() {
       {/* Feedback modal */}
       {showFeedbackModal && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[24px] p-6 w-[400px] shadow-xl">
+          <div className="bg-bg-surface rounded-[24px] p-6 w-[400px] shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-medium text-text-main">标记异常</h3>
               <button onClick={() => { setShowFeedbackModal(false); setFeedbackText('') }} className="p-1"><X className="w-4 h-4 text-text-muted" /></button>

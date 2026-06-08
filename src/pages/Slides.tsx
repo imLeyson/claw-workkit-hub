@@ -114,7 +114,7 @@ function Label({ text }: { text: string }) {
 
 function StatCard({ icon: Icon, value, label, sub, accent }: { icon: any; value: string; label: string; sub: string; accent?: boolean }) {
   return (
-    <div className={`animate-fade-in-up rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 ${accent ? 'bg-accent-500 text-white shadow-lg shadow-accent-500/20' : 'bg-white border border-border-default hover:shadow-md'}`}>
+    <div className={`animate-fade-in-up rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 ${accent ? 'bg-accent-500 text-white shadow-lg shadow-accent-500/20' : 'bg-bg-surface border border-border-default hover:shadow-md'}`}>
       <Icon className={`w-6 h-6 mx-auto mb-3 ${accent ? 'text-white/80' : 'text-accent-500'}`} />
       <div className={`text-[32px] font-light leading-none mb-2 tracking-[-0.02em] ${accent ? 'text-white' : 'text-text-main'}`}>{value}</div>
       <div className={`text-[12px] font-semibold mb-1 ${accent ? 'text-white/85' : 'text-text-main'}`}>{label}</div>
@@ -169,7 +169,7 @@ const slides = [
             { role: '客服', stat: '从零梳理', desc: '每次重新整理 FAQ 知识库', icon: MessageSquareText },
             { role: '设计', stat: '缺少依据', desc: '凭感觉调整详情页信息层级', icon: Palette },
           ].map((item) => (
-            <div key={item.role} className="animate-fade-in-up bg-white rounded-2xl p-5 border border-border-default flex items-start gap-4 transition-shadow duration-300 hover:shadow-md">
+            <div key={item.role} className="animate-fade-in-up bg-bg-surface rounded-2xl p-5 border border-border-default flex items-start gap-4 transition-shadow duration-300 hover:shadow-md">
               <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
                 <item.icon className="w-5 h-5 text-accent-500" />
               </div>
@@ -235,7 +235,7 @@ const slides = [
             { num: '05', title: '策略汇总', desc: '跨岗位整合大促执行清单与风险点' },
             { num: '06', title: '资产沉淀', desc: '保存流程与模板，下次大促几分钟启动' },
           ].map((item) => (
-            <div key={item.num} className="animate-fade-in-up bg-white rounded-2xl p-5 border border-border-default transition-shadow duration-300 hover:shadow-md group">
+            <div key={item.num} className="animate-fade-in-up bg-bg-surface rounded-2xl p-5 border border-border-default transition-shadow duration-300 hover:shadow-md group">
               <div className="text-[11px] font-bold text-accent-400 mb-2 group-hover:text-accent-500 transition-colors">{item.num}</div>
               <div className="text-[15px] font-semibold text-text-main mb-1.5">{item.title}</div>
               <div className="text-[12px] text-text-muted leading-relaxed">{item.desc}</div>
@@ -302,7 +302,7 @@ const slides = [
         <p className="text-[15px] text-text-muted mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           每个 Work Kit 记录的是<span className="text-accent-600 font-semibold">资料结构、任务模板、Prompt 和报告格式</span>。换一个品类、换一次大促，照样能用。
         </p>
-        <div className="bg-white rounded-[24px] p-7 border border-border-default shadow-sm mb-6 animate-scale-in" style={{ animationDelay: '150ms' }}>
+        <div className="bg-bg-surface rounded-[24px] p-7 border border-border-default shadow-sm mb-6 animate-scale-in" style={{ animationDelay: '150ms' }}>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Repeat className="w-5 h-5 text-accent-500" /></div>
@@ -343,15 +343,15 @@ const slides = [
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted mb-5">Before</div>
             <div className="space-y-3">
               {['各岗位各自整理资料', '分析口径与格式不统一', 'AI 输出无结构化沉淀', '每次大促从零启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted"><span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-[10px] text-red-400">✕</span> {t}</div>
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-muted"><span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-[10px] text-red-500">✕</span> {t}</div>
               ))}
             </div>
           </div>
-          <div className="animate-fade-in-up bg-accent-50/60 rounded-2xl p-7 border border-accent-200">
+          <div className="animate-fade-in-up bg-accent-500/[0.06] rounded-2xl p-7 border border-accent-500/20">
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent-600 mb-5">With PromoKit AI</div>
             <div className="space-y-3">
               {['统一资料库 · 同源协同', '各岗位结构化 AI 输出', '一键保存为 Work Kit', '下次大促几分钟启动'].map((t) => (
-                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary"><span className="w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span> {t}</div>
+                <div key={t} className="flex items-center gap-3 text-[13px] text-text-secondary"><span className="w-5 h-5 rounded-full bg-accent-500/15 flex items-center justify-center shrink-0 text-[10px] text-accent-600">✓</span> {t}</div>
               ))}
             </div>
           </div>
@@ -392,13 +392,13 @@ const slides = [
             <h2 className="text-[34px] font-light tracking-[-0.02em] text-text-main leading-none mb-2">系统图表：转换与决策</h2>
             <p className="text-[13px] text-text-muted">按要求展示从需求归类到界面设计的完整迭代过程，让关键设计逻辑一眼可读。</p>
           </div>
-          <div className="rounded-2xl border border-border-default bg-white px-4 py-3 shadow-sm text-right">
+          <div className="rounded-2xl border border-border-default bg-bg-surface px-4 py-3 shadow-sm text-right">
             <div className="text-[12px] text-text-muted mb-1">PromoKit AI</div>
             <div className="text-[15px] font-medium text-text-main">大促 AI 工作包设计逻辑</div>
           </div>
         </div>
 
-        <div className="rounded-[26px] bg-white border border-border-default shadow-[0_18px_50px_rgba(28,28,30,0.06)] px-6 py-6 animate-scale-in" style={{ animationDelay: '80ms' }}>
+        <div className="rounded-[26px] bg-bg-surface border border-border-default shadow-[0_18px_50px_rgba(28,28,30,0.06)] px-6 py-6 animate-scale-in" style={{ animationDelay: '80ms' }}>
           <svg className="w-full h-[330px]" viewBox="0 0 1040 330" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <marker id="system-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
@@ -444,7 +444,7 @@ const slides = [
         </div>
 
         <div className="grid grid-cols-[1fr_1fr] gap-4 mt-4 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
-          <div className="rounded-2xl border border-border-default bg-white p-4 shadow-sm">
+          <div className="rounded-2xl border border-border-default bg-bg-surface p-4 shadow-sm">
             <div className="text-[13px] font-medium text-text-main mb-2">对标图片要求</div>
             <p className="text-[12px] leading-relaxed text-text-muted">用系统图完整呈现项目关键节点的迭代过程：从需求池归类开始，经由定义与策略、系统架构设计，最终落到界面设计。</p>
           </div>
@@ -475,7 +475,7 @@ const slides = [
           把一次有效的大促分析流程<br />变成团队下一次可直接复用的起点
         </p>
         <div className="flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <Link to="/" className="btn-primary-filled bg-white text-accent-600 border-white hover:bg-white/90 hover:border-white text-[15px] px-8 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10">
+          <Link to="/" className="btn-primary-filled bg-bg-surface text-accent-600 border-white hover:bg-bg-surface/90 hover:border-white text-[15px] px-8 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10">
             进入产品演示 <ArrowRight className="w-4 h-4" />
           </Link>
           <Link to="/create" className="btn-primary text-white border-white/25 hover:bg-white/8 hover:border-white/50 text-[15px] px-8 py-3.5 transition-all duration-300">

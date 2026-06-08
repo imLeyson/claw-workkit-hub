@@ -346,7 +346,7 @@ export default function CreateProject() {
 
         {step === 2 && workKit && (
           <div className="space-y-8">
-            <p className="text-[13px] text-text-secondary leading-relaxed bg-accent-50/30 rounded-xl p-4">
+            <p className="text-[13px] text-text-secondary leading-relaxed bg-accent-500/[0.03] rounded-xl p-4">
               模板已预设 {workKit.includedRoles.length} 个岗位角色、{workKit.sections.length} 个任务模板和资料结构。你只需补充活动信息即可启动项目。
             </p>
             {errors.campaign && <p className="text-[12px] text-error">{errors.campaign}</p>}

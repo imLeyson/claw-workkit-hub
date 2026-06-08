@@ -71,9 +71,9 @@ export default function Archive() {
       </div>
 
       {/* Learning CTA — 纪要建议：启动新项目前先学习 */}
-      <div className="bg-accent-50/40 rounded-2xl p-5 border border-accent-100 mb-8 flex items-center justify-between">
+      <div className="bg-accent-500/[0.04] rounded-2xl p-5 border border-accent-500/15 mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-accent-100 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-accent-500/15 flex items-center justify-center">
             <BookOpen className="w-4.5 h-4.5 text-accent-600" />
           </div>
           <div>
@@ -99,9 +99,9 @@ export default function Archive() {
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
-          <button onClick={() => setFilterTag(null)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${!filterTag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-gray-100'}`}>全部</button>
+          <button onClick={() => setFilterTag(null)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${!filterTag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-white/[0.06]'}`}>全部</button>
           {allTags.map((tag) => (
-            <button key={tag} onClick={() => setFilterTag(filterTag === tag ? null : tag)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${filterTag === tag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-gray-100'}`}>{tag}</button>
+            <button key={tag} onClick={() => setFilterTag(filterTag === tag ? null : tag)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${filterTag === tag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-white/[0.06]'}`}>{tag}</button>
           ))}
         </div>
       </div>
@@ -115,15 +115,15 @@ export default function Archive() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {successKits.map((k) => (
-              <div key={k.id} className="bg-white rounded-2xl p-4 border border-amber-200 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => setReuseKit(k.id)}>
-                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+              <div key={k.id} className="bg-bg-surface rounded-2xl p-4 border border-amber-500/20 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => setReuseKit(k.id)}>
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
                   <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-text-main truncate">{k.name}</div>
                   <div className="text-[11px] text-text-muted">{k.version} · 复用 {k.reuseCount} 次 · 评分 {k.rating}</div>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium shrink-0">成功案例</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-medium shrink-0">成功案例</span>
               </div>
             ))}
           </div>
@@ -218,10 +218,10 @@ export default function Archive() {
                     {showHistory ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
                   </button>
                   {showHistory && (
-                    <div className="mt-3 ml-[22px] pl-4 border-l-2 border-accent-200 space-y-3">
+                    <div className="mt-3 ml-[22px] pl-4 border-l-2 border-accent-500/20 space-y-3">
                       {wk.versionHistory.map((v) => (
                         <div key={v.version} className="relative">
-                          <div className="absolute -left-[25px] top-1.5 w-[10px] h-[10px] rounded-full bg-white border-2 border-accent-400" />
+                          <div className="absolute -left-[25px] top-1.5 w-[10px] h-[10px] rounded-full bg-bg-surface border-2 border-accent-400" />
                           <div className="text-[12px] font-medium text-text-main">{v.version}</div>
                           <div className="text-[11px] text-text-muted mt-0.5">{v.date} — {v.changes}</div>
                         </div>
@@ -242,11 +242,11 @@ export default function Archive() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 mt-5 bg-gray-50/50 border-t border-border-light flex items-center justify-between">
+                <div className="px-6 py-4 mt-5 bg-white/[0.03] border-t border-border-light flex items-center justify-between">
                   <div className="text-[11px] text-text-muted">
                     来源项目：
                     {sourceProject ? (
-                      <button onClick={() => navigate(`/report/${sourceProject.slug}`)} className="text-accent-600 hover:text-accent-700 transition-colors font-medium">
+                      <button onClick={() => navigate(`/report/${sourceProject.slug}`)} className="text-accent-600 hover:text-accent-500 transition-colors font-medium">
                         {sourceProject.name}
                       </button>
                     ) : (
@@ -276,7 +276,7 @@ export default function Archive() {
         if (!wk) return null
         return (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-            <div className="bg-white rounded-[24px] p-6 w-[460px] shadow-xl">
+            <div className="bg-bg-surface rounded-[24px] p-6 w-[460px] shadow-xl">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center shrink-0"><Package className="w-5 h-5 text-accent-500" /></div>
                 <div>
@@ -290,8 +290,8 @@ export default function Archive() {
                 <div className="flex justify-between"><span className="text-text-muted">任务模板</span><span className="font-medium text-text-main">{wk.sections.length} 个</span></div>
                 <div className="flex justify-between"><span className="text-text-muted">资料结构</span><span className="font-medium text-text-main text-right max-w-[220px] leading-snug">{wk.materialStructure}</span></div>
               </div>
-              <div className="bg-accent-50/50 rounded-2xl p-3.5 mb-5 text-center">
-                <p className="text-[12px] text-accent-700 leading-relaxed">
+              <div className="bg-accent-500/[0.05] rounded-2xl p-3.5 mb-5 text-center">
+                <p className="text-[12px] text-accent-500 leading-relaxed">
                   <Sparkles className="w-3.5 h-3.5 inline mr-1" />
                   基于此模板创建新项目，{wk.includedRoles.length} 个岗位角色和资料结构将自动预填。你只需补充活动信息即可开始。
                 </p>

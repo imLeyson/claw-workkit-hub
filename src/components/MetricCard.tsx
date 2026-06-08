@@ -56,7 +56,7 @@ export default function MetricCard({ icon: Icon, label, value, sub, progress, co
       </div>
       {progress !== undefined && (
         <div>
-          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
             <div
               className={`h-full ${c.barGradient} rounded-full transition-all duration-500`}
               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

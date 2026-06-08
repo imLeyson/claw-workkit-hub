@@ -61,7 +61,7 @@ const aiStatusConfig: Record<string, string> = {
   readable: 'bg-success-soft text-success', processing: 'bg-accent-50 text-accent-600', need_review: 'bg-warning-soft text-warning',
 }
 const typeColorMap: Record<string, string> = {
-  review: 'bg-accent-50 text-accent-700', spec: 'bg-gray-100 text-text-muted', faq: 'bg-success-soft text-success', copy_asset: 'bg-accent-50/50 text-accent-700',
+  review: 'bg-accent-50 text-accent-500', spec: 'bg-white/[0.06] text-text-muted', faq: 'bg-success-soft text-success', copy_asset: 'bg-accent-500/[0.05] text-accent-500',
 }
 const typeIcons: Record<string, typeof FileSpreadsheet> = {
   review: MessageSquareText, spec: ClipboardList, faq: MessageSquareText, copy_asset: Paperclip,
@@ -267,7 +267,7 @@ export default function MaterialLibrary() {
       </div>
 
       {/* Upload */}
-      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-[24px] p-8 text-center mb-10 transition-all cursor-pointer group ${uploading ? 'border-accent-300 bg-accent-50/20' : 'border-border-default hover:border-accent-300 hover:bg-accent-50/20'}`}>
+      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-[24px] p-8 text-center mb-10 transition-all cursor-pointer group ${uploading ? 'border-accent-300 bg-accent-500/10/20' : 'border-border-default hover:border-accent-300 hover:bg-accent-500/10/20'}`}>
         <div className="w-14 h-14 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
           {uploading ? (
             <div className="w-6 h-6 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
@@ -282,7 +282,7 @@ export default function MaterialLibrary() {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); downloadTemplate() }}
-            className="inline-flex items-center gap-2 rounded-xl border border-accent-200 bg-white px-4 py-2 text-[12px] font-medium text-accent-700 shadow-sm shadow-accent-100/40 transition-colors hover:border-accent-300 hover:bg-accent-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-accent-500/20 bg-bg-surface px-4 py-2 text-[12px] font-medium text-accent-500 shadow-sm shadow-accent-100/40 transition-colors hover:border-accent-300 hover:bg-accent-50"
           >
             <Download className="h-3.5 w-3.5" />
             下载 CSV 模板
@@ -292,7 +292,7 @@ export default function MaterialLibrary() {
           <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
           <div className="flex flex-wrap gap-1.5">
             {['类型', '竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容'].map((field) => (
-              <span key={field} className={`rounded-lg px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-700' : 'bg-gray-50 text-text-muted'}`}>
+              <span key={field} className={`rounded-lg px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-500' : 'bg-gray-50 text-text-muted'}`}>
                 {field}
               </span>
             ))}
@@ -310,25 +310,25 @@ export default function MaterialLibrary() {
       {/* Competitors */}
       <div className="flex items-center justify-between mb-4">
         <span className="section-title">竞品商品 · {competitors.length}</span>
-        <button onClick={openAddComp} className="text-[11px] font-medium text-accent-600 hover:text-accent-700 flex items-center gap-1">
+        <button onClick={openAddComp} className="text-[11px] font-medium text-accent-600 hover:text-accent-500 flex items-center gap-1">
           <Plus className="w-3.5 h-3.5" />添加竞品
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         {competitors.map((comp, i) => (
-          <div key={i} className="card-surface rounded-[20px] p-5 bg-gradient-to-b from-white to-accent-50/20 relative group">
+          <div key={i} className="card-surface rounded-[20px] p-5 bg-gradient-to-b from-bg-surface to-accent-500/[0.10]/20 relative group">
             <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => openEditComp(i)} className="w-7 h-7 rounded-lg bg-white border border-border-light flex items-center justify-center hover:bg-accent-50 transition-colors">
+              <button onClick={() => openEditComp(i)} className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-accent-50 transition-colors">
                 <Pencil className="w-3 h-3 text-text-muted" />
               </button>
-              <button onClick={() => handleDeleteComp(i)} className="w-7 h-7 rounded-lg bg-white border border-border-light flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-colors">
+              <button onClick={() => handleDeleteComp(i)} className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-red-500/10 hover:border-red-200 transition-colors">
                 <X className="w-3 h-3 text-text-muted hover:text-error" />
               </button>
             </div>
             <div className="flex items-center justify-between mb-3 pr-16">
               <span className="text-[15px] font-medium text-text-main">{comp.brand}</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${platformColors[comp.platform] || 'bg-gray-100 text-gray-600'}`}>{comp.platform}</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${platformColors[comp.platform] || 'bg-white/[0.06] text-gray-600'}`}>{comp.platform}</span>
             </div>
             <div className="text-[12px] text-text-muted mb-3">{comp.name}</div>
             <div className="flex items-center gap-4 text-[12px] text-text-secondary mb-2">
@@ -339,7 +339,7 @@ export default function MaterialLibrary() {
             {comp.topIssues.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {comp.topIssues.map((issue) => (
-                  <span key={issue} className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-700">{issue}</span>
+                  <span key={issue} className="text-[10px] px-2 py-0.5 rounded-md bg-accent-50 text-accent-500">{issue}</span>
                 ))}
               </div>
             )}
@@ -349,7 +349,7 @@ export default function MaterialLibrary() {
           <div className="col-span-full text-center py-10 border-2 border-dashed border-border-default rounded-2xl">
             <p className="text-[13px] text-text-muted mb-2">暂无竞品商品</p>
             <p className="text-[11px] text-text-muted mb-4">上传竞品评论数据自动识别，或手动添加</p>
-            <button onClick={openAddComp} className="text-[12px] font-medium text-accent-600 hover:text-accent-700">+ 手动添加竞品</button>
+            <button onClick={openAddComp} className="text-[12px] font-medium text-accent-600 hover:text-accent-500">+ 手动添加竞品</button>
           </div>
         )}
       </div>
@@ -357,10 +357,10 @@ export default function MaterialLibrary() {
       {/* Comp form modal */}
       {showCompForm && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={() => setShowCompForm(false)}>
-          <div className="bg-white rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-bg-surface rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-medium text-text-main">{editingIndex !== null ? '编辑竞品' : '添加竞品商品'}</h3>
-              <button onClick={() => setShowCompForm(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-4 h-4 text-text-muted" /></button>
+              <button onClick={() => setShowCompForm(false)} className="p-1 rounded-lg hover:bg-white/[0.06]"><X className="w-4 h-4 text-text-muted" /></button>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -389,12 +389,12 @@ export default function MaterialLibrary() {
         {materials.map((m) => {
           const Icon = typeIcons[m.type] || FileSpreadsheet
           return (
-            <div key={m.id} className="card-surface rounded-[16px] p-4 flex items-center gap-4 group cursor-default hover:border-accent-200 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
+            <div key={m.id} className="card-surface rounded-[16px] p-4 flex items-center gap-4 group cursor-default hover:border-accent-500/20 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
               <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
               <div className="flex-1 min-w-0"><div className="text-[13px] font-medium text-text-main truncate">{m.label}</div><div className="text-[10px] text-text-muted">{m.fileName} · {m.uploadedAt}</div></div>
               <span className={`tag ${typeColorMap[m.type] || 'bg-gray-50 text-text-muted'}`}>{materialTypeLabels[m.type]}</span>
               <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${aiStatusConfig[m.aiStatus]}`}>{aiStatusLabels[m.aiStatus]}</span>
-              <button onClick={() => handleDeleteMaterial(m.id)} className="w-6 h-6 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50"><Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" /></button>
+              <button onClick={() => handleDeleteMaterial(m.id)} className="w-6 h-6 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" /></button>
             </div>
           )
         })}

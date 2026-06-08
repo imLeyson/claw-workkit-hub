@@ -7,10 +7,10 @@ import { useToast } from '../components/Toast'
 import type { MaterialType } from '../types'
 
 const sourceColorMap: Record<string, string> = {
-  '竞品评论': 'bg-accent-50 text-accent-700',
-  '商品参数': 'bg-gray-100 text-text-muted',
+  '竞品评论': 'bg-accent-50 text-accent-500',
+  '商品参数': 'bg-white/[0.06] text-text-muted',
   '客服记录': 'bg-success-soft text-success',
-  '历史文案': 'bg-accent-50/50 text-accent-700',
+  '历史文案': 'bg-accent-500/[0.05] text-accent-500',
 }
 
 const sourceMaterialMap: Record<string, MaterialType> = {
@@ -101,7 +101,7 @@ export default function TaskCards() {
       </div>
 
       {/* Smart association — collapsible */}
-      <div className="mb-10 bg-accent-50/40 rounded-2xl border border-accent-100 overflow-hidden">
+      <div className="mb-10 bg-accent-500/[0.04] rounded-2xl border border-accent-500/15 overflow-hidden">
         <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-accent-500" />
@@ -112,7 +112,7 @@ export default function TaskCards() {
         {showAssociation && (
         <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           {getWorkKits().sort((a, b) => b.reuseCount - a.reuseCount).slice(0, 5).map((k) => (
-            <Link key={k.id} to="/archive" className="bg-white rounded-xl p-3 border border-accent-100 text-[11px] hover:shadow-sm transition-shadow">
+            <Link key={k.id} to="/archive" className="bg-bg-surface rounded-xl p-3 border border-accent-500/15 text-[11px] hover:shadow-sm transition-shadow">
               <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 12)}{k.name.length > 12 ? '...' : ''}</div>
               <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次</div>
             </Link>
@@ -144,7 +144,7 @@ export default function TaskCards() {
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
                     task.status === 'generated' ? 'bg-kit-50 text-kit-600' :
-                    task.status === 'ready' ? 'bg-accent-50 text-accent-600' : blocked ? 'bg-warning-soft text-warning' : 'bg-gray-100 text-gray-500'
+                    task.status === 'ready' ? 'bg-accent-50 text-accent-600' : blocked ? 'bg-warning-soft text-warning' : 'bg-white/[0.06] text-gray-500'
                   }`}>
                     {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '待分析' : blocked ? '待补资料' : '待生成'}
                   </span>
@@ -169,7 +169,7 @@ export default function TaskCards() {
                 </div>
               </div>
 
-              <div className={`${isFirst ? 'px-8' : 'px-6'} py-3 bg-gray-50/50 border-t border-border-light flex items-center justify-between`}>
+              <div className={`${isFirst ? 'px-8' : 'px-6'} py-3 bg-white/[0.03] border-t border-border-light flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-[12px] text-text-muted">
                     <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
