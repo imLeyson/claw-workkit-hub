@@ -105,23 +105,17 @@ export default function TaskCards() {
         <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 为你关联 5 个相关经验</span>
+            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 推荐 {Math.min(5, getWorkKits().length)} 个高复用 Work Kit</span>
           </div>
           {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
         </button>
         {showAssociation && (
-        <div className="px-4 pb-4 grid grid-cols-5 gap-2">
-          {getWorkKits().slice(0, 2).map((k) => (
-            <div key={k.id} className="bg-white rounded-xl p-3 border border-accent-100 text-[11px]">
-              <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 10)}...</div>
-              <div className="text-text-muted">{k.version} · {k.reuseCount} 次复用</div>
-            </div>
-          ))}
-          {[{ label: '吹风机竞品分析', tag: '评论挖掘' }, { label: '直播话术框架', tag: '文案生成' }, { label: '详情页优化模板', tag: '设计参考' }].map((item) => (
-            <div key={item.label} className="bg-white rounded-xl p-3 border border-border-light text-[11px]">
-              <div className="font-medium text-text-main mb-0.5 truncate">{item.label}</div>
-              <div className="text-text-muted">{item.tag}</div>
-            </div>
+        <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          {getWorkKits().sort((a, b) => b.reuseCount - a.reuseCount).slice(0, 5).map((k) => (
+            <Link key={k.id} to="/archive" className="bg-white rounded-xl p-3 border border-accent-100 text-[11px] hover:shadow-sm transition-shadow">
+              <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 12)}{k.name.length > 12 ? '...' : ''}</div>
+              <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次</div>
+            </Link>
           ))}
         </div>
         )}
