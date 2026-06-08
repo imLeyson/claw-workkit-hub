@@ -123,7 +123,7 @@ export default function TaskCards() {
 
       {/* Task card grid */}
       <div className="grid grid-cols-2 gap-5 stagger">
-        {tasks.map((task, idx) => {
+        {tasks.map((task) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
           const availableTypes = new Set(inputMats.map((m) => m.type))
           const missingTags = task.sourceTags.filter((tag) => {
@@ -131,15 +131,13 @@ export default function TaskCards() {
             return materialType ? !availableTypes.has(materialType) : false
           })
           const blocked = task.status === 'pending' && inputMats.length === 0
-          const isFirst = idx === 0
           return (
-            <div key={task.id} className={`card-surface rounded-[24px] card-hover overflow-hidden group animate-fade-in-up ${isFirst ? 'col-span-2' : 'border-l-[3px] border-l-transparent hover:border-l-accent-400'}`}>
-              {isFirst && <div className="h-[3px] bg-accent-500" />}
-              <div className={`${isFirst ? 'p-8' : 'p-6'}`}>
+            <div key={task.id} className="card-surface rounded-[24px] card-hover overflow-hidden group animate-fade-in-up border-l-[3px] border-l-transparent hover:border-l-accent-400">
+              <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-muted">{roleLabels[task.role]}岗</span>
-                    <h3 className={`font-medium text-text-main mt-1 ${isFirst ? 'text-[20px]' : 'text-[17px]'}`}>{task.title}</h3>
+                    <h3 className="text-[17px] font-medium text-text-main mt-1">{task.title}</h3>
                   </div>
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
@@ -149,9 +147,9 @@ export default function TaskCards() {
                     {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '待分析' : blocked ? '待补资料' : '待生成'}
                   </span>
                 </div>
-                <p className={`text-text-muted leading-relaxed mb-4 ${isFirst ? 'text-[14px]' : 'text-[13px]'}`}>{task.description}</p>
+                <p className="text-[13px] text-text-muted leading-relaxed mb-4">{task.description}</p>
 
-                <div className={`flex flex-wrap items-center gap-2 text-[11px] mb-4 ${isFirst ? '' : 'min-h-[24px]'}`}>
+                <div className="flex flex-wrap items-center gap-2 text-[11px] mb-4 min-h-[24px]">
                   <span className={inputMats.length > 0 ? 'text-text-muted' : 'text-warning'}>
                     输入：{inputMats.length > 0 ? `${inputMats.length} 份已关联` : '暂无可用资料'}
                   </span>
@@ -169,7 +167,7 @@ export default function TaskCards() {
                 </div>
               </div>
 
-              <div className={`${isFirst ? 'px-8' : 'px-6'} py-3 bg-white/[0.03] border-t border-border-light flex items-center justify-between`}>
+              <div className="px-6 py-3 bg-white/[0.03] border-t border-border-light flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-[12px] text-text-muted">
                     <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}
