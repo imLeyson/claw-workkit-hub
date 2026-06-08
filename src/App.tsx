@@ -1,9 +1,10 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { Sparkles, LogOut } from 'lucide-react'
 import { ToastProvider } from './components/Toast'
 import { AuthProvider, useAuth } from './components/AuthProvider'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import CommandPalette, { useCommandPalette } from './components/CommandPalette'
 import Sidebar from './components/Sidebar'
 import { isSupabaseConfigured } from './services/supabase'
 
@@ -47,6 +48,18 @@ function Breadcrumb() {
 function AppContent() {
   const location = useLocation()
   const { user, loading, logout } = useAuth()
+  const cmd = useCommandPalette()
+
+  // ⌘K / Ctrl+K shortcut
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault(); cmd.toggle()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [cmd.toggle])
 
   if (location.pathname === '/slides') return <Slides />
   if (location.pathname === '/login') return <Login />
@@ -108,6 +121,7 @@ function AppContent() {
           </div>
         </main>
       </div>
+      <CommandPalette open={cmd.open} onClose={cmd.close} />
     </div>
   )
 }
