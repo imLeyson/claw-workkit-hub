@@ -7,7 +7,7 @@ import { useToast } from '../components/Toast'
 import type { MaterialType } from '../types'
 
 const sourceColorMap: Record<string, string> = {
-  '竞品评论': 'bg-accent-50 text-accent-500',
+  '竞品评论': 'bg-accent-500/10 text-accent-400',
   '商品参数': 'bg-white/[0.06] text-text-muted',
   '客服记录': 'bg-success-soft text-success',
   '历史文案': 'bg-accent-500/[0.05] text-accent-500',
@@ -142,7 +142,7 @@ export default function TaskCards() {
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
                     task.status === 'generated' ? 'bg-kit-50 text-kit-600' :
-                    task.status === 'ready' ? 'bg-accent-50 text-accent-600' : blocked ? 'bg-warning-soft text-warning' : 'bg-white/[0.06] text-gray-500'
+                    task.status === 'ready' ? 'bg-accent-500/10 text-accent-400' : blocked ? 'bg-warning-soft text-warning' : 'bg-white/5 text-text-muted'
                   }`}>
                     {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '待分析' : blocked ? '待补资料' : '待生成'}
                   </span>
