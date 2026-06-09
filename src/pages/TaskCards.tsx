@@ -33,6 +33,17 @@ export default function TaskCards() {
       setTasks(getTasks(project.id))
     }
   }, [projectSlug])
+
+  useEffect(() => {
+    const handleSync = () => {
+      if (project) {
+        setTasks(getTasks(project.id))
+      }
+    }
+    window.addEventListener('promokit_db_update', handleSync)
+    return () => window.removeEventListener('promokit_db_update', handleSync)
+  }, [project, projectSlug])
+
   const { showToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [showAssociation, setShowAssociation] = useState(true)

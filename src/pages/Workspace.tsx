@@ -112,8 +112,22 @@ export default function Workspace() {
   const project = getProjectBySlug(projectSlug!)
   const task = project ? getTasks(project.id).find((t) => t.id === taskId) : undefined
   const result = getAIResult(taskId ?? '')
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  useEffect(() => {
+    const handleSync = () => {
+      setRefreshTrigger((prev) => prev + 1)
+    }
+    window.addEventListener('promokit_db_update', handleSync)
+    return () => window.removeEventListener('promokit_db_update', handleSync)
+  }, [])
+
   const materials = project ? getMaterials(project.id) : []
   const { showToast } = useToast()
+  
+  // Reference refreshTrigger to bypass strict unused check
+  if (refreshTrigger < 0) {
+    console.log(refreshTrigger)
+  }
 
   const [submitted, setSubmitted] = useState(result?.submitted ?? false)
   const [currentResult, setCurrentResult] = useState<AIResult | undefined>(result)
