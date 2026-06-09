@@ -1,13 +1,51 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Target, Trash2, RotateCcw } from 'lucide-react'
+import { ArrowRight, Target, Trash2, RotateCcw, Pencil, X } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getTasks, getAIResult, getWorkKits, deleteProject, resetAllData } from '../services/db'
+import { getProjects, getTasks, getAIResult, getWorkKits, deleteProject, resetAllData, updateProject } from '../services/db'
+import type { Project } from '../types'
 
 export default function Dashboard() {
   const [projects, setProjects] = useState(getProjects())
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [showReset, setShowReset] = useState(false)
+
+  // Project form editing state
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [projectForm, setProjectForm] = useState({
+    name: '',
+    description: '',
+    category: '',
+    campaign: '',
+  })
+
+  const handleOpenEdit = (p: Project) => {
+    setEditingProject(p)
+    setProjectForm({
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      campaign: p.campaign,
+    })
+  }
+
+  const handleSaveProject = () => {
+    if (!editingProject) return
+    if (!projectForm.name.trim()) {
+      alert('项目名称不能为空')
+      return
+    }
+    const updated: Project = {
+      ...editingProject,
+      name: projectForm.name.trim(),
+      description: projectForm.description.trim(),
+      category: projectForm.category.trim(),
+      campaign: projectForm.campaign.trim(),
+    }
+    updateProject(updated)
+    setProjects(getProjects())
+    setEditingProject(null)
+  }
 
   const handleDelete = (id: string) => {
     deleteProject(id)
@@ -85,12 +123,22 @@ export default function Dashboard() {
                   </span>
                 </div>
               </Link>
-              <button
-                onClick={(e) => { e.preventDefault(); setDeleteId(p.id) }}
-                className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity hover:bg-red-500/10 hover:border-red-200"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-text-muted" />
-              </button>
+              <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                <button
+                  onClick={(e) => { e.preventDefault(); handleOpenEdit(p) }}
+                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-white/5 cursor-pointer"
+                  title="编辑项目"
+                >
+                  <Pencil className="w-3.5 h-3.5 text-text-muted hover:text-accent-500" />
+                </button>
+                <button
+                  onClick={(e) => { e.preventDefault(); setDeleteId(p.id) }}
+                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-red-500/10 hover:border-red-200 cursor-pointer"
+                  title="删除项目"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" />
+                </button>
+              </div>
             </div>
           )
         })}
@@ -132,6 +180,69 @@ export default function Dashboard() {
               <button onClick={() => { resetAllData(); setProjects(getProjects()); setShowReset(false); window.location.reload() }} className="btn-primary-filled">
                 确认恢复
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit project modal */}
+      {editingProject && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in" onClick={() => setEditingProject(null)}>
+          <div className="bg-bg-surface rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-2xl border border-border-default" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-medium text-text-main font-semibold">编辑项目信息</h3>
+              <button onClick={() => setEditingProject(null)} className="p-1 rounded-lg hover:bg-white/[0.06] cursor-pointer"><X className="w-4 h-4 text-text-muted" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5 font-semibold">项目名称 *</label>
+                <input
+                  type="text"
+                  value={projectForm.name}
+                  onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
+                  placeholder="例：618 美妆个护竞品分析"
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  autoFocus
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5 font-semibold">商品类目</label>
+                <input
+                  type="text"
+                  value={projectForm.category}
+                  onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
+                  placeholder="例：个护美妆"
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5 font-semibold">活动场景</label>
+                <input
+                  type="text"
+                  value={projectForm.campaign}
+                  onChange={(e) => setProjectForm({ ...projectForm, campaign: e.target.value })}
+                  placeholder="例：618 年中大促"
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5 font-semibold">项目描述</label>
+                <textarea
+                  value={projectForm.description}
+                  onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                  placeholder="例：针对竞品评论、参数及文案进行多维度调研..."
+                  rows={3}
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button onClick={() => setEditingProject(null)} className="btn-ghost text-[13px] cursor-pointer">取消</button>
+              <button onClick={handleSaveProject} className="btn-primary-filled text-[13px] cursor-pointer">保存修改</button>
             </div>
           </div>
         </div>

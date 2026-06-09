@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp, Pencil, Plus, X } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjectBySlug, getMaterials, getTasks, getWorkKits, updateTask, refreshTaskMaterialLinks } from '../services/db'
+import { getProjectBySlug, getMaterials, getTasks, getWorkKits, updateTask, refreshTaskMaterialLinks, addTask } from '../services/db'
 import { useToast } from '../components/Toast'
-import type { MaterialType } from '../types'
+import type { MaterialType, Role, TaskCard } from '../types'
 
 const sourceColorMap: Record<string, string> = {
   '竞品评论': 'bg-accent-500/10 text-accent-400',
@@ -37,6 +37,114 @@ export default function TaskCards() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showAssociation, setShowAssociation] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  // Task form state
+  const [showTaskForm, setShowTaskForm] = useState(false)
+  const [editingTask, setEditingTask] = useState<TaskCard | null>(null)
+  const [taskForm, setTaskForm] = useState({
+    role: 'merchandise' as Role,
+    title: '',
+    description: '',
+    assignedTo: '',
+    promptPreview: '',
+    outputFormat: '',
+    judgmentCriteriaStr: '',
+    sourceTags: [] as string[],
+  })
+
+  const openAddTask = () => {
+    setEditingTask(null)
+    setTaskForm({
+      role: 'merchandise',
+      title: '',
+      description: '',
+      assignedTo: '',
+      promptPreview: '',
+      outputFormat: '',
+      judgmentCriteriaStr: '',
+      sourceTags: [],
+    })
+    setShowTaskForm(true)
+  }
+
+  const openEditTask = (task: TaskCard) => {
+    setEditingTask(task)
+    setTaskForm({
+      role: task.role,
+      title: task.title,
+      description: task.description,
+      assignedTo: task.assignedTo || '',
+      promptPreview: task.promptPreview,
+      outputFormat: task.outputFormat,
+      judgmentCriteriaStr: (task.judgmentCriteria || []).join('\n'),
+      sourceTags: task.sourceTags,
+    })
+    setShowTaskForm(true)
+  }
+
+  const toggleTag = (tag: string) => {
+    setTaskForm((prev) => {
+      const idx = prev.sourceTags.indexOf(tag)
+      if (idx >= 0) {
+        return { ...prev, sourceTags: prev.sourceTags.filter((t) => t !== tag) }
+      } else {
+        return { ...prev, sourceTags: [...prev.sourceTags, tag] }
+      }
+    })
+  }
+
+  const handleSaveTask = async () => {
+    if (!project) return
+    if (!taskForm.title.trim()) {
+      showToast('请输入任务标题', 'error')
+      return
+    }
+    if (!taskForm.description.trim()) {
+      showToast('请输入任务描述', 'error')
+      return
+    }
+
+    const judgmentCriteria = taskForm.judgmentCriteriaStr
+      .split('\n')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
+
+    if (editingTask) {
+      const updated: TaskCard = {
+        ...editingTask,
+        role: taskForm.role,
+        title: taskForm.title.trim(),
+        description: taskForm.description.trim(),
+        assignedTo: taskForm.assignedTo.trim(),
+        promptPreview: taskForm.promptPreview.trim(),
+        outputFormat: taskForm.outputFormat.trim(),
+        judgmentCriteria,
+        sourceTags: taskForm.sourceTags,
+      }
+      updateTask(updated)
+      showToast('任务更新成功', 'success')
+    } else {
+      const newTask: TaskCard = {
+        id: 't_' + Date.now(),
+        projectId: project.id,
+        role: taskForm.role,
+        title: taskForm.title.trim(),
+        description: taskForm.description.trim(),
+        status: 'pending',
+        assignedTo: taskForm.assignedTo.trim() || '未分配',
+        inputMaterials: [],
+        promptPreview: taskForm.promptPreview.trim() || `围绕「${taskForm.title.trim()}」进行深度分析，分析资料中包含的竞品反馈。`,
+        outputFormat: taskForm.outputFormat.trim() || '列表',
+        judgmentCriteria: judgmentCriteria.length > 0 ? judgmentCriteria : ['确认数据完整性', '形成结论清单'],
+        sourceTags: taskForm.sourceTags,
+      }
+      await addTask(newTask)
+      showToast('自定义任务添加成功', 'success')
+    }
+    refreshTaskMaterialLinks(project.id)
+    setTasks(getTasks(project.id))
+    setShowTaskForm(false)
+  }
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
@@ -79,6 +187,10 @@ export default function TaskCards() {
           <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 系统根据资料自动生成可执行的 AI 分析任务卡。</p>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={openAddTask} className="btn-ghost text-accent-500 hover:text-accent-600 flex items-center gap-1.5 cursor-pointer">
+            <Plus className="w-4 h-4" />
+            <span>添加自定义分析任务</span>
+          </button>
           {!allReady && (
             <button onClick={generateAll} disabled={isGenerating} className="btn-primary-filled">
               {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -136,7 +248,19 @@ export default function TaskCards() {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-muted">{roleLabels[task.role]}岗</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-muted">{roleLabels[task.role]}岗</span>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          openEditTask(task)
+                        }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-white/10 text-text-muted hover:text-accent-500 cursor-pointer flex items-center justify-center"
+                        title="编辑任务"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    </div>
                     <h3 className="text-[17px] font-medium text-text-main mt-1">{task.title}</h3>
                   </div>
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
@@ -213,6 +337,129 @@ export default function TaskCards() {
 
       {tasks.length === 0 && (
         <div className="text-center py-20 text-text-muted text-[14px]">暂无任务卡，请先在资料库上传数据。</div>
+      )}
+
+      {/* Task form modal */}
+      {showTaskForm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in" onClick={() => setShowTaskForm(false)}>
+          <div className="bg-bg-surface rounded-2xl p-6 w-[560px] max-w-[95vw] shadow-2xl border border-border-default max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[18px] font-medium text-text-main">{editingTask ? '编辑分析任务' : '添加自定义分析任务'}</h3>
+              <button onClick={() => setShowTaskForm(false)} className="p-1 rounded-lg hover:bg-white/[0.06] cursor-pointer"><X className="w-4 h-4 text-text-muted" /></button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-medium text-text-muted mb-1.5">岗位角色 *</label>
+                  <select
+                    value={taskForm.role}
+                    onChange={(e) => setTaskForm({ ...taskForm, role: e.target.value as Role })}
+                    className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-bg-surface text-text-main cursor-pointer"
+                  >
+                    {Object.entries(roleLabels).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-text-muted mb-1.5">负责人</label>
+                  <input
+                    type="text"
+                    value={taskForm.assignedTo}
+                    onChange={(e) => setTaskForm({ ...taskForm, assignedTo: e.target.value })}
+                    placeholder="例：张经理"
+                    className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">任务标题 *</label>
+                <input
+                  type="text"
+                  value={taskForm.title}
+                  onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                  placeholder="例：竞品高频痛点挖掘"
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">任务描述 *</label>
+                <textarea
+                  value={taskForm.description}
+                  onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                  placeholder="请输入对该分析任务的简要描述..."
+                  rows={2}
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">输出格式 *</label>
+                <input
+                  type="text"
+                  value={taskForm.outputFormat}
+                  onChange={(e) => setTaskForm({ ...taskForm, outputFormat: e.target.value })}
+                  placeholder="例：表格：痛点、表现与改进行动"
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">资料来源需求</label>
+                <div className="flex flex-wrap gap-2">
+                  {['竞品评论', '商品参数', '客服记录', '历史文案'].map((tag) => {
+                    const active = taskForm.sourceTags.includes(tag)
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        className={`text-[11px] px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                          active
+                            ? 'bg-accent-500/10 border-accent-500 text-accent-400 font-medium'
+                            : 'border-border-default text-text-muted hover:border-text-muted'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">Prompt 提示词模板 (AI 分析预设指令)</label>
+                <textarea
+                  value={taskForm.promptPreview}
+                  onChange={(e) => setTaskForm({ ...taskForm, promptPreview: e.target.value })}
+                  placeholder="例：请分析提供的竞品数据，挖掘出三个最核心的痛点，并给出具体的营销卖点转化建议。"
+                  rows={3}
+                  className="w-full text-[12px] font-mono px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">验收标准 (每行一个)</label>
+                <textarea
+                  value={taskForm.judgmentCriteriaStr}
+                  onChange={(e) => setTaskForm({ ...taskForm, judgmentCriteriaStr: e.target.value })}
+                  placeholder="例：&#10;痛点分析必须基于真实的差评评论&#10;建议方案有可执行的代码或文案细节"
+                  rows={2}
+                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button onClick={() => setShowTaskForm(false)} className="btn-ghost text-[13px] cursor-pointer">取消</button>
+              <button onClick={handleSaveTask} className="btn-primary-filled text-[13px] cursor-pointer">{editingTask ? '保存修改' : '创建任务'}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

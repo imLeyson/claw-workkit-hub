@@ -25,8 +25,8 @@ import {
   RotateCcw,
 } from 'lucide-react'
 import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult, getWorkKits, getMaterials, upsertWorkKitFromProject } from '../services/db'
-import type { Material, WorkKit } from '../types'
+import { getProjectBySlug, getTasks, getAIResult, getWorkKits, getMaterials, upsertWorkKitFromProject, saveAIResult } from '../services/db'
+import type { Material, WorkKit, AISection } from '../types'
 import { useToast } from '../components/Toast'
 
 const materialTypeLabels: Record<string, string> = {
@@ -146,6 +146,145 @@ export default function Report() {
     const fallback = getDefaultReportDraft(baseSummaries, baseNextSteps, defaultKeep, defaultTrack)
     return readReportDraft(project?.id || 'unknown', fallback)
   })
+
+  const handleUpdateReportResultSection = (taskId: string, sectionIndex: number, updatedFields: Partial<AISection>) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const nextSections = (result.sections || []).map((sec, idx) => {
+      if (idx === sectionIndex) {
+        return { ...sec, ...updatedFields }
+      }
+      return sec
+    })
+    const nextResult = { ...result, sections: nextSections }
+    saveAIResult(nextResult)
+    setExecutionRefresh((v) => v + 1)
+  }
+
+  const handleReportMatrixCellChange = (taskId: string, secIdx: number, rowIdx: number, colIdx: number, value: string) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextRows = (sec.rows || []).map((row, rIdx) => {
+      if (rIdx === rowIdx) {
+        return row.map((cell, cIdx) => (cIdx === colIdx ? value : cell))
+      }
+      return row
+    })
+    handleUpdateReportResultSection(taskId, secIdx, { rows: nextRows })
+  }
+
+  const handleReportMatrixHeaderChange = (taskId: string, secIdx: number, colIdx: number, value: string) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextHeaders = (sec.headers || []).map((h, cIdx) => (cIdx === colIdx ? value : h))
+    handleUpdateReportResultSection(taskId, secIdx, { headers: nextHeaders })
+  }
+
+  const handleReportMatrixAddRow = (taskId: string, secIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const colCount = sec.headers?.length || 3
+    const newRow = Array(colCount).fill('新增内容')
+    const nextRows = [...(sec.rows || []), newRow]
+    handleUpdateReportResultSection(taskId, secIdx, { rows: nextRows })
+  }
+
+  const handleReportMatrixDeleteRow = (taskId: string, secIdx: number, rowIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextRows = (sec.rows || []).filter((_, rIdx) => rIdx !== rowIdx)
+    handleUpdateReportResultSection(taskId, secIdx, { rows: nextRows })
+  }
+
+  const handleReportListItemChange = (taskId: string, secIdx: number, itemIdx: number, value: string) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextItems = (sec.items || []).map((item, idx) => (idx === itemIdx ? value : item))
+    handleUpdateReportResultSection(taskId, secIdx, { items: nextItems })
+  }
+
+  const handleReportListAddItem = (taskId: string, secIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextItems = [...(sec.items || []), '新增项目要点...']
+    handleUpdateReportResultSection(taskId, secIdx, { items: nextItems })
+  }
+
+  const handleReportListDeleteItem = (taskId: string, secIdx: number, itemIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextItems = (sec.items || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateReportResultSection(taskId, secIdx, { items: nextItems })
+  }
+
+  const handleReportQAChange = (taskId: string, secIdx: number, itemIdx: number, field: 'q' | 'a', value: string) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQA = (sec.qa || []).map((item, idx) => {
+      if (idx === itemIdx) {
+        return { ...item, [field]: value }
+      }
+      return item
+    })
+    handleUpdateReportResultSection(taskId, secIdx, { qa: nextQA })
+  }
+
+  const handleReportQAAdd = (taskId: string, secIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQA = [...(sec.qa || []), { q: '新增问题？', a: '新增答复内容...' }]
+    handleUpdateReportResultSection(taskId, secIdx, { qa: nextQA })
+  }
+
+  const handleReportQADelete = (taskId: string, secIdx: number, itemIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQA = (sec.qa || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateReportResultSection(taskId, secIdx, { qa: nextQA })
+  }
+
+  const handleReportQuoteChange = (taskId: string, secIdx: number, itemIdx: number, field: 'text' | 'source', value: string) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQuotes = (sec.quotes || []).map((item, idx) => {
+      if (idx === itemIdx) {
+        return { ...item, [field]: value }
+      }
+      return item
+    })
+    handleUpdateReportResultSection(taskId, secIdx, { quotes: nextQuotes })
+  }
+
+  const handleReportQuoteAdd = (taskId: string, secIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQuotes = [...(sec.quotes || []), { text: '新原话摘录内容', source: '渠道来源' }]
+    handleUpdateReportResultSection(taskId, secIdx, { quotes: nextQuotes })
+  }
+
+  const handleReportQuoteDelete = (taskId: string, secIdx: number, itemIdx: number) => {
+    const result = getAIResult(taskId)
+    if (!result) return
+    const sec = result.sections[secIdx]
+    const nextQuotes = (sec.quotes || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateReportResultSection(taskId, secIdx, { quotes: nextQuotes })
+  }
+
+  const handleReportTextChange = (taskId: string, secIdx: number, value: string) => {
+    handleUpdateReportResultSection(taskId, secIdx, { body: value })
+  }
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
@@ -454,32 +593,298 @@ export default function Report() {
                     )}
                   </div>
                   {result?.submitted ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3 animate-fade-in-up">
                       {result.sections.map((section, i) => (
                         <div key={i} className="rounded-[20px] border border-border-light bg-bg-primary/45 p-5">
-                          <h4 className="text-[13px] font-medium text-text-main mb-3">{section.title}</h4>
+                          {editMode ? (
+                            <div className="mb-4 flex flex-col gap-1">
+                              <label className="text-[10px] text-text-muted font-medium uppercase tracking-[0.08em]">区块标题</label>
+                              <input
+                                type="text"
+                                value={section.title}
+                                onChange={(e) => handleUpdateReportResultSection(task.id, i, { title: e.target.value })}
+                                className="text-[13px] font-medium text-text-main bg-bg-surface border border-border-default rounded-xl px-3 py-1.5 w-full focus:outline-none focus:border-accent-400"
+                              />
+                            </div>
+                          ) : (
+                            <h4 className="text-[13px] font-medium text-text-main mb-3">{section.title}</h4>
+                          )}
+
                           {section.type === 'matrix' && section.headers && section.rows && (
                             <div className="overflow-x-auto">
-                              <table className="w-full text-[12px]">
-                                <thead><tr className="border-b border-border-light">{section.headers.map((h: string) => <th key={h} className="text-left py-2 px-2 text-[10px] font-medium uppercase tracking-[0.06em] text-text-muted">{h}</th>)}</tr></thead>
-                                <tbody>{section.rows.map((row: string[], ri: number) => <tr key={ri}>{row.map((cell: string, ci: number) => <td key={ci} className={`py-2 px-2 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>)}</tr>)}</tbody>
-                              </table>
+                              {editMode ? (
+                                <div>
+                                  <table className="w-full text-[12px]">
+                                    <thead>
+                                      <tr className="border-b border-border-light">
+                                        {section.headers.map((h, ci) => (
+                                          <th key={ci} className="py-2 px-1 text-left">
+                                            <input
+                                              type="text"
+                                              value={h}
+                                              onChange={(e) => handleReportMatrixHeaderChange(task.id, i, ci, e.target.value)}
+                                              className="w-full bg-bg-primary border border-border-light rounded-lg px-2 py-1 text-[11px] font-semibold text-text-main focus:outline-none focus:border-accent-400"
+                                            />
+                                          </th>
+                                        ))}
+                                        <th className="w-10"></th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {section.rows.map((row, ri) => (
+                                        <tr key={ri} className="border-b border-border-light last:border-0">
+                                          {row.map((cell, ci) => (
+                                            <td key={ci} className="py-2 px-1">
+                                              <textarea
+                                                value={cell}
+                                                onChange={(e) => handleReportMatrixCellChange(task.id, i, ri, ci, e.target.value)}
+                                                rows={Math.max(1, Math.ceil(cell.length / 18))}
+                                                className="w-full bg-bg-surface border border-border-light rounded-lg px-2 py-1 text-[12px] text-text-secondary focus:outline-none focus:border-accent-400 resize-y"
+                                              />
+                                            </td>
+                                          ))}
+                                          <td className="py-2 px-1 text-center">
+                                            <button
+                                              onClick={() => handleReportMatrixDeleteRow(task.id, i, ri)}
+                                              className="p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                                              title="删除行"
+                                            >
+                                              <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                  <button
+                                    onClick={() => handleReportMatrixAddRow(task.id, i)}
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" /> 添加行
+                                  </button>
+                                </div>
+                              ) : (
+                                <table className="w-full text-[12px]">
+                                  <thead>
+                                    <tr className="border-b border-border-light">
+                                      {section.headers.map((h: string) => (
+                                        <th key={h} className="text-left py-2 px-2 text-[10px] font-medium uppercase tracking-[0.06em] text-text-muted">{h}</th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {section.rows.map((row: string[], ri: number) => (
+                                      <tr key={ri}>
+                                        {row.map((cell: string, ci: number) => (
+                                          <td key={ci} className={`py-2 px-2 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>
+                                        ))}
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
                             </div>
                           )}
+
                           {section.type === 'list' && section.items && (
-                            <ul className="space-y-1.5">{section.items.map((item: string, j: number) => <li key={j} className="text-[12px] text-text-secondary">— {item}</li>)}</ul>
+                            <div>
+                              {editMode ? (
+                                <div className="space-y-3">
+                                  {section.items.map((item, j) => (
+                                    <div key={j} className="flex items-start gap-2">
+                                      <span className="w-5 h-5 rounded-lg bg-accent-50 text-accent-600 font-medium text-[10px] flex items-center justify-center shrink-0 mt-2">{j + 1}</span>
+                                      <textarea
+                                        value={item}
+                                        onChange={(e) => handleReportListItemChange(task.id, i, j, e.target.value)}
+                                        rows={2}
+                                        className="flex-1 bg-bg-primary border border-border-light rounded-xl p-2 text-[12px] text-text-secondary focus:outline-none"
+                                      />
+                                      <button
+                                        onClick={() => handleReportListDeleteItem(task.id, i, j)}
+                                        className="mt-2 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <button
+                                    onClick={() => handleReportListAddItem(task.id, i)}
+                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
+                                  >
+                                    <Plus className="w-3 h-3" /> 添加项
+                                  </button>
+                                </div>
+                              ) : (
+                                <ul className="space-y-1.5">
+                                  {section.items.map((item: string, j: number) => (
+                                    <li key={j} className="text-[12px] text-text-secondary">— {item}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           )}
+
                           {section.type === 'bullet' && section.items && (
-                            <ul className="space-y-1.5">{section.items.map((item: string, j: number) => <li key={j} className="text-[12px] text-text-secondary flex items-start gap-2"><span className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-1.5 shrink-0" />{item}</li>)}</ul>
+                            <div>
+                              {editMode ? (
+                                <div className="space-y-3">
+                                  {section.items.map((item, j) => (
+                                    <div key={j} className="flex items-start gap-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-4 shrink-0" />
+                                      <textarea
+                                        value={item}
+                                        onChange={(e) => handleReportListItemChange(task.id, i, j, e.target.value)}
+                                        rows={2}
+                                        className="flex-1 bg-bg-primary border border-border-light rounded-xl p-2 text-[12px] text-text-secondary focus:outline-none"
+                                      />
+                                      <button
+                                        onClick={() => handleReportListDeleteItem(task.id, i, j)}
+                                        className="mt-2 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <button
+                                    onClick={() => handleReportListAddItem(task.id, i)}
+                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
+                                  >
+                                    <Plus className="w-3 h-3" /> 添加项
+                                  </button>
+                                </div>
+                              ) : (
+                                <ul className="space-y-1.5">
+                                  {section.items.map((item: string, j: number) => (
+                                    <li key={j} className="text-[12px] text-text-secondary flex items-start gap-2">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-1.5 shrink-0" />{item}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
                           )}
+
                           {section.type === 'qa' && section.qa && (
-                            <div className="space-y-2">{section.qa.map((item: { q: string; a: string }, j: number) => <div key={j} className="bg-white/5 rounded-xl p-3"><p className="text-[12px] font-medium text-text-main mb-1">Q: {item.q}</p><p className="text-[12px] text-text-secondary">A: {item.a}</p></div>)}</div>
+                            <div>
+                              {editMode ? (
+                                <div className="space-y-4">
+                                  {section.qa.map((item, j) => (
+                                    <div key={j} className="bg-white/3 rounded-2xl p-4 border border-border-light relative group">
+                                      <button
+                                        onClick={() => handleReportQADelete(task.id, i, j)}
+                                        className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                      <div className="space-y-2 pr-8">
+                                        <div className="flex flex-col gap-1">
+                                          <label className="text-[10px] text-text-muted font-medium">问题 Q</label>
+                                          <input
+                                            type="text"
+                                            value={item.q}
+                                            onChange={(e) => handleReportQAChange(task.id, i, j, 'q', e.target.value)}
+                                            className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-1.5 text-[12px] font-medium text-text-main focus:outline-none"
+                                          />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                          <label className="text-[10px] text-text-muted font-medium">答复 A</label>
+                                          <textarea
+                                            value={item.a}
+                                            onChange={(e) => handleReportQAChange(task.id, i, j, 'a', e.target.value)}
+                                            rows={3}
+                                            className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-1.5 text-[12px] text-text-secondary focus:outline-none"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                  <button
+                                    onClick={() => handleReportQAAdd(task.id, i)}
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" /> 添加问答对
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  {section.qa.map((item: { q: string; a: string }, j: number) => (
+                                    <div key={j} className="bg-white/5 rounded-xl p-3">
+                                      <p className="text-[12px] font-medium text-text-main mb-1">Q: {item.q}</p>
+                                      <p className="text-[12px] text-text-secondary">A: {item.a}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           )}
+
                           {section.type === 'quotes' && section.quotes && (
-                            <div className="space-y-2">{section.quotes.map((q: { text: string; source: string }, j: number) => <div key={j} className="bg-white/5 rounded-lg p-3 italic text-[12px] text-text-secondary">"{q.text}"<p className="text-[10px] text-text-muted mt-1 not-italic">—— {q.source}</p></div>)}</div>
+                            <div>
+                              {editMode ? (
+                                <div className="space-y-4">
+                                  {section.quotes.map((q, j) => (
+                                    <div key={j} className="bg-white/3 rounded-xl p-4 border border-border-light relative group">
+                                      <button
+                                        onClick={() => handleReportQuoteDelete(task.id, i, j)}
+                                        className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                      <div className="space-y-2 pr-8">
+                                        <div className="flex flex-col gap-1">
+                                          <label className="text-[10px] text-text-muted font-medium">用户原话</label>
+                                          <textarea
+                                            value={q.text}
+                                            onChange={(e) => handleReportQuoteChange(task.id, i, j, 'text', e.target.value)}
+                                            rows={2}
+                                            className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-1.5 text-[12px] text-text-secondary italic focus:outline-none"
+                                          />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                          <label className="text-[10px] text-text-muted font-medium">来源渠道/用户</label>
+                                          <input
+                                            type="text"
+                                            value={q.source}
+                                            onChange={(e) => handleReportQuoteChange(task.id, i, j, 'source', e.target.value)}
+                                            className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-1.5 text-[11px] text-text-main focus:outline-none"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                  <button
+                                    onClick={() => handleReportQuoteAdd(task.id, i)}
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" /> 添加原话引用
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  {section.quotes.map((q: { text: string; source: string }, j: number) => (
+                                    <div key={j} className="bg-white/5 rounded-lg p-3 italic text-[12px] text-text-secondary">
+                                      "{q.text}"
+                                      <p className="text-[10px] text-text-muted mt-1 not-italic">—— {q.source}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           )}
+
                           {section.type === 'text' && section.body && (
-                            <p className="text-[12px] text-text-secondary leading-relaxed">{section.body}</p>
+                            <div>
+                              {editMode ? (
+                                <textarea
+                                  value={section.body}
+                                  onChange={(e) => handleReportTextChange(task.id, i, e.target.value)}
+                                  rows={6}
+                                  className="w-full bg-bg-primary border border-border-light rounded-2xl p-4 text-[12px] text-text-secondary leading-relaxed focus:outline-none"
+                                />
+                              ) : (
+                                <p className="text-[12px] text-text-secondary leading-relaxed">{section.body}</p>
+                              )}
+                            </div>
                           )}
                         </div>
                       ))}

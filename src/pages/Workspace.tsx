@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag, BookOpen, Link2, ShieldCheck, Check, MinusCircle } from 'lucide-react'
+import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag, BookOpen, Link2, ShieldCheck, Check, MinusCircle, Edit3, Plus, Trash2 } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjectBySlug, getTasks, getAIResult, getMaterials, getWorkKits, saveAIResult, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
@@ -143,6 +143,129 @@ export default function Workspace() {
     })
   }
 
+  const [workspaceEditMode, setWorkspaceEditMode] = useState(false)
+
+  useEffect(() => {
+    setSubmitted(result?.submitted ?? false)
+    setCurrentResult(result)
+    setAiSections(result?.sections ?? null)
+    setWorkspaceEditMode(false)
+  }, [taskId])
+
+  const handleUpdateSection = (sectionIndex: number, updatedFields: Partial<AISection>) => {
+    if (!currentResult) return
+    const sectionsBase = aiSections || currentResult.sections || []
+    const nextSections = sectionsBase.map((sec, idx) => {
+      if (idx === sectionIndex) {
+        return { ...sec, ...updatedFields }
+      }
+      return sec
+    })
+    setAiSections(nextSections)
+    const nextResult = { ...currentResult, sections: nextSections }
+    setCurrentResult(nextResult)
+    saveAIResult(nextResult)
+  }
+
+  const handleMatrixCellChange = (secIdx: number, rowIdx: number, colIdx: number, value: string) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextRows = (sec.rows || []).map((row, rIdx) => {
+      if (rIdx === rowIdx) {
+        return row.map((cell, cIdx) => (cIdx === colIdx ? value : cell))
+      }
+      return row
+    })
+    handleUpdateSection(secIdx, { rows: nextRows })
+  }
+
+  const handleMatrixHeaderChange = (secIdx: number, colIdx: number, value: string) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextHeaders = (sec.headers || []).map((h, cIdx) => (cIdx === colIdx ? value : h))
+    handleUpdateSection(secIdx, { headers: nextHeaders })
+  }
+
+  const handleMatrixAddRow = (secIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const colCount = sec.headers?.length || 3
+    const newRow = Array(colCount).fill('新增内容')
+    const nextRows = [...(sec.rows || []), newRow]
+    handleUpdateSection(secIdx, { rows: nextRows })
+  }
+
+  const handleMatrixDeleteRow = (secIdx: number, rowIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextRows = (sec.rows || []).filter((_, rIdx) => rIdx !== rowIdx)
+    handleUpdateSection(secIdx, { rows: nextRows })
+  }
+
+  const handleListItemChange = (secIdx: number, itemIdx: number, value: string) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextItems = (sec.items || []).map((item, idx) => (idx === itemIdx ? value : item))
+    handleUpdateSection(secIdx, { items: nextItems })
+  }
+
+  const handleListAddItem = (secIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextItems = [...(sec.items || []), '新增项目要点...']
+    handleUpdateSection(secIdx, { items: nextItems })
+  }
+
+  const handleListDeleteItem = (secIdx: number, itemIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextItems = (sec.items || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateSection(secIdx, { items: nextItems })
+  }
+
+  const handleQAChange = (secIdx: number, itemIdx: number, field: 'q' | 'a', value: string) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQA = (sec.qa || []).map((item, idx) => {
+      if (idx === itemIdx) {
+        return { ...item, [field]: value }
+      }
+      return item
+    })
+    handleUpdateSection(secIdx, { qa: nextQA })
+  }
+
+  const handleQAAdd = (secIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQA = [...(sec.qa || []), { q: '新增问题？', a: '新增答复内容...' }]
+    handleUpdateSection(secIdx, { qa: nextQA })
+  }
+
+  const handleQADelete = (secIdx: number, itemIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQA = (sec.qa || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateSection(secIdx, { qa: nextQA })
+  }
+
+  const handleQuoteChange = (secIdx: number, itemIdx: number, field: 'text' | 'source', value: string) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQuotes = (sec.quotes || []).map((item, idx) => {
+      if (idx === itemIdx) {
+        return { ...item, [field]: value }
+      }
+      return item
+    })
+    handleUpdateSection(secIdx, { quotes: nextQuotes })
+  }
+
+  const handleQuoteAdd = (secIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQuotes = [...(sec.quotes || []), { text: '新原话摘录内容', source: '渠道来源' }]
+    handleUpdateSection(secIdx, { quotes: nextQuotes })
+  }
+
+  const handleQuoteDelete = (secIdx: number, itemIdx: number) => {
+    const sec = (aiSections || currentResult!.sections)[secIdx]
+    const nextQuotes = (sec.quotes || []).filter((_, idx) => idx !== itemIdx)
+    handleUpdateSection(secIdx, { quotes: nextQuotes })
+  }
+
+  const handleTextChange = (secIdx: number, value: string) => {
+    handleUpdateSection(secIdx, { body: value })
+  }
+
   const handleGenerate = async () => {
     setGenerating(true)
     if (hasApiKey()) {
@@ -201,6 +324,18 @@ export default function Workspace() {
     showToast('已提交到策略报告', 'success')
   }
 
+  const handleRetract = () => {
+    if (!currentResult) return
+    const retractedResult = { ...currentResult, submitted: false }
+    setSubmitted(false)
+    setCurrentResult(retractedResult)
+    saveAIResult(retractedResult)
+    if (task) {
+      updateTask({ ...task, status: 'generated' })
+    }
+    showToast('已撤回提交，可重新编辑', 'info')
+  }
+
   const confirmFeedback = () => {
     const text = feedbackText.trim()
     if (text) {
@@ -251,6 +386,10 @@ export default function Workspace() {
         </div>
         {showResult && !submitted && (
           <div className="flex items-center gap-3">
+            <button onClick={() => setWorkspaceEditMode(!workspaceEditMode)} className="btn-primary text-[13px]">
+              {workspaceEditMode ? <Check className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+              {workspaceEditMode ? '完成编辑' : '编辑分析'}
+            </button>
             <button onClick={() => setShowFeedbackModal(true)} className="btn-ghost text-[13px]">
               <Flag className="w-4 h-4" /> 标记异常
             </button>
@@ -432,78 +571,300 @@ export default function Workspace() {
               </div>
 
               {(aiSections || currentResult.sections || []).map((section, i) => (
-                <div key={i} className="card-surface rounded-[24px] p-6">
-                  <h4 className="text-[15px] font-medium text-text-main mb-5">{section.title}</h4>
+                <div key={i} className="card-surface rounded-[24px] p-6 animate-fade-in-up">
+                  {workspaceEditMode ? (
+                    <div className="mb-5 flex flex-col gap-1">
+                      <label className="text-[10px] text-text-muted font-medium uppercase tracking-[0.08em]">区块标题</label>
+                      <input
+                        type="text"
+                        value={section.title}
+                        onChange={(e) => handleUpdateSection(i, { title: e.target.value })}
+                        className="text-[15px] font-medium text-text-main bg-bg-primary border border-border-default rounded-xl px-3 py-2 w-full focus:outline-none focus:border-accent-400"
+                      />
+                    </div>
+                  ) : (
+                    <h4 className="text-[15px] font-medium text-text-main mb-5">{section.title}</h4>
+                  )}
 
                   {section.type === 'matrix' && section.headers && section.rows && (
                     <div className="overflow-x-auto">
-                      <table className="w-full text-[13px]">
-                        <thead>
-                          <tr className="border-b border-border-default">
-                            {section.headers.map((h) => (
-                              <th key={h} className="text-left py-3 px-3 text-[10px] font-medium uppercase tracking-[0.08em] text-text-muted">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {section.rows.map((row, ri) => (
-                            <tr key={ri} className="border-b border-border-light last:border-0">
-                              {row.map((cell, ci) => (
-                                <td key={ci} className={`py-3 px-3 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>
+                      {workspaceEditMode ? (
+                        <div>
+                          <table className="w-full text-[13px]">
+                            <thead>
+                              <tr className="border-b border-border-default">
+                                {section.headers.map((h, ci) => (
+                                  <th key={ci} className="py-2 px-1 text-left">
+                                    <input
+                                      type="text"
+                                      value={h}
+                                      onChange={(e) => handleMatrixHeaderChange(i, ci, e.target.value)}
+                                      className="w-full bg-bg-primary border border-border-light rounded-lg px-2 py-1 text-[11px] font-semibold text-text-main focus:outline-none focus:border-accent-400"
+                                    />
+                                  </th>
+                                ))}
+                                <th className="w-10"></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {section.rows.map((row, ri) => (
+                                <tr key={ri} className="border-b border-border-light last:border-0">
+                                  {row.map((cell, ci) => (
+                                    <td key={ci} className="py-2 px-1">
+                                      <textarea
+                                        value={cell}
+                                        onChange={(e) => handleMatrixCellChange(i, ri, ci, e.target.value)}
+                                        rows={Math.max(1, Math.ceil(cell.length / 18))}
+                                        className="w-full bg-bg-surface border border-border-light rounded-lg px-2 py-1 text-[13px] text-text-secondary focus:outline-none focus:border-accent-400 resize-y"
+                                      />
+                                    </td>
+                                  ))}
+                                  <td className="py-2 px-1 text-center">
+                                    <button
+                                      onClick={() => handleMatrixDeleteRow(i, ri)}
+                                      className="p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                                      title="删除行"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <button
+                            onClick={() => handleMatrixAddRow(i)}
+                            className="mt-3 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 添加行
+                          </button>
+                        </div>
+                      ) : (
+                        <table className="w-full text-[13px]">
+                          <thead>
+                            <tr className="border-b border-border-default">
+                              {section.headers.map((h) => (
+                                <th key={h} className="text-left py-3 px-3 text-[10px] font-medium uppercase tracking-[0.08em] text-text-muted">{h}</th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {section.rows.map((row, ri) => (
+                              <tr key={ri} className="border-b border-border-light last:border-0">
+                                {row.map((cell, ci) => (
+                                  <td key={ci} className={`py-3 px-3 ${ci === 0 ? 'text-text-main font-medium' : 'text-text-secondary'}`}>{cell}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
                     </div>
                   )}
 
                   {section.type === 'list' && section.items && (
-                    <ol className="space-y-3">
-                      {section.items.map((item, j) => (
-                        <li key={j} className="flex items-start gap-3 text-[13px] text-text-secondary leading-relaxed">
-                          <span className="w-6 h-6 rounded-lg bg-accent-50 text-accent-600 font-medium text-[11px] flex items-center justify-center shrink-0 mt-px">{j + 1}</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ol>
+                    <div>
+                      {workspaceEditMode ? (
+                        <div className="space-y-3">
+                          {section.items.map((item, j) => (
+                            <div key={j} className="flex items-start gap-2">
+                              <span className="w-6 h-6 rounded-lg bg-accent-50 text-accent-600 font-medium text-[11px] flex items-center justify-center shrink-0 mt-2">{j + 1}</span>
+                              <textarea
+                                value={item}
+                                onChange={(e) => handleListItemChange(i, j, e.target.value)}
+                                rows={2}
+                                className="flex-1 bg-bg-primary border border-border-light rounded-xl p-2.5 text-[13px] text-text-secondary focus:outline-none focus:border-accent-400"
+                              />
+                              <button
+                                onClick={() => handleListDeleteItem(i, j)}
+                                className="mt-2 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => handleListAddItem(i)}
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 添加项
+                          </button>
+                        </div>
+                      ) : (
+                        <ol className="space-y-3">
+                          {section.items.map((item, j) => (
+                            <li key={j} className="flex items-start gap-3 text-[13px] text-text-secondary leading-relaxed">
+                              <span className="w-6 h-6 rounded-lg bg-accent-50 text-accent-600 font-medium text-[11px] flex items-center justify-center shrink-0 mt-px">{j + 1}</span>
+                              {item}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
                   )}
 
                   {section.type === 'bullet' && section.items && (
-                    <ul className="space-y-3">
-                      {section.items.map((item, j) => (
-                        <li key={j} className="flex items-start gap-3 text-[13px] text-text-secondary leading-relaxed">
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-2 shrink-0" />{item}
-                        </li>
-                      ))}
-                    </ul>
+                    <div>
+                      {workspaceEditMode ? (
+                        <div className="space-y-3">
+                          {section.items.map((item, j) => (
+                            <div key={j} className="flex items-start gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-4 shrink-0" />
+                              <textarea
+                                value={item}
+                                onChange={(e) => handleListItemChange(i, j, e.target.value)}
+                                rows={2}
+                                className="flex-1 bg-bg-primary border border-border-light rounded-xl p-2.5 text-[13px] text-text-secondary focus:outline-none focus:border-accent-400"
+                              />
+                              <button
+                                onClick={() => handleListDeleteItem(i, j)}
+                                className="mt-2 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => handleListAddItem(i)}
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 添加项
+                          </button>
+                        </div>
+                      ) : (
+                        <ul className="space-y-3">
+                          {section.items.map((item, j) => (
+                            <li key={j} className="flex items-start gap-3 text-[13px] text-text-secondary leading-relaxed">
+                              <div className="w-1.5 h-1.5 rounded-full bg-accent-400 mt-2 shrink-0" />{item}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   )}
 
                   {section.type === 'qa' && section.qa && (
-                    <div className="space-y-3">
-                      {section.qa.map((item, j) => (
-                        <div key={j} className="bg-white/5 rounded-2xl p-4">
-                          <p className="text-[13px] font-medium text-text-main mb-2">Q: {item.q}</p>
-                          <p className="text-[13px] text-text-secondary leading-relaxed">A: {item.a}</p>
+                    <div>
+                      {workspaceEditMode ? (
+                        <div className="space-y-4">
+                          {section.qa.map((item, j) => (
+                            <div key={j} className="bg-white/3 rounded-2xl p-4 border border-border-light relative group">
+                              <button
+                                onClick={() => handleQADelete(i, j)}
+                                className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                              <div className="space-y-3 pr-8">
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[10px] text-text-muted font-medium">问题 Q</label>
+                                  <input
+                                    type="text"
+                                    value={item.q}
+                                    onChange={(e) => handleQAChange(i, j, 'q', e.target.value)}
+                                    className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-2 text-[13px] font-medium text-text-main focus:outline-none focus:border-accent-400"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[10px] text-text-muted font-medium">答复 A</label>
+                                  <textarea
+                                    value={item.a}
+                                    onChange={(e) => handleQAChange(i, j, 'a', e.target.value)}
+                                    rows={3}
+                                    className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-2 text-[13px] text-text-secondary focus:outline-none focus:border-accent-400"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => handleQAAdd(i)}
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 添加问答对
+                          </button>
                         </div>
-                      ))}
+                      ) : (
+                        <div className="space-y-3">
+                          {section.qa.map((item, j) => (
+                            <div key={j} className="bg-white/5 rounded-2xl p-4">
+                              <p className="text-[13px] font-medium text-text-main mb-2">Q: {item.q}</p>
+                              <p className="text-[13px] text-text-secondary leading-relaxed">A: {item.a}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {section.type === 'quotes' && section.quotes && (
-                    <div className="space-y-2">
-                      {section.quotes.map((q, j) => (
-                        <div key={j} className="bg-white/5 rounded-xl p-4">
-                          <p className="text-[13px] text-text-secondary leading-relaxed italic">"{q.text}"</p>
-                          <p className="text-[11px] text-text-muted mt-1.5">—— {q.source}</p>
+                    <div>
+                      {workspaceEditMode ? (
+                        <div className="space-y-4">
+                          {section.quotes.map((q, j) => (
+                            <div key={j} className="bg-white/3 rounded-xl p-4 border border-border-light relative group">
+                              <button
+                                onClick={() => handleQuoteDelete(i, j)}
+                                className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                              <div className="space-y-3 pr-8">
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[10px] text-text-muted font-medium">用户原话</label>
+                                  <textarea
+                                    value={q.text}
+                                    onChange={(e) => handleQuoteChange(i, j, 'text', e.target.value)}
+                                    rows={2}
+                                    className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-2 text-[13px] text-text-secondary italic focus:outline-none focus:border-accent-400"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[10px] text-text-muted font-medium">来源渠道/用户</label>
+                                  <input
+                                    type="text"
+                                    value={q.source}
+                                    onChange={(e) => handleQuoteChange(i, j, 'source', e.target.value)}
+                                    className="w-full bg-bg-primary border border-border-light rounded-xl px-3 py-2 text-[12px] text-text-main focus:outline-none focus:border-accent-400"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => handleQuoteAdd(i)}
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 添加原话引用
+                          </button>
                         </div>
-                      ))}
+                      ) : (
+                        <div className="space-y-2">
+                          {section.quotes.map((q, j) => (
+                            <div key={j} className="bg-white/5 rounded-xl p-4">
+                              <p className="text-[13px] text-text-secondary leading-relaxed italic">"{q.text}"</p>
+                              <p className="text-[11px] text-text-muted mt-1.5">—— {q.source}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {section.type === 'text' && section.body && (
-                    <div className="bg-accent-500/[0.05] rounded-2xl p-5">
-                      <p className="text-[13px] text-text-secondary leading-relaxed">{section.body}</p>
+                    <div>
+                      {workspaceEditMode ? (
+                        <textarea
+                          value={section.body}
+                          onChange={(e) => handleTextChange(i, e.target.value)}
+                          rows={6}
+                          className="w-full bg-bg-primary border border-border-light rounded-2xl p-4 text-[13px] text-text-secondary leading-relaxed focus:outline-none focus:border-accent-400"
+                        />
+                      ) : (
+                        <div className="bg-accent-500/[0.05] rounded-2xl p-5">
+                          <p className="text-[13px] text-text-secondary leading-relaxed">{section.body}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -518,7 +879,14 @@ export default function Workspace() {
                     <p className="text-[14px] font-medium text-success">已提交到策略报告</p>
                     <p className="text-[12px] text-text-muted">该分析结果已汇入报告，可在报告页查看。</p>
                   </div>
-                  <Link to={`/tasks/${projectSlug}`} className="btn-ghost text-[12px]">继续其他任务 →</Link>
+                  <div className="flex items-center gap-3">
+                    <button onClick={handleRetract} className="btn-ghost text-[12px] hover:text-error hover:bg-error-soft">
+                      撤回提交
+                    </button>
+                    <Link to={`/tasks/${projectSlug}`} className="btn-primary-filled text-[12px]">
+                      继续其他任务 →
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

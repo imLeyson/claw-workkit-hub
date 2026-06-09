@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp, ShieldCheck, Bot, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp, ShieldCheck, Bot, AlertTriangle, CheckCircle2, Pencil, SlidersHorizontal } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjects, getWorkKits } from '../services/db'
+import { useToast } from '../components/Toast'
 import type { WorkKit } from '../types'
 
 type ValidationDecision = 'keep' | 'revise'
@@ -61,6 +62,8 @@ export default function Archive() {
   const [kits] = useState(getWorkKits())
   const [validationRuns, setValidationRuns] = useState<Record<string, Record<string, ValidationDecision>>>(readValidationState)
   const [draftValidation, setDraftValidation] = useState<Record<string, ValidationDecision>>({})
+  const { showToast } = useToast()
+  const [editKit, setEditKit] = useState<WorkKit | null>(null)
 
   const toggleHistory = (id: string) => {
     setExpandedHistory((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -187,22 +190,56 @@ export default function Archive() {
       </div>
 
       {/* Search + Filter bar */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative flex-1 max-w-[320px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
+      <div className="space-y-6 mb-10">
+        {/* Search Row */}
+        <div className="relative w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-accent-500 transition-colors" />
           <input
             type="text"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="搜索 Work Kit 名称、描述、标签..."
-            className="w-full pl-9 pr-3 py-2 border border-border-default rounded-xl text-[12px] focus:outline-none focus:border-accent-400 bg-transparent"
+            placeholder="搜索 Work Kit 模板名称、应用场景或技术标签..."
+            className="w-full pl-11 pr-16 py-3.5 bg-bg-surface border border-border-default rounded-2xl text-[13px] focus:outline-none focus:border-accent-500/50 focus:ring-4 focus:ring-accent-500/5 text-text-main placeholder-text-placeholder shadow-sm transition-all duration-300"
           />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-mono text-text-placeholder bg-white/5 border border-border-light px-2 py-1 rounded-md max-sm:hidden">
+            <span>ESC</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button onClick={() => setFilterTag(null)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${!filterTag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-white/[0.06]'}`}>全部</button>
-          {allTags.map((tag) => (
-            <button key={tag} onClick={() => setFilterTag(filterTag === tag ? null : tag)} className={`text-[11px] px-3 py-1.5 rounded-lg transition-colors ${filterTag === tag ? 'bg-accent-500 text-white' : 'bg-gray-50 text-text-muted hover:bg-white/[0.06]'}`}>{tag}</button>
-          ))}
+
+        {/* Category Tabs Row */}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-2 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-accent-500" />
+            <span>按类别筛选工作包</span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setFilterTag(null)}
+              className={`text-[12px] px-4 py-2 rounded-xl border transition-all cursor-pointer ${
+                !filterTag
+                  ? 'bg-accent-500 border-accent-500 text-white shadow-md shadow-accent-500/15'
+                  : 'bg-bg-surface border-border-default text-text-secondary hover:border-accent-500/30 hover:text-accent-500 hover:bg-accent-500/[0.01]'
+              }`}
+            >
+              全部模板
+            </button>
+            {allTags.map((tag) => {
+              const isActive = filterTag === tag
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setFilterTag(isActive ? null : tag)}
+                  className={`text-[12px] px-4 py-2 rounded-xl border transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-accent-500 border-accent-500 text-white shadow-md shadow-accent-500/15'
+                      : 'bg-bg-surface border-border-default text-text-secondary hover:border-accent-500/30 hover:text-accent-500 hover:bg-accent-500/[0.01]'
+                  }`}
+                >
+                  {tag}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
@@ -354,6 +391,9 @@ export default function Archive() {
                     )}
                   </div>
                   <div className="flex items-center gap-3">
+                    <button onClick={() => setEditKit(wk)} className="btn-ghost text-[12px]">
+                      <Pencil className="w-3.5 h-3.5" /> 编辑
+                    </button>
                     <button onClick={() => openValidation(wk.id)} className="btn-ghost text-[12px]">
                       <ShieldCheck className="w-3.5 h-3.5" /> 启动验证
                     </button>
@@ -510,6 +550,94 @@ export default function Archive() {
           </div>
         )
       })()}
+
+      {editKit && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={() => setEditKit(null)}>
+          <div className="bg-bg-surface rounded-[24px] p-6 w-[500px] shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
+                <Pencil className="w-5 h-5 text-accent-500" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-medium text-text-main">编辑工作包信息</h3>
+                <p className="text-[12px] text-text-muted">修改 Work Kit 在资产库中的基础信息描述</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">工作包名称 *</label>
+                <input
+                  type="text"
+                  value={editKit.name}
+                  onChange={(e) => setEditKit({ ...editKit, name: e.target.value })}
+                  className="w-full text-[13px] px-3 py-2.5 bg-bg-primary border border-border-default rounded-xl focus:outline-none focus:border-accent-400 text-text-main"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">描述信息 *</label>
+                <textarea
+                  value={editKit.description}
+                  onChange={(e) => setEditKit({ ...editKit, description: e.target.value })}
+                  rows={3}
+                  className="w-full text-[13px] px-3 py-2.5 bg-bg-primary border border-border-default rounded-xl focus:outline-none focus:border-accent-400 text-text-main"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-medium text-text-muted mb-1.5">适用场景</label>
+                  <input
+                    type="text"
+                    value={editKit.scenario}
+                    onChange={(e) => setEditKit({ ...editKit, scenario: e.target.value })}
+                    className="w-full text-[13px] px-3 py-2.5 bg-bg-primary border border-border-default rounded-xl focus:outline-none focus:border-accent-400 text-text-main"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-text-muted mb-1.5">资料结构描述</label>
+                  <input
+                    type="text"
+                    value={editKit.materialStructure}
+                    onChange={(e) => setEditKit({ ...editKit, materialStructure: e.target.value })}
+                    className="w-full text-[13px] px-3 py-2.5 bg-bg-primary border border-border-default rounded-xl focus:outline-none focus:border-accent-400 text-text-main"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-text-muted mb-1.5">标签 (以逗号或空格分隔)</label>
+                <input
+                  type="text"
+                  value={editKit.tags.join(', ')}
+                  onChange={(e) => setEditKit({ ...editKit, tags: e.target.value.split(/[,，\s]+/).map(t => t.trim()).filter(Boolean) })}
+                  className="w-full text-[13px] px-3 py-2.5 bg-bg-primary border border-border-default rounded-xl focus:outline-none focus:border-accent-400 text-text-main"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 justify-end mt-6">
+              <button onClick={() => setEditKit(null)} className="btn-ghost text-[13px]">取消</button>
+              <button
+                onClick={() => {
+                  if (!editKit.name.trim() || !editKit.description.trim()) {
+                    showToast('请填写完整名称和描述', 'error')
+                    return
+                  }
+                  const allKits = getWorkKits()
+                  const idx = allKits.findIndex((k) => k.id === editKit.id)
+                  if (idx >= 0) {
+                    allKits[idx] = editKit
+                    localStorage.setItem('promokit_kits', JSON.stringify(allKits))
+                    showToast('工作包已更新', 'success')
+                    setTimeout(() => window.location.reload(), 800)
+                  }
+                  setEditKit(null)
+                }}
+                className="btn-primary-filled text-[13px]"
+              >
+                保存修改
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

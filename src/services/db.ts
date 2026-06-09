@@ -102,6 +102,21 @@ export async function addProject(p: Project) {
   } catch { /* offline — localStorage is fine */ }
 }
 
+export async function updateProject(p: Project) {
+  const projects = getProjects()
+  const idx = projects.findIndex((item) => item.id === p.id)
+  if (idx >= 0) {
+    projects[idx] = p
+    write('promokit_projects', projects)
+    try {
+      await supabase.from('projects').update({
+        name: p.name, description: p.description,
+        category: p.category, campaign: p.campaign, status: p.status,
+      }).eq('id', p.id)
+    } catch { /* offline */ }
+  }
+}
+
 export function deleteProject(projectId: string) {
   const projects = getProjects().filter((p) => p.id !== projectId)
   write('promokit_projects', projects)
