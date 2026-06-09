@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, FileText, MessageSquareText, Palette, Repeat, ChevronLeft, ChevronRight, Clock, Users, TrendingUp } from 'lucide-react'
+import { ArrowRight, FileText, MessageSquareText, Palette, Repeat, ChevronLeft, ChevronRight, Clock, Users, TrendingUp, Search, Target, Database, LayoutDashboard, FolderOpen, Package, Briefcase, ClipboardList } from 'lucide-react'
 import Logo from '../components/Logo'
 
 /* ── Background system ── */
@@ -119,6 +119,183 @@ function StatCard({ icon: Icon, value, label, sub, accent }: { icon: any; value:
       <div className={`text-[32px] font-light leading-none mb-2 tracking-[-0.02em] ${accent ? 'text-white' : 'text-text-main'}`}>{value}</div>
       <div className={`text-[12px] font-semibold mb-1 ${accent ? 'text-white/85' : 'text-text-main'}`}>{label}</div>
       <div className={`text-[11px] leading-snug ${accent ? 'text-white/50' : 'text-text-muted'}`}>{sub}</div>
+    </div>
+  )
+}
+
+const processColumns = [
+  {
+    no: '01',
+    title: '需求池归类',
+    icon: Search,
+    visual: 'needs',
+    caption: '从实际工作中归纳出关键问题',
+    items: [
+      ['资料分散', '评论、商品、客服反馈散落在不同文件'],
+      ['岗位断裂', '各岗位分析口径与输出格式不统一'],
+      ['经验不可交接', 'AI 用法停留在个人经验中'],
+      ['重复整理', '每次大促都从零启动'],
+    ],
+  },
+  {
+    no: '02',
+    title: '定义与策略',
+    icon: Target,
+    visual: 'strategy',
+    caption: '将问题转化为产品定义与核心策略',
+    items: [
+      ['资料结构化', '统一资料类型与字段'],
+      ['岗位任务化', '明确目标、输入与输出格式'],
+      ['AI 可控化', '结构化分析 + 质量检查'],
+      ['流程资产化', '沉淀为 Work Kit'],
+    ],
+  },
+  {
+    no: '03',
+    title: '系统架构设计',
+    icon: Database,
+    visual: 'architecture',
+    caption: '将策略转化为系统结构与功能模块',
+    items: [
+      ['电商资料库', '集中管理评论、商品、客服、文案'],
+      ['岗位分析任务', '生成任务卡与 Prompt'],
+      ['AI 分析工作台', '承载结果与质量检查'],
+      ['报告与资产库', '汇总并保存流程资产'],
+    ],
+  },
+  {
+    no: '04',
+    title: '界面设计',
+    icon: LayoutDashboard,
+    visual: 'interface',
+    caption: '将系统结构转化为用户可操作的界面',
+    items: [
+      ['Dashboard', '项目总览与进度看板'],
+      ['资料库', '导入与管理电商资料'],
+      ['任务卡', '展示岗位任务和输出要求'],
+      ['AI 工作台', '生成结构化分析结果'],
+      ['报告页', '输出可执行策略报告'],
+    ],
+  },
+]
+
+function ConnectorLabel({ text, className = '' }: { text: string; className?: string }) {
+  return (
+    <div className={`absolute flex items-center gap-3 text-[12px] font-bold text-accent-600 ${className}`}>
+      <span>{text}</span>
+      <span className="h-px w-12 bg-accent-400/70" />
+      <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
+    </div>
+  )
+}
+
+function ProcessVisual({ type }: { type: string }) {
+  if (type === 'needs') {
+    return (
+      <div className="h-[94px] rounded-[18px] border border-accent-100 bg-white/65 px-4 py-3 flex items-center gap-4">
+        <div className="w-16 h-16 rounded-2xl border border-accent-100 bg-bg-surface flex items-center justify-center">
+          <Search className="w-9 h-9 text-accent-500" strokeWidth={2.2} />
+        </div>
+        <div className="flex-1 space-y-2">
+          {[
+            ['竞品评论', 'bg-accent-500'],
+            ['客服问答', 'bg-emerald-500'],
+            ['历史文案', 'bg-amber-500'],
+          ].map(([text, color]) => (
+            <div key={text} className="h-7 rounded-lg border border-border-default bg-bg-surface px-3 flex items-center gap-2 text-[11px] font-medium text-text-secondary">
+              <span className={`w-2 h-2 rounded-full ${color}`} />
+              {text}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (type === 'strategy') {
+    return (
+      <div className="h-[94px] rounded-[18px] border border-accent-100 bg-white/65 px-4 py-3 flex items-center gap-4">
+        <div className="w-16 h-16 rounded-full border border-accent-100 bg-bg-surface flex items-center justify-center">
+          <Target className="w-10 h-10 text-accent-500" strokeWidth={2.3} />
+        </div>
+        <div className="grid grid-cols-2 gap-2 flex-1">
+          {['结构', '任务', '质检', '资产'].map((text) => (
+            <div key={text} className="h-8 rounded-lg border border-border-default bg-bg-surface flex items-center justify-center text-[11px] font-medium text-text-muted">{text}</div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (type === 'architecture') {
+    const modules = [
+      [Database, '资料库', 'text-blue-500'],
+      [ClipboardList, '任务卡', 'text-emerald-600'],
+      [Briefcase, '工作台', 'text-accent-500'],
+      [Package, '资产库', 'text-red-500'],
+    ]
+    return (
+      <div className="h-[94px] rounded-[18px] border border-accent-100 bg-white/65 px-4 py-3 grid grid-cols-2 gap-2">
+        {modules.map(([Icon, text, color]) => (
+          <div key={text as string} className="rounded-xl border border-border-default bg-bg-surface px-3 flex items-center gap-2">
+            <Icon className={`w-4 h-4 ${color as string}`} strokeWidth={2.3} />
+            <span className="text-[11px] font-medium text-text-secondary">{text as string}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-[112px] rounded-[18px] border border-accent-100 bg-white/65 px-4 py-3 grid grid-cols-2 grid-rows-2 gap-2.5 overflow-hidden">
+      {[
+        [LayoutDashboard, 'Dashboard'],
+        [FolderOpen, '资料库'],
+        [Briefcase, '工作台'],
+        [FileText, '报告页'],
+      ].map(([Icon, text]) => (
+        <div key={text as string} className="min-h-0 rounded-xl border border-border-default bg-bg-surface px-3 py-1.5 shadow-[0_8px_18px_rgba(28,28,30,0.03)]">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Icon className="w-4 h-4 text-accent-500" strokeWidth={2.3} />
+            <span className="text-[11px] font-bold text-text-secondary">{text as string}</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-accent-100 mb-1.5" />
+          <div className="h-1.5 w-[72%] rounded-full bg-gray-100" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ProcessCard({ column }: { column: typeof processColumns[number] }) {
+  const Icon = column.icon
+  const isInterface = column.visual === 'interface'
+  return (
+    <div className="h-[452px] rounded-[18px] border border-accent-200/80 bg-bg-surface/95 shadow-[0_20px_45px_rgba(28,28,30,0.07)] overflow-hidden">
+      <div className="h-[58px] border-b border-accent-200/70 px-5 flex items-center justify-between bg-gradient-to-b from-white to-accent-50/25">
+        <div className="flex items-baseline gap-3">
+          <span className="text-[30px] leading-none font-bold text-accent-600 tracking-[-0.04em]">{column.no}</span>
+          <span className="text-[19px] font-bold text-text-main tracking-[-0.02em]">{column.title}</span>
+        </div>
+        <div className="w-9 h-9 rounded-xl border border-accent-100 bg-bg-surface flex items-center justify-center">
+          <Icon className="w-4.5 h-4.5 text-accent-500" strokeWidth={2.3} />
+        </div>
+      </div>
+      <div className="p-4">
+        <ProcessVisual type={column.visual} />
+        <p className={`text-center text-[12px] text-text-muted ${isInterface ? 'mt-3 mb-3' : 'mt-4 mb-5'}`}>{column.caption}</p>
+        <div className={isInterface ? 'space-y-2' : 'space-y-2.5'}>
+          {column.items.map(([title, desc]) => (
+            <div key={title} className={`${isInterface ? 'h-[35px]' : 'h-[46px]'} rounded-xl border border-border-default bg-bg-surface px-3.5 flex items-center gap-2.5`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
+              <div className="min-w-0">
+                <div className="text-[12px] font-bold text-text-main leading-tight truncate">{title}</div>
+                <div className="text-[10.5px] text-text-muted leading-tight truncate">{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -381,77 +558,57 @@ const slides = [
     ),
   },
 
-  /* 8 ── System Diagram Requirement */
+  /* 8 ── Design Process Mapping */
   {
     theme: 'light' as const, bgVariant: 7,
     content: (
-      <div className="w-[1120px] max-w-[calc(100vw-96px)] -my-8">
-        <div className="flex items-start justify-between mb-5 animate-fade-in-up">
-          <div>
-            <Label text="System Diagram" />
-            <h2 className="text-[34px] font-light tracking-[-0.02em] text-text-main leading-none mb-2">系统图表：转换与决策</h2>
-            <p className="text-[13px] text-text-muted">按要求展示从需求归类到界面设计的完整迭代过程，让关键设计逻辑一眼可读。</p>
+      <div className="relative w-[1180px] max-w-[calc(100vw-58px)] -my-12 pt-2 pb-2">
+        <div className="absolute -right-40 -top-44 w-[350px] h-[350px] rounded-full bg-accent-50/45" />
+        <div className="absolute -left-36 bottom-[-135px] w-[280px] h-[280px] rounded-full bg-gray-100/55" />
+        <div className="absolute top-[292px] -left-16 w-36 h-px bg-accent-200/55" />
+        <div className="absolute top-[430px] -right-14 w-36 h-px bg-accent-200/55" />
+
+        <div className="relative flex items-start justify-between mb-11 animate-fade-in-up">
+          <div className="flex items-center gap-4 pt-2">
+            <Logo variant="icon" theme="light" size={34} />
+            <div>
+              <div className="text-[20px] font-bold tracking-[-0.03em] text-text-main leading-tight">PromoKit AI</div>
+              <div className="text-[11px] text-text-muted mt-0.5">电商大促 AI 工作包系统</div>
+            </div>
           </div>
-          <div className="rounded-2xl border border-border-default bg-bg-surface px-4 py-3 shadow-sm text-right">
-            <div className="text-[12px] text-text-muted mb-1">PromoKit AI</div>
-            <div className="text-[15px] font-medium text-text-main">大促 AI 工作包设计逻辑</div>
+
+          <div className="absolute left-1/2 -translate-x-1/2 top-0 text-center w-[620px]">
+            <h2 className="text-[36px] font-bold tracking-[-0.04em] text-text-main leading-tight">PromoKit AI 的设计过程映射</h2>
+            <p className="mt-2 text-[13px] text-text-muted">将抽象需求逐步转化为可落地的系统架构与用户界面，形成可复用的 AI 工作包流程</p>
           </div>
         </div>
 
-        <div className="rounded-[26px] bg-bg-surface border border-border-default shadow-[0_18px_50px_rgba(28,28,30,0.06)] px-6 py-6 animate-scale-in" style={{ animationDelay: '80ms' }}>
-          <svg className="w-full h-[330px]" viewBox="0 0 1040 330" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <marker id="system-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-                <path d="M1 1L9 5L1 9" stroke="#1A1A1A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </marker>
-            </defs>
+        <div className="relative animate-scale-in" style={{ animationDelay: '80ms' }}>
+          <ConnectorLabel text="转换" className="left-[353px] -top-[26px]" />
+          <ConnectorLabel text="转换" className="left-[632px] -top-[26px]" />
+          <ConnectorLabel text="转换" className="left-[907px] -top-[26px]" />
 
-            <g stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
-              <path d="M120 112 C120 48 165 35 230 35" markerEnd="url(#system-arrow)" />
-              <path d="M330 35 C380 35 395 55 395 112" markerEnd="url(#system-arrow)" />
-              <path d="M452 112 C452 48 497 35 562 35" markerEnd="url(#system-arrow)" />
-              <path d="M662 35 C712 35 727 55 727 112" markerEnd="url(#system-arrow)" />
-              <path d="M784 112 C784 48 829 35 894 35" markerEnd="url(#system-arrow)" />
-              <path d="M994 35 C1020 45 1020 82 1020 112" markerEnd="url(#system-arrow)" />
+          <div className="grid grid-cols-4 gap-4">
+            {processColumns.map((column) => (
+              <ProcessCard key={column.no} column={column} />
+            ))}
+          </div>
 
-              <path d="M255 165 H340" markerEnd="url(#system-arrow)" />
-              <path d="M586 165 H672" markerEnd="url(#system-arrow)" />
-              <path d="M892 165 H978" markerEnd="url(#system-arrow)" />
-
-              <path d="M120 218 C120 282 165 295 230 295" markerEnd="url(#system-arrow)" />
-              <path d="M330 295 C380 295 395 275 395 218" markerEnd="url(#system-arrow)" />
-              <path d="M452 218 C452 282 497 295 562 295" markerEnd="url(#system-arrow)" />
-              <path d="M662 295 C712 295 727 275 727 218" markerEnd="url(#system-arrow)" />
-              <path d="M784 218 C784 282 829 295 894 295" markerEnd="url(#system-arrow)" />
-              <path d="M994 295 C1020 285 1020 248 1020 218" markerEnd="url(#system-arrow)" />
-            </g>
-
-            <g fontFamily="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" textAnchor="middle">
-              <text x="260" y="67" fontSize="42" fontWeight="700" fill="#1A1A1A">转换</text>
-              <text x="592" y="67" fontSize="42" fontWeight="700" fill="#1A1A1A">转换</text>
-              <text x="924" y="67" fontSize="42" fontWeight="700" fill="#1A1A1A">转换</text>
-
-              <text x="110" y="183" fontSize="44" fontWeight="700" fill="#1A1A1A">需求池归类</text>
-              <text x="435" y="183" fontSize="44" fontWeight="700" fill="#1A1A1A">定义与策略</text>
-              <text x="705" y="183" fontSize="40" fontWeight="700" fill="#1A1A1A">系统架构设计</text>
-              <text x="962" y="183" fontSize="44" fontWeight="700" fill="#1A1A1A">界面设计</text>
-
-              <text x="260" y="310" fontSize="42" fontWeight="700" fill="#1A1A1A">决策</text>
-              <text x="592" y="310" fontSize="42" fontWeight="700" fill="#1A1A1A">决策</text>
-              <text x="924" y="310" fontSize="42" fontWeight="700" fill="#1A1A1A">决策</text>
-            </g>
-          </svg>
+          <ConnectorLabel text="决策" className="left-[76px] -bottom-[32px]" />
+          <ConnectorLabel text="决策" className="left-[351px] -bottom-[32px]" />
+          <ConnectorLabel text="决策" className="left-[628px] -bottom-[32px]" />
+          <div className="absolute right-[87px] -bottom-[28px] text-[12px] font-medium text-text-muted">界面落地</div>
         </div>
 
-        <div className="grid grid-cols-[1fr_1fr] gap-4 mt-4 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
-          <div className="rounded-2xl border border-border-default bg-bg-surface p-4 shadow-sm">
-            <div className="text-[13px] font-medium text-text-main mb-2">对标图片要求</div>
-            <p className="text-[12px] leading-relaxed text-text-muted">用系统图完整呈现项目关键节点的迭代过程：从需求池归类开始，经由定义与策略、系统架构设计，最终落到界面设计。</p>
+        <div className="relative mt-11 mx-auto w-[850px] h-[74px] rounded-2xl border border-accent-200/80 bg-bg-surface/95 shadow-[0_18px_45px_rgba(28,28,30,0.06)] flex items-center px-7 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
+          <div className="w-12 h-12 rounded-2xl border border-accent-100 bg-accent-50/40 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6 text-accent-500" strokeWidth={2.3} />
           </div>
-          <div className="rounded-2xl bg-sidebar p-4 text-white shadow-sm">
-            <div className="text-[13px] font-medium text-accent-400 mb-2">核心表达</div>
-            <p className="text-[12px] leading-relaxed text-white/62">“转换”说明每一阶段如何生成下一阶段，“决策”说明每一阶段如何完成取舍与界定，避免从需求直接跳到界面。</p>
-          </div>
+          <div className="h-10 w-px bg-accent-200 mx-7" />
+          <div className="text-[20px] font-bold text-accent-600 shrink-0 mr-7">最终目标</div>
+          <p className="text-[14px] leading-relaxed text-text-main">
+            把一次有效的大促分析流程，转化为团队可复用、可交接、可迭代的 AI 工作包资产，持续提升团队效率与决策质量。
+          </p>
         </div>
       </div>
     ),
@@ -507,7 +664,7 @@ export default function Slides() {
   const slide = slides[current]
 
   return (
-    <div className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-700 ${slide.theme === 'dark' ? 'bg-sidebar' : 'bg-bg-primary'}`}>
+    <div data-theme={slide.theme} className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-700 ${slide.theme === 'dark' ? 'bg-sidebar' : 'bg-bg-primary'}`}>
       <Decors theme={slide.theme} variant={slide.bgVariant} />
       <div key={current} className="relative z-10 px-8 py-16 animate-fade-in-up">{slide.content}</div>
 

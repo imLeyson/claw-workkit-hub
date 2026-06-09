@@ -206,6 +206,9 @@ export function upsertWorkKitFromProject(kit: WorkKit): { kit: WorkKit; mode: 'c
   if (existingIndex >= 0) {
     const existing = kits[existingIndex]
     const nextVersion = nextMinorVersion(existing.version)
+    const changeNote = kit.feedback
+      ? `更新版本：同步「${kit.basedOnProjectName}」最新报告结果与任务模板；${kit.feedback}`
+      : `更新版本：同步「${kit.basedOnProjectName}」最新报告结果与任务模板`
     const updated: WorkKit = {
       ...existing,
       ...kit,
@@ -213,9 +216,9 @@ export function upsertWorkKitFromProject(kit: WorkKit): { kit: WorkKit; mode: 'c
       version: nextVersion,
       createdAt: existing.createdAt,
       reuseCount: existing.reuseCount,
-      rating: existing.rating,
+      rating: Math.max(existing.rating, kit.rating || 0),
       versionHistory: [
-        { version: nextVersion, date: today, changes: `更新版本：同步「${kit.basedOnProjectName}」最新报告结果与任务模板` },
+        { version: nextVersion, date: today, changes: changeNote },
         ...existing.versionHistory,
       ],
     }

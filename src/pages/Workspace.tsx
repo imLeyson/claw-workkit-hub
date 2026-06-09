@@ -1,11 +1,22 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag } from 'lucide-react'
+import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag, BookOpen, Link2, ShieldCheck, Check, MinusCircle } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult, getMaterials, saveAIResult, updateTask } from '../services/db'
+import { getProjectBySlug, getTasks, getAIResult, getMaterials, getWorkKits, saveAIResult, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
 import { hasApiKey, generateAnalysis, saveApiKey, clearApiKey, isRealAIEnabled } from '../services/ai'
-import type { AIResult, AISection, TaskCard } from '../types'
+import type { AIResult, AISection, Material, Project, TaskCard, WorkKit } from '../types'
+
+interface KnowledgeRecommendation {
+  id: string
+  title: string
+  source: string
+  type: string
+  relevance: number
+  reason: string
+  promptHint: string
+  verification: string
+}
 
 function buildMockSections(task: TaskCard, materialCount: number): AISection[] {
   const roleLabel = roleLabels[task.role]
@@ -50,6 +61,52 @@ function buildAIResult(task: TaskCard, sections: AISection[]): AIResult {
   }
 }
 
+function buildKnowledgeRecommendations(project: Project, task: TaskCard, materials: Material[], kits: WorkKit[]): KnowledgeRecommendation[] {
+  const roleLabel = roleLabels[task.role]
+  const relatedKits = kits
+    .filter((kit) => kit.includedRoles.includes(task.role) || kit.tags.some((tag) => project.category.includes(tag) || task.title.includes(tag)))
+    .sort((a, b) => (b.rating * 10 + b.reuseCount) - (a.rating * 10 + a.reuseCount))
+    .slice(0, 2)
+    .map((kit, index) => ({
+      id: `kit-${kit.id}`,
+      title: kit.name,
+      source: `${kit.version} · 复用 ${kit.reuseCount} 次 · 评分 ${kit.rating}`,
+      type: index === 0 ? '成功案例' : '可复用流程',
+      relevance: Math.min(98, 88 + kit.reuseCount),
+      reason: `包含${roleLabel}岗任务模板，可提前学习相似项目的资料结构、判断口径和输出格式。`,
+      promptHint: `沿用「${kit.name}」中的${roleLabel}分析框架，但根据 ${project.category} 与 ${project.campaign} 重新校准结论。`,
+      verification: `成功案例已标星，适合作为公司知识库的优先参考项。`,
+    }))
+
+  const materialHints = materials.slice(0, 3).map((material, index) => ({
+    id: `mat-${material.id}`,
+    title: material.label,
+    source: material.fileName || material.platform || '项目资料',
+    type: material.type === 'review' ? '竞品样本' : material.type === 'faq' ? '客服知识' : material.type === 'copy_asset' ? '历史文案' : '商品资料',
+    relevance: 86 - index * 3,
+    reason: `已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。`,
+    promptHint: `优先引用「${material.label}」中的事实、用户原话或参数，不直接套用未经验证的结论。`,
+    verification: material.type === 'review'
+      ? `可与市场竞品反馈做横向对比，识别公司知识库未覆盖的问题。`
+      : `可与本次 AI 输出做一致性检查，保留有效内容并标记待修订项。`,
+  }))
+
+  const promptFallback: KnowledgeRecommendation[] = [
+    {
+      id: `prompt-${task.id}`,
+      title: `${roleLabel}岗高关联 Prompt`,
+      source: '系统根据任务目标自动生成',
+      type: 'Prompt 片段',
+      relevance: 84,
+      reason: `围绕「${task.title}」自动筛选出最贴近的提示词，可直接并入本次分析。`,
+      promptHint: task.promptPreview,
+      verification: '由人工验证角色复核输出是否符合岗位目标、输入来源和输出格式。',
+    },
+  ]
+
+  return [...relatedKits, ...materialHints, ...promptFallback].slice(0, 5)
+}
+
 export default function Workspace() {
   const { projectSlug, taskId } = useParams<{ projectSlug: string; taskId: string }>()
   const project = getProjectBySlug(projectSlug!)
@@ -69,18 +126,33 @@ export default function Workspace() {
   const [realAI, setRealAI] = useState(hasApiKey())
   const [showKeyInput, setShowKeyInput] = useState(false)
   const [apiKeyInput, setApiKeyInput] = useState('')
+  const [adoptedKnowledgeIds, setAdoptedKnowledgeIds] = useState<string[]>([])
 
   if (!project || !task) return <div className="text-text-muted text-sm p-8">任务不存在</div>
 
   const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
   const reviewMats = inputMats.filter((m) => m.type === 'review')
+  const knowledgeRecommendations = buildKnowledgeRecommendations(project, task, inputMats, getWorkKits())
+  const adoptedIds = adoptedKnowledgeIds.length > 0 ? adoptedKnowledgeIds : knowledgeRecommendations.slice(0, 2).map((item) => item.id)
+  const adoptedRecommendations = knowledgeRecommendations.filter((item) => adoptedIds.includes(item.id))
+
+  const toggleKnowledge = (id: string) => {
+    setAdoptedKnowledgeIds((prev) => {
+      const base = prev.length > 0 ? prev : adoptedIds
+      return base.includes(id) ? base.filter((item) => item !== id) : [...base, id]
+    })
+  }
 
   const handleGenerate = async () => {
     setGenerating(true)
     if (hasApiKey()) {
       try {
-        const matContents = inputMats.map((m) => m.content)
-        const sections = await generateAnalysis(task.promptPreview, matContents, roleLabels[task.role])
+        const matContents = [
+          ...inputMats.map((m) => m.content),
+          ...adoptedRecommendations.map((k) => `知识库关联：${k.title}。采纳理由：${k.reason}。提示词补充：${k.promptHint}`),
+        ]
+        const enrichedPrompt = `${task.promptPreview}\n\n请同时参考以下知识库关联项，并输出验证角色的保留/修订判断：\n${adoptedRecommendations.map((k, i) => `${i + 1}. ${k.title}：${k.promptHint}`).join('\n')}`
+        const sections = await generateAnalysis(enrichedPrompt, matContents, roleLabels[task.role])
         setAiSections(sections)
         const generated = buildAIResult(task, sections)
         setCurrentResult(generated)
@@ -101,7 +173,7 @@ export default function Workspace() {
     } else {
       // Fallback: mock delay
       setTimeout(() => {
-        const sections = buildMockSections(task, inputMats.length)
+        const sections = buildMockSections(task, inputMats.length + adoptedRecommendations.length)
         const generated = buildAIResult(task, sections)
         setAiSections(sections)
         setCurrentResult(generated)
@@ -210,6 +282,45 @@ export default function Workspace() {
             <span className="section-title">Prompt</span>
             <p className="mt-3 text-[13px] text-text-muted leading-relaxed">{task.promptPreview}</p>
           </div>
+          <div className="rounded-[22px] border border-accent-500/15 bg-accent-500/[0.035] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="section-title">智能知识关联</span>
+              <span className="text-[10px] font-semibold text-accent-600">{adoptedRecommendations.length}/5 已采纳</span>
+            </div>
+            <div className="space-y-2.5">
+              {knowledgeRecommendations.map((item) => {
+                const adopted = adoptedIds.includes(item.id)
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleKnowledge(item.id)}
+                    className={`w-full text-left rounded-2xl border p-3 transition-all ${
+                      adopted
+                        ? 'border-accent-500/25 bg-bg-surface shadow-sm shadow-accent-500/5'
+                        : 'border-border-light bg-bg-surface/55 hover:border-accent-500/15'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${adopted ? 'bg-accent-500 text-white' : 'bg-white/5 text-text-muted'}`}>
+                        {adopted ? <Check className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="text-[12px] font-semibold text-text-main truncate">{item.title}</span>
+                          <span className="text-[10px] font-bold text-accent-600 shrink-0">{item.relevance}%</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-accent-50 text-accent-600">{item.type}</span>
+                          <span className="text-[10px] text-text-muted truncate">{item.source}</span>
+                        </div>
+                        <p className="text-[11px] leading-relaxed text-text-muted">{item.reason}</p>
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           {feedbackItems.length > 0 && (
             <div>
               <span className="section-title">异常标记</span>
@@ -244,7 +355,7 @@ export default function Workspace() {
               </div>
               <h3 className="text-[20px] font-light text-text-main mb-3">准备就绪</h3>
               <p className="text-[14px] text-text-muted mb-8 max-w-sm mx-auto leading-relaxed">
-                已加载 {reviewMats.length} 个竞品的评论数据，点击生成 AI 分析。
+                已加载 {reviewMats.length} 个竞品的评论数据，并采纳 {adoptedRecommendations.length} 个高相关知识项。
               </p>
               <button onClick={handleGenerate} className="btn-primary-filled text-[15px] px-8 py-3">
                 <Sparkles className="w-5 h-5" /> 生成分析
@@ -260,12 +371,57 @@ export default function Workspace() {
                 ))}
               </div>
               <p className="text-[15px] font-medium text-text-main mb-2">AI 正在分析...</p>
-              <p className="text-[13px] text-text-muted">读取竞品评论数据、聚类用户高频痛点</p>
+              <p className="text-[13px] text-text-muted">读取竞品评论、关联知识库、执行验证角色对比</p>
             </div>
           )}
 
           {showResult && currentResult && (
             <div className="space-y-6">
+              <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
+                <div className="absolute right-0 top-0 w-36 h-36 rounded-full bg-accent-500/5 translate-x-12 -translate-y-16" />
+                <div className="relative flex items-start justify-between gap-8">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <ShieldCheck className="w-4 h-4 text-accent-500" />
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-600">验证角色 · 内外知识库对比</span>
+                    </div>
+                    <h3 className="text-[18px] font-medium text-text-main mb-2">已把采纳知识项纳入本次分析口径</h3>
+                    <p className="text-[13px] text-text-muted leading-relaxed max-w-xl">
+                      系统将公司知识库、成功案例与市场竞品资料并行对比，保留可复用判断，标记需要人工复核或更新的内容。
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 shrink-0 w-[300px]">
+                    {[
+                      ['采纳知识', `${adoptedRecommendations.length} 项`],
+                      ['验证来源', `${reviewMats.length} 个竞品`],
+                      ['待复核', feedbackItems.length ? `${feedbackItems.length} 条` : '0 条'],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-2xl border border-border-light bg-bg-primary/70 p-3 text-center">
+                        <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
+                        <div className="text-[10px] text-text-muted">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="relative grid grid-cols-2 gap-3 mt-5">
+                  {adoptedRecommendations.slice(0, 4).map((item) => (
+                    <div key={item.id} className="rounded-2xl border border-border-light bg-bg-primary/70 p-3">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Link2 className="w-3.5 h-3.5 text-accent-500" />
+                        <span className="text-[12px] font-medium text-text-main truncate">{item.title}</span>
+                      </div>
+                      <p className="text-[11px] text-text-muted leading-relaxed">{item.verification}</p>
+                    </div>
+                  ))}
+                </div>
+                {adoptedRecommendations.length === 0 && (
+                  <div className="relative mt-5 rounded-2xl border border-warning/20 bg-warning-soft p-4 flex items-center gap-3">
+                    <MinusCircle className="w-4 h-4 text-warning" />
+                    <p className="text-[12px] text-warning">当前未采纳知识项，建议至少选择一个成功案例或高相关资料再生成。</p>
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center justify-between">
                 <h3 className="text-[16px] font-medium text-text-main flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-accent-500" /> AI 分析结果

@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(gh repo *)",
+      "Bash(gh api *)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh --version)",
+      "Bash(git clone *)",
+      "Bash(mkdir -p /Users/leyson/Desktop/claw-workkit-hub/.claude/skills)",
+      "Bash(cp -r /tmp/playwright-skill/skills/playwright-skill /Users/leyson/Desktop/claw-workkit-hub/.claude/skills/playwright-skill)",
+      "Read(//tmp/guizang-ppt-skill/**)"
     ]
   }
 }

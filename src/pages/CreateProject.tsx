@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Package } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Package, BookOpen, CheckCircle2, Star, GitBranch, Sparkles, Database } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getWorkKitById, addProject, addTask, refreshTaskMaterialLinks } from '../services/db'
-import type { Project, Competitor, TaskCard } from '../types'
+import { getWorkKitById, getProjects, addProject, addTask, refreshTaskMaterialLinks, incrementWorkKitReuse } from '../services/db'
+import type { Project, Competitor, TaskCard, WorkKit } from '../types'
 import { useToast } from '../components/Toast'
 import type { Role } from '../types'
 
@@ -66,6 +66,42 @@ const defaultTaskTemplates: Record<Role, Omit<TaskCard, 'id' | 'projectId' | 'as
   },
 }
 
+function buildLearningItems(workKit: WorkKit) {
+  const sectionItems = workKit.sections.slice(0, 3).map((section, index) => ({
+    id: `section-${index}`,
+    title: section.title,
+    meta: `${roleLabels[section.role]}岗任务模板`,
+    desc: section.content[0]?.title || '学习该岗位的输出结构与判断口径',
+    icon: BookOpen,
+  }))
+  return [
+    {
+      id: 'structure',
+      title: '资料结构预学习',
+      meta: '启动前准备',
+      desc: workKit.materialStructure,
+      icon: Database,
+    },
+    ...sectionItems,
+    {
+      id: 'feedback',
+      title: '上次反馈与版本变化',
+      meta: `${workKit.version} · ${workKit.versionHistory.length} 次迭代`,
+      desc: workKit.feedback,
+      icon: GitBranch,
+    },
+  ].slice(0, 5)
+}
+
+function createUniqueSlug(name: string) {
+  const base = name.trim().replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9一-鿿-]/g, '') || `project-${Date.now()}`
+  const existing = new Set(getProjects().map((project) => project.slug))
+  if (!existing.has(base)) return base
+  let index = 2
+  while (existing.has(`${base}-${index}`)) index += 1
+  return `${base}-${index}`
+}
+
 export default function CreateProject() {
   const navigate = useNavigate()
   const { showToast } = useToast()
@@ -87,6 +123,7 @@ export default function CreateProject() {
   }, [workKit])
 
   const steps = workKit ? templateSteps : normalSteps
+  const learningItems = useMemo(() => (workKit ? buildLearningItems(workKit) : []), [workKit])
 
   const [step, setStep] = useState(0)
   const [name, setName] = useState(workKit ? workKit.name.replace(' Work Kit', '') : '')
@@ -98,6 +135,15 @@ export default function CreateProject() {
   const [campaign, setCampaign] = useState('')
   const [category, setCategory] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
+  const [learnedIds, setLearnedIds] = useState<string[]>(() => (learningItems[0] ? [learningItems[0].id] : []))
+  const learnedCount = learnedIds.length
+  const plannedTaskCount = workKit
+    ? workKit.sections.filter((section) => roles.some((role) => role.checked && role.role === section.role)).length
+    : roles.filter((role) => role.checked).length
+
+  const toggleLearned = (id: string) => {
+    setLearnedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
+  }
 
   const addCompetitor = () => {
     const trimmed = competitorInput.trim()
@@ -137,7 +183,7 @@ export default function CreateProject() {
       setErrors({})
       // Build real project
       const id = 'p' + Date.now()
-      const slug = name.trim().replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9一-鿿-]/g, '')
+      const slug = createUniqueSlug(name)
       const comps: Competitor[] = competitors.map((c) => ({
         name: c, brand: c, platform: '天猫', price: '¥0', reviewCount: 0, rating: 0, topIssues: [],
       }))
@@ -157,21 +203,28 @@ export default function CreateProject() {
 
       // Clone task cards from template
       if (workKit) {
+        incrementWorkKitReuse(workKit.id)
         for (const section of workKit.sections) {
           if (!selectedRoles.includes(section.role)) continue
+          const firstContent = section.content[0]
           const taskCard: TaskCard = {
             id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
             projectId: id,
             role: section.role,
             title: section.title,
-            description: `基于「${workKit.name}」模板生成`,
+            description: `基于「${workKit.name}」模板生成。已完成 ${learnedCount}/${learningItems.length} 个启动前学习项，可继续在工作台关联知识库。`,
             status: 'ready',
             assignedTo: roleLabels[section.role] + '负责人',
             inputMaterials: [],
-            promptPreview: section.content.map((c) => c.title).join('；'),
-            outputFormat: '',
-            judgmentCriteria: [],
-            sourceTags: workKit.tags.slice(0, 2),
+            promptPreview: [
+              `你是一位${roleLabels[section.role]}岗位专家。请沿用「${workKit.name}」中的「${section.title}」流程。`,
+              firstContent?.items?.length ? `参考模板要点：${firstContent.items.slice(0, 4).join('；')}` : '',
+              firstContent?.rows?.length ? `参考矩阵维度：${firstContent.headers?.join('、') || '要素、判断、动作'}` : '',
+              `结合新项目的活动、类目和竞品资料重新判断，不直接照搬历史结论。`,
+            ].filter(Boolean).join('\n'),
+            outputFormat: firstContent?.title || '结构化分析结果',
+            judgmentCriteria: ['是否结合新项目资料重新判断', '是否说明沿用与修订依据', '是否可沉淀为新的知识项'],
+            sourceTags: workKit.tags.slice(0, 3),
           }
           addTask(taskCard)
           createdTaskCount += 1
@@ -205,70 +258,145 @@ export default function CreateProject() {
   }
 
   return (
-    <div className="max-w-xl">
+    <div className={workKit ? 'max-w-6xl' : 'max-w-xl'}>
       {/* Header */}
-      <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">
-        {workKit ? `基于模板创建项目` : '创建新项目'}
-      </h1>
-      <p className="text-[14px] text-text-secondary mb-4 leading-relaxed">
-        {workKit
-          ? `复用「${workKit.name}」— 岗位角色、资料结构和分析流程已自动预填。`
-          : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
-      </p>
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
+          <span className="section-title">{workKit ? 'WORK KIT LAUNCH · 启动前学习' : 'NEW PROJECT · 项目配置'}</span>
+        </div>
+        <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">
+          {workKit ? `基于模板创建项目` : '创建新项目'}
+        </h1>
+        <p className="text-[14px] text-text-secondary max-w-xl leading-relaxed">
+          {workKit
+            ? `复用「${workKit.name}」— 先学习成功案例，再带着模板任务进入新项目。`
+            : '配置竞品分析项目，系统自动生成各岗位 AI 任务卡。'}
+        </p>
+      </div>
 
       {/* Template info card (persistent in template mode) */}
       {workKit && (
-        <div className="card-surface rounded-[20px] p-5 mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-accent-50 flex items-center justify-center">
-              <Package className="w-4.5 h-4.5 text-accent-500" />
+        <div className="grid grid-cols-[1.05fr_0.95fr] gap-6 mb-10">
+          <div className="card-surface rounded-[28px] p-6 overflow-hidden relative">
+            <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-accent-500/5" />
+            <div className="relative flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
+                <Package className="w-5 h-5 text-accent-500" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-[18px] font-medium text-text-main truncate">{workKit.name}</h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-semibold flex items-center gap-1 shrink-0">
+                    <Star className="w-3 h-3 fill-amber-400" />{workKit.rating}
+                  </span>
+                </div>
+                <p className="text-[12px] text-text-muted leading-relaxed">{workKit.description}</p>
+              </div>
             </div>
-            <div>
-              <div className="text-[13px] font-medium text-text-main">{workKit.name}</div>
-              <div className="text-[11px] text-text-muted">{workKit.version} · 复用 {workKit.reuseCount} 次 · {workKit.includedRoles.length} 个岗位</div>
+            <div className="grid grid-cols-4 gap-3 mb-6">
+              {[
+                ['模板版本', workKit.version],
+                ['复用次数', `${workKit.reuseCount} 次`],
+                ['岗位', `${workKit.includedRoles.length} 个`],
+                ['任务', `${workKit.sections.length} 个`],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl bg-bg-primary/65 border border-border-light p-3 text-center">
+                  <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
+                  <div className="text-[10px] text-text-muted">{label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-3 text-[12px]">
+              <div className="flex items-start gap-3">
+                <Database className="w-4 h-4 text-accent-500 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-text-muted mb-0.5">资料结构</div>
+                  <div className="text-text-secondary leading-relaxed">{workKit.materialStructure}</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-4 h-4 text-accent-500 mt-0.5 shrink-0" />
+                <div>
+                  <div className="text-text-muted mb-0.5">适用场景</div>
+                  <div className="text-text-secondary leading-relaxed">{workKit.scenario}</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 text-[12px]">
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-text-muted mb-0.5">资料结构</div>
-              <div className="text-text-secondary leading-snug">{workKit.materialStructure}</div>
+
+          <div className="card-surface rounded-[28px] p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Pre-learning Pack</div>
+                <h2 className="text-[18px] font-medium text-text-main">启动前学习包</h2>
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-accent-50 flex flex-col items-center justify-center">
+                <span className="text-[18px] font-light text-accent-600 leading-none">{learnedCount}/{learningItems.length}</span>
+                <span className="text-[9px] text-accent-500 mt-1">已学习</span>
+              </div>
             </div>
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-text-muted mb-0.5">包含岗位</div>
-              <div className="text-text-secondary">{workKit.includedRoles.map((r) => roleLabels[r]).join('、')}</div>
-            </div>
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-text-muted mb-0.5">适用场景</div>
-              <div className="text-text-secondary">{workKit.scenario}</div>
-            </div>
-            <div className="bg-white/5 rounded-xl p-3">
-              <div className="text-text-muted mb-0.5">任务模板</div>
-              <div className="text-text-secondary">{workKit.sections.length} 个任务</div>
+            <div className="space-y-2.5">
+              {learningItems.map((item) => {
+                const Icon = item.icon
+                const learned = learnedIds.includes(item.id)
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleLearned(item.id)}
+                    className={`w-full rounded-2xl border p-3.5 text-left transition-all ${
+                      learned ? 'border-accent-500/25 bg-accent-500/[0.045]' : 'border-border-light bg-bg-primary/55 hover:border-accent-500/20'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${learned ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
+                        {learned ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="text-[13px] font-medium text-text-main truncate">{item.title}</span>
+                          <span className="text-[10px] text-text-muted shrink-0">{item.meta}</span>
+                        </div>
+                        <p className="text-[11px] text-text-muted leading-relaxed line-clamp-2">{item.desc}</p>
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* Step dots */}
-      <div className="flex items-center gap-3 mb-12">
-        {steps.map((label, i) => (
-          <div key={label} className="flex items-center gap-3">
-            <button
-              onClick={() => { if (i < step) setStep(i) }}
-              className={`w-[10px] h-[10px] rounded-full transition-all ${
-                i === step ? 'bg-accent-500 scale-125' : i < step ? 'bg-accent-200' : 'bg-gray-200'
-              }`}
-            />
-            <span className={`text-[12px] transition-colors ${i === step ? 'text-text-main font-medium' : 'text-text-muted'}`}>
-              {label}
-            </span>
-            {i < steps.length - 1 && <div className="w-6 h-px bg-border-default" />}
-          </div>
-        ))}
-      </div>
+      <div className={workKit ? 'grid grid-cols-[220px_1fr] gap-8 items-start' : ''}>
+        {/* Step dots */}
+        <div className={workKit ? 'card-surface rounded-[24px] p-4 sticky top-6' : 'flex items-center gap-3 mb-12'}>
+          {steps.map((label, i) => (
+            <div key={label} className={workKit ? 'flex items-center gap-3 py-3' : 'flex items-center gap-3'}>
+              <button
+                onClick={() => { if (i < step) setStep(i) }}
+                className={`w-[10px] h-[10px] rounded-full transition-all ${
+                  i === step ? 'bg-accent-500 scale-125' : i < step ? 'bg-accent-200' : 'bg-gray-200'
+                }`}
+              />
+              <span className={`text-[12px] transition-colors ${i === step ? 'text-text-main font-medium' : 'text-text-muted'}`}>
+                {label}
+              </span>
+              {!workKit && i < steps.length - 1 && <div className="w-6 h-px bg-border-default" />}
+            </div>
+          ))}
+          {workKit && (
+            <div className="mt-4 rounded-2xl bg-bg-primary/70 border border-border-light p-3">
+              <div className="text-[10px] text-text-muted mb-1">创建后将自动生成</div>
+              <div className="text-[18px] font-light text-text-main leading-none">{plannedTaskCount} 张任务卡</div>
+              <div className="text-[11px] text-accent-600 mt-2">已学习 {learnedCount} 个模板知识项</div>
+            </div>
+          )}
+        </div>
 
-      {/* Form */}
-      <div className="mb-12 min-h-[200px]">
+        <div>
+          {/* Form */}
+          <div className="mb-12 min-h-[200px]">
         {step === 0 && (
           <div className="space-y-8">
             <div>
@@ -384,23 +512,25 @@ export default function CreateProject() {
         )}
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-ghost disabled:opacity-20">
-          <ArrowLeft className="w-4 h-4" />
-          上一步
-        </button>
-        {step < steps.length - 1 ? (
-          <button onClick={handleNext} className="btn-primary">
-            下一步
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        ) : (
-          <button onClick={handleCreate} className="btn-primary-filled">
-            创建项目
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        )}
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-ghost disabled:opacity-20">
+              <ArrowLeft className="w-4 h-4" />
+              上一步
+            </button>
+            {step < steps.length - 1 ? (
+              <button onClick={handleNext} className="btn-primary">
+                下一步
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button onClick={handleCreate} className="btn-primary-filled">
+                创建项目
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

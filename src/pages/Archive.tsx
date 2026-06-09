@@ -1,16 +1,66 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp } from 'lucide-react'
+import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp, ShieldCheck, Bot, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjects, getWorkKits } from '../services/db'
+import type { WorkKit } from '../types'
+
+type ValidationDecision = 'keep' | 'revise'
+
+function readValidationState(): Record<string, Record<string, ValidationDecision>> {
+  try {
+    const raw = localStorage.getItem('promokit_validation_runs')
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function buildValidationRows(kit: WorkKit) {
+  const hasCopy = kit.includedRoles.includes('copywriting')
+  const hasService = kit.includedRoles.includes('customer_service')
+  const hasDesign = kit.includedRoles.includes('design')
+  return [
+    {
+      id: 'agent-copy',
+      agent: hasCopy ? '话术对比智能体' : '流程完整性智能体',
+      target: hasCopy ? '公司文案框架 vs 市场竞品话术' : '公司流程结构 vs 外部通用流程',
+      score: hasCopy ? 88 : 82,
+      finding: hasCopy ? '公司知识库结构完整，但竞品近期更强调场景化开场和数字钩子。' : '流程覆盖主要环节，但缺少每日运行后的异常回写口径。',
+      action: hasCopy ? '保留五段式结构，修订开场钩子与互动问答模板。' : '增加“验证角色结论”和“下一次修订点”字段。',
+      suggested: 'revise' as ValidationDecision,
+    },
+    {
+      id: 'agent-market',
+      agent: '市场竞品验证角色',
+      target: `${kit.scenario} · 竞品策略横向对比`,
+      score: kit.rating >= 4.8 ? 93 : 79,
+      finding: kit.rating >= 4.8 ? '历史验证表现稳定，可作为新项目启动前优先学习样本。' : '当前评分未达到优先标星标准，需要补充更多复用反馈。',
+      action: kit.rating >= 4.8 ? '保持成功案例标星，并在新项目中默认推荐。' : '标记为观察模板，待下一次项目复用后更新评分。',
+      suggested: kit.rating >= 4.8 ? 'keep' as ValidationDecision : 'revise' as ValidationDecision,
+    },
+    {
+      id: 'agent-knowledge',
+      agent: hasService || hasDesign ? '知识库修订审核人' : '知识库保留审核人',
+      target: '公司知识库沉淀项',
+      score: kit.versionHistory.length >= 2 ? 86 : 74,
+      finding: kit.versionHistory.length >= 2 ? '已有版本迭代记录，可追溯团队反馈和修改依据。' : '版本历史较少，暂时无法证明经验持续复用有效。',
+      action: kit.versionHistory.length >= 2 ? '保留版本历史，并把本次验证结论写入下一版变更说明。' : '补充项目反馈来源和复用后的效果指标。',
+      suggested: kit.versionHistory.length >= 2 ? 'keep' as ValidationDecision : 'revise' as ValidationDecision,
+    },
+  ]
+}
 
 export default function Archive() {
   const navigate = useNavigate()
   const [reuseKit, setReuseKit] = useState<string | null>(null)
+  const [validationKit, setValidationKit] = useState<string | null>(null)
   const [expandedHistory, setExpandedHistory] = useState<Record<string, boolean>>({})
   const [filterTag, setFilterTag] = useState<string | null>(null)
   const [searchText, setSearchText] = useState('')
   const [kits] = useState(getWorkKits())
+  const [validationRuns, setValidationRuns] = useState<Record<string, Record<string, ValidationDecision>>>(readValidationState)
+  const [draftValidation, setDraftValidation] = useState<Record<string, ValidationDecision>>({})
 
   const toggleHistory = (id: string) => {
     setExpandedHistory((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -18,6 +68,24 @@ export default function Archive() {
 
   const allTags = [...new Set(kits.flatMap((k) => k.tags))]
   const totalReuse = kits.reduce((s, k) => s + k.reuseCount, 0)
+  const validatedCount = Object.keys(validationRuns).length
+
+  const openValidation = (id: string) => {
+    const kit = kits.find((k) => k.id === id)
+    if (!kit) return
+    const existing = validationRuns[id]
+    const initial = existing || Object.fromEntries(buildValidationRows(kit).map((row) => [row.id, row.suggested]))
+    setDraftValidation(initial)
+    setValidationKit(id)
+  }
+
+  const saveValidation = () => {
+    if (!validationKit) return
+    const next = { ...validationRuns, [validationKit]: draftValidation }
+    setValidationRuns(next)
+    localStorage.setItem('promokit_validation_runs', JSON.stringify(next))
+    setValidationKit(null)
+  }
 
   // Filter by tag + text search
   const filteredKits = useMemo(() => {
@@ -51,11 +119,12 @@ export default function Archive() {
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-8">
         {[
           { icon: Package, value: String(kits.length), label: 'Work Kit 模板', sub: '可复用分析流程' },
           { icon: TrendingUp, value: String(totalReuse), label: '累计复用次数', sub: '跨项目经验传承' },
           { icon: Star, value: String(successKits.length), label: '已验证成功案例', sub: `评分 ≥ 4.8` },
+          { icon: ShieldCheck, value: String(validatedCount), label: '对比验证记录', sub: '保留/修订决策' },
         ].map((s) => (
           <div key={s.label} className="card-surface rounded-2xl p-5 flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
@@ -68,6 +137,37 @@ export default function Archive() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Validation console — 纪要建议：固定流程 + 小智能体对比 */}
+      <div className="card-surface rounded-[26px] p-6 mb-8 overflow-hidden relative">
+        <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-accent-500/5 translate-x-20 -translate-y-24" />
+        <div className="relative flex items-start justify-between gap-8">
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
+              <Bot className="w-5 h-5 text-accent-500" />
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Validation Agents · 知识库对比验证</div>
+              <h2 className="text-[20px] font-medium text-text-main mb-2">固定流程每天跑，判断知识该保留还是修订</h2>
+              <p className="text-[13px] text-text-muted leading-relaxed max-w-2xl">
+                将公司 Work Kit 与市场竞品话术、流程结构和项目反馈横向对比，用验证角色输出可执行的保留/修改动作，避免每次项目都重新设定。
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2 w-[310px] shrink-0">
+            {[
+              ['运行频率', '每日'],
+              ['智能体', '3 个'],
+              ['动作', '保留/修订'],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-2xl bg-bg-primary/70 border border-border-light p-3 text-center">
+                <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
+                <div className="text-[10px] text-text-muted">{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Learning CTA — 纪要建议：启动新项目前先学习 */}
@@ -254,6 +354,9 @@ export default function Archive() {
                     )}
                   </div>
                   <div className="flex items-center gap-3">
+                    <button onClick={() => openValidation(wk.id)} className="btn-ghost text-[12px]">
+                      <ShieldCheck className="w-3.5 h-3.5" /> 启动验证
+                    </button>
                     {sourceProject && (
                       <button onClick={() => navigate(`/report/${sourceProject.slug}`)} className="btn-ghost text-[12px]">
                         查看来源报告 <ArrowRight className="w-3.5 h-3.5" />
@@ -299,6 +402,109 @@ export default function Archive() {
               <div className="flex items-center gap-2 justify-end">
                 <button onClick={() => setReuseKit(null)} className="btn-ghost text-[13px]">取消</button>
                 <button onClick={() => { setReuseKit(null); navigate(`/create?from=archive&kit=${wk.id}`) }} className="btn-primary-filled text-[13px]">确认，开始创建</button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Validation dialog */}
+      {validationKit && (() => {
+        const wk = kits.find((k) => k.id === validationKit)
+        if (!wk) return null
+        const rows = buildValidationRows(wk)
+        const reviseCount = rows.filter((row) => draftValidation[row.id] === 'revise').length
+        return (
+          <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50">
+            <div className="bg-bg-surface rounded-[28px] p-6 w-[760px] max-h-[86vh] overflow-auto shadow-2xl">
+              <div className="flex items-start justify-between gap-6 mb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-accent-500" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Validation Run</div>
+                    <h3 className="text-[20px] font-medium text-text-main">{wk.name}</h3>
+                    <p className="text-[12px] text-text-muted mt-1">对比公司知识库与市场竞品，决定保留、修订和下一版动作。</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-bg-primary border border-border-light px-4 py-3 text-center">
+                  <div className="text-[20px] font-light text-text-main leading-none">{rows.length - reviseCount}/{rows.length}</div>
+                  <div className="text-[10px] text-text-muted mt-1">建议保留</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[1fr_1fr] gap-4 mb-5">
+                <div className="rounded-2xl border border-border-light bg-bg-primary/70 p-4">
+                  <div className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">公司知识库</div>
+                  <p className="text-[13px] text-text-secondary leading-relaxed">{wk.materialStructure}</p>
+                </div>
+                <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+                  <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-2">市场竞品参照</div>
+                  <p className="text-[13px] text-text-secondary leading-relaxed">竞品评论、详情页话术、直播脚本、用户反馈和外部优秀流程。</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {rows.map((row) => {
+                  const decision = draftValidation[row.id] || row.suggested
+                  return (
+                    <div key={row.id} className="rounded-2xl border border-border-light bg-bg-primary/60 p-4">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Bot className="w-4 h-4 text-accent-500" />
+                            <span className="text-[14px] font-medium text-text-main">{row.agent}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-surface text-text-muted">{row.score} 分</span>
+                          </div>
+                          <div className="text-[11px] text-text-muted">{row.target}</div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => setDraftValidation((prev) => ({ ...prev, [row.id]: 'keep' }))}
+                            className={`text-[11px] px-3 py-1.5 rounded-xl border transition-colors ${decision === 'keep' ? 'border-success/30 bg-success-soft text-success' : 'border-border-light text-text-muted hover:text-text-main'}`}
+                          >
+                            保留
+                          </button>
+                          <button
+                            onClick={() => setDraftValidation((prev) => ({ ...prev, [row.id]: 'revise' }))}
+                            className={`text-[11px] px-3 py-1.5 rounded-xl border transition-colors ${decision === 'revise' ? 'border-warning/30 bg-warning-soft text-warning' : 'border-border-light text-text-muted hover:text-text-main'}`}
+                          >
+                            标记修订
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-[1fr_1fr] gap-3">
+                        <div className="rounded-xl bg-bg-surface/70 p-3">
+                          <div className="flex items-center gap-2 text-[11px] font-medium text-text-main mb-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-success" /> 对比发现
+                          </div>
+                          <p className="text-[12px] text-text-muted leading-relaxed">{row.finding}</p>
+                        </div>
+                        <div className="rounded-xl bg-bg-surface/70 p-3">
+                          <div className="flex items-center gap-2 text-[11px] font-medium text-text-main mb-1">
+                            <AlertTriangle className="w-3.5 h-3.5 text-warning" /> 修订动作
+                          </div>
+                          <p className="text-[12px] text-text-muted leading-relaxed">{row.action}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="mt-6 rounded-2xl bg-accent-500/[0.05] border border-accent-500/15 p-4 flex items-start gap-3">
+                <Sparkles className="w-4 h-4 text-accent-500 mt-0.5 shrink-0" />
+                <p className="text-[12px] text-text-secondary leading-relaxed">
+                  保存后，本次验证会成为资产库的验证记录；下一次创建项目或执行任务时，可优先采用“保留”项，并对“修订”项进行人工复核。
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 mt-6">
+                <button onClick={() => setValidationKit(null)} className="btn-ghost text-[13px]">取消</button>
+                <button onClick={saveValidation} className="btn-primary-filled text-[13px]">
+                  保存验证结论
+                </button>
               </div>
             </div>
           </div>
