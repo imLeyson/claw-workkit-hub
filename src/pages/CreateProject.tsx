@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Package, BookOpen, CheckCircle2, Star, GitBranch, Sparkles, Database } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Package, BookOpen, CheckCircle2, Star, GitBranch, Sparkles, Database, Target, Pencil, Lightbulb, ListChecks } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getWorkKitById, getProjects, addProject, addTask, refreshTaskMaterialLinks, incrementWorkKitReuse } from '../services/db'
 import type { Project, Competitor, TaskCard, WorkKit } from '../types'
@@ -72,6 +72,9 @@ function buildLearningItems(workKit: WorkKit) {
     title: section.title,
     meta: `${roleLabels[section.role]}岗任务模板`,
     desc: section.content[0]?.title || '学习该岗位的输出结构与判断口径',
+    objective: `理解「${section.title}」在新项目里要复用的分析框架，以及哪些结论需要重新验证。`,
+    takeaway: section.content[0]?.items?.slice(0, 3) || section.content[0]?.rows?.slice(0, 3).map((row) => row.slice(0, 3).join(' · ')) || ['识别该岗位的核心输入', '复用输出结构', '按新项目资料重新判断'],
+    apply: `创建任务卡时会把该模板写入 ${roleLabels[section.role]} 岗 Prompt，并要求结合新项目资料重新判断。`,
     icon: BookOpen,
   }))
   return [
@@ -80,6 +83,9 @@ function buildLearningItems(workKit: WorkKit) {
       title: '资料结构预学习',
       meta: '启动前准备',
       desc: workKit.materialStructure,
+      objective: '先看清这个 Work Kit 依赖哪些资料，避免新项目启动后才发现关键输入缺失。',
+      takeaway: workKit.materialStructure.split(' · ').map((item) => `准备${item}`).slice(0, 4),
+      apply: '创建项目后，资料库会以这些资料类型作为导入提示，任务卡也会等待相应资料补齐。',
       icon: Database,
     },
     ...sectionItems,
@@ -88,6 +94,13 @@ function buildLearningItems(workKit: WorkKit) {
       title: '上次反馈与版本变化',
       meta: `${workKit.version} · ${workKit.versionHistory.length} 次迭代`,
       desc: workKit.feedback,
+      objective: '学习团队上一次为什么修订模板，避免复用时重复踩同样的问题。',
+      takeaway: [
+        workKit.feedback || '暂无反馈，建议本次复用后补充效果记录',
+        workKit.versionHistory[0]?.changes || '记录本次版本变化',
+        `当前评分 ${workKit.rating}，复用 ${workKit.reuseCount} 次`,
+      ],
+      apply: '创建出的任务卡会提示团队说明“沿用/修订”的依据，便于后续再沉淀为新版 Work Kit。',
       icon: GitBranch,
     },
   ].slice(0, 5)
@@ -136,13 +149,23 @@ export default function CreateProject() {
   const [category, setCategory] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
   const [learnedIds, setLearnedIds] = useState<string[]>(() => (learningItems[0] ? [learningItems[0].id] : []))
+  const [activeLearningId, setActiveLearningId] = useState(() => learningItems[0]?.id || '')
+  const [learningNotes, setLearningNotes] = useState<Record<string, string>>({})
   const learnedCount = learnedIds.length
+  const activeLearningItem = learningItems.find((item) => item.id === activeLearningId) || learningItems[0]
+  const learningPercent = learningItems.length ? Math.round((learnedCount / learningItems.length) * 100) : 0
+  const learnedItems = learningItems.filter((item) => learnedIds.includes(item.id))
+  const learningSummary = learnedItems.map((item) => {
+    const note = learningNotes[item.id]?.trim()
+    return `${item.title}：${note || item.apply}`
+  })
   const plannedTaskCount = workKit
     ? workKit.sections.filter((section) => roles.some((role) => role.checked && role.role === section.role)).length
     : roles.filter((role) => role.checked).length
 
   const toggleLearned = (id: string) => {
     setLearnedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
+    setActiveLearningId(id)
   }
 
   const addCompetitor = () => {
@@ -198,6 +221,20 @@ export default function CreateProject() {
         team: team as any,
       }
       await addProject(newProject)
+      if (workKit) {
+        const records = JSON.parse(localStorage.getItem('promokit_prelearning_records') || '[]')
+        records.unshift({
+          projectId: id,
+          projectName: name.trim(),
+          workKitId: workKit.id,
+          workKitName: workKit.name,
+          learnedIds,
+          notes: learningNotes,
+          summary: learningSummary,
+          createdAt: new Date().toISOString(),
+        })
+        localStorage.setItem('promokit_prelearning_records', JSON.stringify(records.slice(0, 30)))
+      }
       const selectedRoles = roles.filter((r) => r.checked).map((r) => r.role as Role)
       let createdTaskCount = 0
 
@@ -220,6 +257,7 @@ export default function CreateProject() {
               `你是一位${roleLabels[section.role]}岗位专家。请沿用「${workKit.name}」中的「${section.title}」流程。`,
               firstContent?.items?.length ? `参考模板要点：${firstContent.items.slice(0, 4).join('；')}` : '',
               firstContent?.rows?.length ? `参考矩阵维度：${firstContent.headers?.join('、') || '要素、判断、动作'}` : '',
+              learningSummary.length ? `启动前学习记录：${learningSummary.join('｜')}` : '',
               `结合新项目的活动、类目和竞品资料重新判断，不直接照搬历史结论。`,
             ].filter(Boolean).join('\n'),
             outputFormat: firstContent?.title || '结构化分析结果',
@@ -331,38 +369,109 @@ export default function CreateProject() {
                 <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Pre-learning Pack</div>
                 <h2 className="text-[18px] font-medium text-text-main">启动前学习包</h2>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-accent-50 flex flex-col items-center justify-center">
-                <span className="text-[18px] font-light text-accent-600 leading-none">{learnedCount}/{learningItems.length}</span>
-                <span className="text-[9px] text-accent-500 mt-1">已学习</span>
+              <div className="w-16 h-16 rounded-2xl bg-accent-50 flex flex-col items-center justify-center">
+                <span className="text-[19px] font-light text-accent-600 leading-none">{learningPercent}%</span>
+                <span className="text-[9px] text-accent-500 mt-1">{learnedCount}/{learningItems.length}</span>
               </div>
             </div>
-            <div className="space-y-2.5">
-              {learningItems.map((item) => {
-                const Icon = item.icon
-                const learned = learnedIds.includes(item.id)
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => toggleLearned(item.id)}
-                    className={`w-full rounded-2xl border p-3.5 text-left transition-all ${
-                      learned ? 'border-accent-500/25 bg-accent-500/[0.045]' : 'border-border-light bg-bg-primary/55 hover:border-accent-500/20'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${learned ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
-                        {learned ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-[13px] font-medium text-text-main truncate">{item.title}</span>
-                          <span className="text-[10px] text-text-muted shrink-0">{item.meta}</span>
+
+            <div className="h-2 rounded-full bg-bg-primary overflow-hidden mb-5">
+              <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${learningPercent}%` }} />
+            </div>
+
+            <div className="grid grid-cols-[0.78fr_1.22fr] gap-4">
+              <div className="space-y-2">
+                {learningItems.map((item, index) => {
+                  const Icon = item.icon
+                  const learned = learnedIds.includes(item.id)
+                  const active = activeLearningItem?.id === item.id
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveLearningId(item.id)}
+                      className={`w-full rounded-2xl border p-3 text-left transition-all ${
+                        active ? 'border-accent-500/35 bg-accent-500/[0.06]' : 'border-border-light bg-bg-primary/55 hover:border-accent-500/20'
+                      }`}
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${learned ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
+                          {learned ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
                         </div>
-                        <p className="text-[11px] text-text-muted leading-relaxed line-clamp-2">{item.desc}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-[10px] font-mono text-accent-600">{String(index + 1).padStart(2, '0')}</span>
+                            <span className="text-[12px] font-medium text-text-main truncate">{item.title}</span>
+                          </div>
+                          <p className="text-[10px] text-text-muted truncate">{item.meta}</p>
+                        </div>
                       </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {activeLearningItem && (
+                <div className="rounded-[22px] border border-border-light bg-bg-primary/60 p-4 min-h-[360px] flex flex-col">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <div className="text-[10px] text-text-muted mb-1">{activeLearningItem.meta}</div>
+                      <h3 className="text-[16px] font-medium text-text-main">{activeLearningItem.title}</h3>
                     </div>
-                  </button>
-                )
-              })}
+                    <button
+                      onClick={() => toggleLearned(activeLearningItem.id)}
+                      className={`text-[11px] px-3 py-1.5 rounded-xl border transition-colors ${
+                        learnedIds.includes(activeLearningItem.id)
+                          ? 'border-success/30 bg-success-soft text-success'
+                          : 'border-accent-500/25 bg-accent-500/10 text-accent-600'
+                      }`}
+                    >
+                      {learnedIds.includes(activeLearningItem.id) ? '已学会' : '标记学会'}
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 flex-1">
+                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold text-accent-600 mb-2">
+                        <Target className="w-3.5 h-3.5" />学习目标
+                      </div>
+                      <p className="text-[12px] text-text-secondary leading-relaxed">{activeLearningItem.objective}</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold text-ai-400 mb-2">
+                        <Lightbulb className="w-3.5 h-3.5" />关键要点
+                      </div>
+                      <ul className="space-y-1.5">
+                        {activeLearningItem.takeaway.map((item, index) => (
+                          <li key={index} className="text-[12px] text-text-secondary leading-relaxed flex gap-2">
+                            <span className="text-accent-500 mt-0.5">•</span>{item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold text-kit-600 mb-2">
+                        <ListChecks className="w-3.5 h-3.5" />如何带入新项目
+                      </div>
+                      <p className="text-[12px] text-text-secondary leading-relaxed">{activeLearningItem.apply}</p>
+                    </div>
+
+                    <div>
+                      <label className="flex items-center gap-2 text-[11px] font-semibold text-text-muted mb-2">
+                        <Pencil className="w-3.5 h-3.5" />我的学习笔记
+                      </label>
+                      <textarea
+                        value={learningNotes[activeLearningItem.id] || ''}
+                        onChange={(e) => setLearningNotes((prev) => ({ ...prev, [activeLearningItem.id]: e.target.value }))}
+                        rows={3}
+                        placeholder="记录本次新项目要沿用什么、要避免什么、需要补充哪些资料..."
+                        className="w-full bg-bg-surface border border-border-default rounded-2xl p-3 text-[12px] text-text-main leading-relaxed resize-none focus:outline-none focus:border-accent-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
