@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp, Pencil, Plus, X } from 'lucide-react'
+import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp, Pencil, Plus, X, Package, BookOpen, GitBranch, ShieldCheck } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjectBySlug, getMaterials, getTasks, getWorkKits, updateTask, refreshTaskMaterialLinks, addTask } from '../services/db'
 import { useToast } from '../components/Toast'
@@ -163,6 +163,19 @@ export default function TaskCards() {
   const allReady = tasks.every((t) => t.status === 'ready' || t.status === 'generated' || t.status === 'submitted')
   const readyPendingTasks = tasks.filter((t) => t.status === 'pending' && t.inputMaterials.length > 0)
   const blockedPendingTasks = tasks.filter((t) => t.status === 'pending' && t.inputMaterials.length === 0)
+  const submittedTasks = tasks.filter((t) => t.status === 'submitted')
+  const generatedTasks = tasks.filter((t) => t.status === 'generated' || t.status === 'submitted')
+  const workKits = getWorkKits()
+  const relevantKits = workKits
+    .filter((kit) => kit.tags.some((tag) => [project.category, project.campaign, '成功案例'].filter(Boolean).includes(tag)) || kit.includedRoles.some((role) => tasks.some((task) => task.role === role)))
+    .sort((a, b) => (b.rating * 10 + b.reuseCount) - (a.rating * 10 + a.reuseCount))
+    .slice(0, 5)
+  const assetSteps = [
+    { icon: BookOpen, label: '学习可复用资产', value: `${relevantKits.length} 个`, desc: '从历史 Work Kit 继承口径' },
+    { icon: Sparkles, label: '生成岗位分析', value: `${generatedTasks.length}/${tasks.length}`, desc: '把资料转成结构化结果' },
+    { icon: ShieldCheck, label: '提交复核报告', value: `${submittedTasks.length}/${tasks.length}`, desc: '进入报告验证与编辑' },
+    { icon: Package, label: '沉淀工作包', value: anyGenerated ? '可推进' : '待分析', desc: '保存为下次启动资产' },
+  ]
 
   const generateAll = useCallback(() => {
     if (isGenerating) return
@@ -192,10 +205,38 @@ export default function TaskCards() {
 
   return (
     <div className="max-w-5xl">
-      <div className="flex items-start justify-between mb-14">
+      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute right-[-90px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-7">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+              <GitBranch className="w-3.5 h-3.5" />
+              Work Kit Assembly
+            </div>
+            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把岗位任务装配成可复用工作包</h1>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-xl">
+              每张任务卡都会记录输入资料、岗位 Prompt、输出格式和判断标准。完成并提交后，这些内容会汇入报告，最终沉淀为下一次大促可学习、可复用的 Work Kit。
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {assetSteps.map((step) => (
+              <div key={step.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <step.icon className="w-4 h-4 text-accent-500" />
+                  <span className="font-mono text-[11px] text-accent-600">{step.value}</span>
+                </div>
+                <div className="text-[12px] font-medium text-text-main">{step.label}</div>
+                <div className="text-[10px] text-text-muted mt-1">{step.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-start justify-between mb-10">
         <div>
-          <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">岗位分析任务</h1>
-          <p className="text-[14px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 系统根据资料自动生成可执行的 AI 分析任务卡。</p>
+          <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mb-3">岗位分析任务</h2>
+          <p className="text-[14px] text-text-secondary max-w-md leading-relaxed">{project.name} — 系统根据资料自动生成可执行的 AI 分析任务卡，并保留后续资产化所需的上下文。</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={openAddTask} className="btn-ghost text-accent-500 hover:text-accent-600 flex items-center gap-1.5 cursor-pointer">
@@ -221,6 +262,8 @@ export default function TaskCards() {
         <span>{materials.length} 份资料</span>
         <span className="text-border-default">·</span>
         <span>{project.team.length} 个岗位</span>
+        <span className="text-border-default">·</span>
+        <span>{submittedTasks.length}/{tasks.length} 已提交到报告</span>
       </div>
 
       {/* Smart association — collapsible */}
@@ -228,13 +271,13 @@ export default function TaskCards() {
         <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 推荐 {Math.min(5, getWorkKits().length)} 个高复用 Work Kit</span>
+            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 推荐 {relevantKits.length} 个高复用 Work Kit</span>
           </div>
           {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
         </button>
         {showAssociation && (
         <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-          {getWorkKits().sort((a, b) => b.reuseCount - a.reuseCount).slice(0, 5).map((k) => (
+          {relevantKits.map((k) => (
             <Link key={k.id} to="/archive" className="bg-bg-surface rounded-xl p-3 border border-accent-500/15 text-[11px] hover:shadow-sm transition-shadow">
               <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 12)}{k.name.length > 12 ? '...' : ''}</div>
               <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次</div>
@@ -245,7 +288,7 @@ export default function TaskCards() {
       </div>
 
       {/* Task card grid */}
-      <div className="grid grid-cols-2 gap-5 stagger">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 stagger">
         {tasks.map((task) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
           const availableTypes = new Set(inputMats.map((m) => m.type))
@@ -360,7 +403,7 @@ export default function TaskCards() {
             </div>
             
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-medium text-text-muted mb-1.5">岗位角色 *</label>
                   <select

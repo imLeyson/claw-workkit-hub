@@ -29,6 +29,9 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
     { id: 'slides', label: '幻灯片', desc: '打开演示模式', icon: Sparkles, action: () => navigate('/slides'), category: '导航' },
     { id: 'new-project', label: '创建新项目', desc: '从模板或空白开始', icon: Plus, action: () => navigate('/create'), category: '操作' },
     { id: 'new-kit', label: '浏览 Work Kit', desc: '复用已有的分析模板', icon: Package, action: () => navigate('/archive'), category: '操作' },
+    { id: 'asset-flow', label: '资产化闭环总览', desc: '查看分析如何沉淀为 Work Kit', icon: Sparkles, action: () => navigate('/'), category: '资产化' },
+    { id: 'asset-materials', label: '资料资产化入口', desc: '把原始资料整理成任务输入', icon: FolderOpen, action: () => navigate('/materials/618-hair-dryer'), category: '资产化' },
+    { id: 'asset-publish', label: '发布 Work Kit', desc: '进入报告完成资产发布检查', icon: Package, action: () => navigate('/report/618-hair-dryer'), category: '资产化' },
   ]
 
   const filtered = query
@@ -77,7 +80,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
                     key={cmd.id}
                     onClick={() => { cmd.action(); onClose() }}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors ${
-                      idx === selected ? 'bg-white/5 text-text-main' : 'text-text-secondary hover:bg-white/3'
+                      idx === selected ? 'bg-white/5 text-text-main' : 'text-text-secondary hover:bg-white/[0.03]'
                     }`}
                   >
                     <cmd.icon className="w-4 h-4 text-accent-500 shrink-0" />

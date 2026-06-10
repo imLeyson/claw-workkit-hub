@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil, Download } from 'lucide-react'
+import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil, Download, Database, GitBranch, Package, ShieldCheck, Sparkles } from 'lucide-react'
 import { materialTypeLabels, aiStatusLabels, platformColors } from '../data/mock'
 import { getProjectBySlug, getMaterials, addMaterial, getProjects, refreshTaskMaterialLinks } from '../services/db'
 import { supabase } from '../services/supabase'
@@ -256,18 +256,101 @@ export default function MaterialLibrary() {
 
   if (!project) return <div className="text-text-muted text-sm p-8">项目不存在</div>
 
+  const materialTypeStats = [
+    { type: 'review' as const, label: '竞品评论', desc: '识别用户痛点与高频评价', required: true },
+    { type: 'spec' as const, label: '商品参数', desc: '支撑卖点、价格和功能对标', required: true },
+    { type: 'faq' as const, label: '客服记录', desc: '沉淀售前疑虑与风险话术', required: false },
+    { type: 'copy_asset' as const, label: '历史文案', desc: '复用表达风格与活动素材', required: false },
+  ].map((item) => {
+    const list = materials.filter((m) => m.type === item.type)
+    return { ...item, count: list.length, ready: list.length > 0 }
+  })
+  const readyTypeCount = materialTypeStats.filter((item) => item.ready).length
+  const requiredReady = materialTypeStats.filter((item) => item.required).every((item) => item.ready)
+  const reviewSamples = materials.reduce((sum, item) => sum + (item.reviewCount || 0), 0)
+  const riskMaterials = materials.filter((item) => item.sensitivity !== 'normal' || item.aiStatus === 'need_review')
+  const assetReadiness = Math.round(((readyTypeCount / materialTypeStats.length) * 0.5 + (requiredReady ? 0.3 : 0) + (riskMaterials.length === 0 ? 0.2 : 0.05)) * 100)
+  const assetPath = [
+    { icon: Database, label: '资料结构化', value: `${materials.length} 份`, desc: '统一评论、参数、客服和文案素材' },
+    { icon: Sparkles, label: '任务输入', value: `${readyTypeCount}/4 类`, desc: '自动关联到岗位任务卡' },
+    { icon: ShieldCheck, label: '质量准入', value: riskMaterials.length === 0 ? '可用' : `${riskMaterials.length} 待复核`, desc: '标记脱敏与人工复核风险' },
+    { icon: Package, label: '资产沉淀', value: requiredReady ? '可推进' : '待补齐', desc: '进入 Work Kit 的资料结构模板' },
+  ]
+
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl">
+      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute right-[-80px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
+        <div className="relative grid lg:grid-cols-[0.95fr_1.05fr] gap-7">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+              <GitBranch className="w-3.5 h-3.5" />
+              Material Asset Hub
+            </div>
+            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把原始资料整理成可复用分析资产</h1>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-xl">
+              资料库不只是上传入口。它会把竞品评论、商品参数、客服记录和历史文案结构化，自动关联到岗位任务，并在最终 Work Kit 中沉淀为下一次项目可复用的资料模板。
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {assetPath.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <item.icon className="w-4 h-4 text-accent-500" />
+                  <span className="font-mono text-[11px] text-accent-600">{item.value}</span>
+                </div>
+                <div className="text-[12px] font-medium text-text-main">{item.label}</div>
+                <div className="text-[10px] text-text-muted mt-1">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="relative mt-5 rounded-[24px] border border-accent-500/15 bg-accent-500/[0.035] p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div>
+              <div className="text-[13px] font-medium text-text-main">资料资产化就绪度</div>
+              <div className="text-[11px] text-text-muted mt-1">核心资料越完整，任务卡生成和 Work Kit 复用越稳定</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[32px] font-light leading-none text-text-main">{assetReadiness}%</div>
+              <div className="text-[10px] text-text-muted mt-1">{reviewSamples || competitors.reduce((sum, item) => sum + item.reviewCount, 0)} 条评论样本</div>
+            </div>
+          </div>
+          <div className="h-2 rounded-full bg-bg-primary overflow-hidden">
+            <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${assetReadiness}%` }} />
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-start justify-between mb-10">
         <div>
-          <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-2">资料库</h1>
-          <p className="text-[13px] text-text-secondary max-w-sm leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录。</p>
+          <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mb-2">资料库</h2>
+          <p className="text-[13px] text-text-secondary max-w-md leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录与历史文案会被转化为岗位任务输入。</p>
         </div>
         <Link to={`/tasks/${projectSlug}`} className="btn-primary">下一步：任务卡 <ArrowRight className="w-4 h-4" /></Link>
       </div>
 
+      <div className="grid md:grid-cols-4 gap-3 mb-8">
+        {materialTypeStats.map((item) => {
+          const Icon = typeIcons[item.type] || FileSpreadsheet
+          return (
+            <div key={item.type} className={`rounded-2xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : item.required ? 'border-warning/20 bg-warning-soft' : 'border-border-light bg-bg-surface'}`}>
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <Icon className={`w-4 h-4 ${item.ready ? 'text-success' : item.required ? 'text-warning' : 'text-text-muted'}`} />
+                <span className="text-[20px] font-light text-text-main leading-none">{item.count}</span>
+              </div>
+              <div className="text-[12px] font-medium text-text-main">{item.label}</div>
+              <p className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</p>
+              <div className="mt-3 text-[10px] font-medium">
+                {item.ready ? <span className="text-success">已覆盖</span> : item.required ? <span className="text-warning">建议优先补齐</span> : <span className="text-text-muted">可选增强</span>}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
       {/* Upload */}
-      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-[24px] p-8 text-center mb-10 transition-all cursor-pointer group ${uploading ? 'border-accent-300 bg-accent-500/10/20' : 'border-border-default hover:border-accent-300 hover:bg-accent-500/10/20'}`}>
+      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-[24px] p-8 text-center mb-10 transition-all cursor-pointer group ${uploading ? 'border-accent-300 bg-accent-500/[0.08]' : 'border-border-default hover:border-accent-300 hover:bg-accent-500/[0.08]'}`}>
         <div className="w-14 h-14 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
           {uploading ? (
             <div className="w-6 h-6 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />

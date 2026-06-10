@@ -17,6 +17,14 @@ function readValidationState(): Record<string, Record<string, ValidationDecision
   }
 }
 
+function readLearningRecords(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_prelearning_records') || '[]')
+  } catch {
+    return []
+  }
+}
+
 function buildValidationRows(kit: WorkKit) {
   const hasCopy = kit.includedRoles.includes('copywriting')
   const hasService = kit.includedRoles.includes('customer_service')
@@ -61,6 +69,7 @@ export default function Archive() {
   const [searchText, setSearchText] = useState('')
   const [kits] = useState(getWorkKits())
   const [validationRuns, setValidationRuns] = useState<Record<string, Record<string, ValidationDecision>>>(readValidationState)
+  const [learningRecords] = useState(readLearningRecords)
   const [draftValidation, setDraftValidation] = useState<Record<string, ValidationDecision>>({})
   const { showToast } = useToast()
   const [editKit, setEditKit] = useState<WorkKit | null>(null)
@@ -72,6 +81,14 @@ export default function Archive() {
   const allTags = [...new Set(kits.flatMap((k) => k.tags))]
   const totalReuse = kits.reduce((s, k) => s + k.reuseCount, 0)
   const validatedCount = Object.keys(validationRuns).length
+  const learningCount = learningRecords.length
+  const avgRating = kits.length > 0 ? (kits.reduce((s, k) => s + k.rating, 0) / kits.length).toFixed(1) : '0.0'
+  const avgLearningPercent = learningCount > 0
+    ? Math.round(learningRecords.reduce((sum, record) => sum + (record.learningPercent ?? 0), 0) / learningCount)
+    : 0
+  const avgSaving = learningCount > 0
+    ? Math.round(learningRecords.reduce((sum, record) => sum + (record.estimatedSaving ?? 0), 0) / learningCount)
+    : 0
 
   const openValidation = (id: string) => {
     const kit = kits.find((k) => k.id === id)
@@ -108,7 +125,7 @@ export default function Archive() {
   const successKits = kits.filter((k) => k.rating >= 4.8)
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl">
       {/* Knowledge Base Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
@@ -122,12 +139,13 @@ export default function Archive() {
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {[
           { icon: Package, value: String(kits.length), label: 'Work Kit 模板', sub: '可复用分析流程' },
           { icon: TrendingUp, value: String(totalReuse), label: '累计复用次数', sub: '跨项目经验传承' },
           { icon: Star, value: String(successKits.length), label: '已验证成功案例', sub: `评分 ≥ 4.8` },
           { icon: ShieldCheck, value: String(validatedCount), label: '对比验证记录', sub: '保留/修订决策' },
+          { icon: BookOpen, value: String(learningCount), label: '启动前学习', sub: `平均评分 ${avgRating}` },
         ].map((s) => (
           <div key={s.label} className="card-surface rounded-2xl p-5 flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
@@ -140,6 +158,60 @@ export default function Archive() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="card-surface rounded-[28px] p-6 mb-8 overflow-hidden relative">
+        <div className="absolute -right-16 -top-20 w-56 h-56 rounded-full bg-ai-400/6" />
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
+          <div>
+            <div className="text-[11px] font-semibold text-ai-400 uppercase tracking-[0.08em] mb-2">Experience Loop · 经验传承轨迹</div>
+            <h2 className="text-[22px] font-medium text-text-main mb-2">从一次分析到下一次启动</h2>
+            <p className="text-[13px] text-text-muted leading-relaxed">
+              这里记录 Work Kit 被学习、复用和验证的过程。团队不只保存结果，还能看见哪些经验正在被下一次项目吸收。
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {[
+              ['学习记录', `${learningCount} 条`, '启动前学习包的使用痕迹'],
+              ['复用强度', `${totalReuse} 次`, '模板被再次用于项目'],
+              ['平均学习', `${avgLearningPercent}%`, avgLearningPercent ? `预计节省 ${avgSaving}%` : '等待复用记录'],
+            ].map(([label, value, sub]) => (
+              <div key={label} className="rounded-2xl bg-bg-primary/70 border border-border-light p-4">
+                <div className="text-[24px] font-light text-text-main leading-none mb-2">{value}</div>
+                <div className="text-[12px] font-medium text-text-main">{label}</div>
+                <div className="text-[10px] text-text-muted mt-1">{sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {learningRecords.length > 0 && (
+          <div className="relative mt-5 grid md:grid-cols-2 gap-3">
+            {learningRecords.slice(0, 4).map((record, index) => (
+              <div key={`${record.projectId}-${index}`} className="rounded-2xl border border-border-light bg-bg-primary/60 p-4">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="text-[13px] font-medium text-text-main truncate">{record.projectName}</div>
+                  <span className="tag bg-ai-400/10 text-ai-400">学习包</span>
+                </div>
+                <p className="text-[11px] text-text-muted mb-2">来自 {record.workKitName}</p>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {[
+                    ['学习', `${record.learningPercent ?? Math.round(((record.learnedIds || []).length / Math.max((record.learnedIds || []).length, 1)) * 100)}%`],
+                    ['节省', record.estimatedSaving ? `${record.estimatedSaving}%` : '待评估'],
+                    ['任务', record.plannedTaskCount ? `${record.plannedTaskCount}张` : `${(record.learnedIds || []).length}项`],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-2">
+                      <div className="text-[13px] font-medium text-text-main leading-none">{value}</div>
+                      <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-2">
+                  {(record.summary || []).join(' / ') || '暂无学习笔记'}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Validation console — 纪要建议：固定流程 + 小智能体对比 */}
@@ -283,6 +355,7 @@ export default function Archive() {
           {filteredKits.map((wk) => {
             const showHistory = expandedHistory[wk.id] ?? false
             const sourceProject = getProjects().find((p) => p.id === wk.basedOnProjectId)
+            const kitLearningRecords = learningRecords.filter((record) => record.workKitId === wk.id)
             return (
               <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden animate-fade-in-up">
                 <div className="p-6 pb-0">
@@ -377,6 +450,44 @@ export default function Archive() {
                     </div>
                   </div>
                 </div>
+
+                {kitLearningRecords.length > 0 && (
+                  <div className="mx-6 mt-4 rounded-2xl border border-ai-400/15 bg-ai-400/[0.04] p-4">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-ai-400" />
+                        <span className="text-[12px] font-semibold text-text-main">最近学习与复用</span>
+                      </div>
+                  <span className="text-[10px] text-ai-400">{kitLearningRecords.length} 条记录</span>
+                </div>
+                    {kitLearningRecords.some((record) => record.estimatedSaving || record.learningPercent) && (
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {[
+                          ['平均学习', `${Math.round(kitLearningRecords.reduce((sum, record) => sum + (record.learningPercent ?? 0), 0) / kitLearningRecords.length)}%`],
+                          ['预计节省', `${Math.round(kitLearningRecords.reduce((sum, record) => sum + (record.estimatedSaving ?? 0), 0) / kitLearningRecords.length)}%`],
+                          ['计划任务', `${kitLearningRecords.reduce((sum, record) => sum + (record.plannedTaskCount ?? 0), 0)}张`],
+                        ].map(([label, value]) => (
+                          <div key={label} className="rounded-xl bg-bg-surface/75 border border-border-light p-3">
+                            <div className="text-[16px] font-light text-text-main leading-none">{value}</div>
+                            <div className="text-[10px] text-text-muted mt-1">{label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="grid md:grid-cols-2 gap-2">
+                      {kitLearningRecords.slice(0, 2).map((record, index) => (
+                        <div key={`${record.projectId}-${index}`} className="rounded-xl bg-bg-surface/75 border border-border-light p-3">
+                          <div className="text-[12px] font-medium text-text-main truncate">{record.projectName}</div>
+                          <div className="text-[10px] text-text-muted mt-1">
+                            {record.learningPercent ? `学习 ${record.learningPercent}%` : `${(record.learnedIds || []).length} 个学习项`}
+                            {record.estimatedSaving ? ` · 预计节省 ${record.estimatedSaving}%` : ''}
+                            {record.plannedTaskCount ? ` · ${record.plannedTaskCount} 张任务` : ''}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Footer */}
                 <div className="px-6 py-4 mt-5 bg-white/[0.03] border-t border-border-light flex items-center justify-between">

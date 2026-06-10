@@ -162,6 +162,20 @@ export default function CreateProject() {
   const plannedTaskCount = workKit
     ? workKit.sections.filter((section) => roles.some((role) => role.checked && role.role === section.role)).length
     : roles.filter((role) => role.checked).length
+  const selectedRoleCount = roles.filter((role) => role.checked).length
+  const launchAssets = workKit
+    ? [
+        { label: '继承任务模板', value: `${plannedTaskCount} 张`, desc: '从历史 Work Kit 复用岗位任务结构' },
+        { label: '启动前学习', value: `${learnedCount}/${learningItems.length}`, desc: '记录已学习内容并写入任务 Prompt' },
+        { label: '预计节省', value: `${Math.min(70, 30 + learnedCount * 8)}%`, desc: '减少重复定义资料、Prompt 与输出格式' },
+        { label: '后续沉淀', value: '新版 Work Kit', desc: '本次复用结果可回流为模板迭代' },
+      ]
+    : [
+        { label: '岗位任务', value: `${selectedRoleCount} 张`, desc: '创建后自动生成岗位分析卡' },
+        { label: '资料结构', value: '待导入', desc: '资料库会沉淀评论、参数、客服和文案结构' },
+        { label: '协作闭环', value: '报告复核', desc: '岗位结果汇总为可编辑策略报告' },
+        { label: '最终资产', value: 'Work Kit', desc: '完成验证后保存为下一次可复用工作包' },
+      ]
 
   const toggleLearned = (id: string) => {
     setLearnedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
@@ -231,6 +245,9 @@ export default function CreateProject() {
           learnedIds,
           notes: learningNotes,
           summary: learningSummary,
+          plannedTaskCount,
+          learningPercent,
+          estimatedSaving: Math.min(70, 30 + learnedCount * 8),
           createdAt: new Date().toISOString(),
         })
         localStorage.setItem('promokit_prelearning_records', JSON.stringify(records.slice(0, 30)))
@@ -313,9 +330,38 @@ export default function CreateProject() {
         </p>
       </div>
 
+      <div className="mb-8 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute right-[-120px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-4">
+              <GitBranch className="w-3.5 h-3.5" />
+              Launch to Asset
+            </div>
+            <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mb-3">
+              {workKit ? '从历史成功案例启动新项目' : '从项目创建开始规划资产沉淀'}
+            </h2>
+            <p className="text-[13px] text-text-secondary leading-relaxed max-w-xl">
+              {workKit
+                ? '复用不是复制旧结论，而是继承资料结构、任务框架和验证经验，再结合新活动重新判断。'
+                : '每个新项目都会沿着资料、任务、工作台、报告、资产库的链路推进，最终沉淀成团队下一次能直接学习的 Work Kit。'}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {launchAssets.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+                <div className="text-[22px] font-light text-text-main leading-none mb-2">{item.value}</div>
+                <div className="text-[12px] font-medium text-text-main">{item.label}</div>
+                <div className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Template info card (persistent in template mode) */}
       {workKit && (
-        <div className="grid grid-cols-[1.05fr_0.95fr] gap-6 mb-10">
+        <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-6 mb-10">
           <div className="card-surface rounded-[28px] p-6 overflow-hidden relative">
             <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-accent-500/5" />
             <div className="relative flex items-start gap-4 mb-6">
@@ -379,7 +425,7 @@ export default function CreateProject() {
               <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${learningPercent}%` }} />
             </div>
 
-            <div className="grid grid-cols-[0.78fr_1.22fr] gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-[0.78fr_1.22fr] gap-4">
               <div className="space-y-2">
                 {learningItems.map((item, index) => {
                   const Icon = item.icon
@@ -477,7 +523,7 @@ export default function CreateProject() {
         </div>
       )}
 
-      <div className={workKit ? 'grid grid-cols-[220px_1fr] gap-8 items-start' : ''}>
+      <div className={workKit ? 'grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 items-start' : ''}>
         {/* Step dots */}
         <div className={workKit ? 'card-surface rounded-[24px] p-4 sticky top-6' : 'flex items-center gap-3 mb-12'}>
           {steps.map((label, i) => (

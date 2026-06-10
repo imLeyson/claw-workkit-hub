@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Target, Trash2, RotateCcw, Pencil, X } from 'lucide-react'
+import { ArrowRight, Target, Trash2, RotateCcw, Pencil, X, Package, BookOpen, GitBranch, Sparkles, Database, ClipboardCheck, ShieldCheck } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getTasks, getAIResult, getWorkKits, deleteProject, resetAllData, updateProject } from '../services/db'
+import { getProjects, getTasks, getAIResult, getWorkKits, getMaterials, deleteProject, resetAllData, updateProject } from '../services/db'
 import type { Project } from '../types'
 
 export default function Dashboard() {
@@ -57,16 +57,118 @@ export default function Dashboard() {
   const totalReviews = projects.reduce((s, p) => s + p.competitors.reduce((a, c) => a + c.reviewCount, 0), 0)
   const allTasks = projects.flatMap((p) => getTasks(p.id))
   const submittedTasks = allTasks.filter((t) => getAIResult(t.id)?.submitted).length
+  const workKits = getWorkKits()
+  const learningRecords = (() => {
+    try { return JSON.parse(localStorage.getItem('promokit_prelearning_records') || '[]') as any[] }
+    catch { return [] }
+  })()
+  const completedProjects = projects.filter((p) => p.status === 'completed').length
+  const assetizedProjects = new Set(workKits.map((kit) => kit.basedOnProjectId)).size
+  const assetizationRate = completedProjects > 0 ? Math.round((assetizedProjects / completedProjects) * 100) : 0
+  const reuseTotal = workKits.reduce((sum, kit) => sum + kit.reuseCount, 0)
   const firstSlug = projects[0]?.slug || '618-hair-dryer'
+  const actionQueue = projects.map((project) => {
+    const tasks = getTasks(project.id)
+    const materials = getMaterials(project.id)
+    const submitted = tasks.filter((task) => getAIResult(task.id)?.submitted).length
+    const generated = tasks.filter((task) => Boolean(getAIResult(task.id)?.generatedAt)).length
+    const hasKit = workKits.some((kit) => kit.basedOnProjectId === project.id)
+    const pct = tasks.length > 0 ? Math.round((submitted / tasks.length) * 100) : 0
+
+    if (materials.length === 0) {
+      return {
+        project,
+        icon: Database,
+        tone: 'warning',
+        title: '补齐资料结构',
+        desc: '先导入竞品评论、商品参数等资料，任务卡才能形成可信输入。',
+        to: `/materials/${project.slug}`,
+        meta: '资料缺口',
+      }
+    }
+    if (generated < tasks.length) {
+      return {
+        project,
+        icon: Sparkles,
+        tone: 'accent',
+        title: '生成岗位分析',
+        desc: `还有 ${Math.max(tasks.length - generated, 0)} 个岗位任务需要进入工作台生成结果。`,
+        to: `/tasks/${project.slug}`,
+        meta: `${generated}/${tasks.length} 已生成`,
+      }
+    }
+    if (submitted < tasks.length) {
+      return {
+        project,
+        icon: ClipboardCheck,
+        tone: 'ai',
+        title: '提交到策略报告',
+        desc: `已生成的岗位结果需要提交到报告，当前提交进度 ${submitted}/${tasks.length}。`,
+        to: `/report/${project.slug}`,
+        meta: `${pct}% 报告进度`,
+      }
+    }
+    if (!hasKit) {
+      return {
+        project,
+        icon: Package,
+        tone: 'kit',
+        title: '发布 Work Kit',
+        desc: '报告已具备沉淀条件，建议完成发布前检查并保存为复用工作包。',
+        to: `/report/${project.slug}`,
+        meta: '待资产化',
+      }
+    }
+    return {
+      project,
+      icon: ShieldCheck,
+      tone: 'success',
+      title: '补充复用验证',
+      desc: '项目已沉淀为资产，建议进入资产库记录保留/修订结论。',
+      to: '/archive',
+      meta: '已资产化',
+    }
+  }).slice(0, 4)
 
   return (
     <div className="max-w-5xl">
+      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute right-[-90px] top-[-140px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
+        <div className="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-7 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+              <GitBranch className="w-3.5 h-3.5" />
+              分析资产化闭环
+            </div>
+            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把每一次分析变成下一次可复用的起点</h1>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-2xl">
+              看板现在追踪项目执行、报告沉淀、Work Kit 复用和启动前学习记录，帮助团队判断经验是否真的被传承，而不只是完成了一份报告。
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { icon: Package, value: `${assetizationRate}%`, label: '项目资产化率', sub: `${assetizedProjects}/${Math.max(completedProjects, 1)} 个完成项目已沉淀` },
+              { icon: BookOpen, value: String(learningRecords.length), label: '启动前学习', sub: '学习包使用记录' },
+              { icon: Sparkles, value: String(reuseTotal), label: '模板复用', sub: 'Work Kit 累计复用' },
+              { icon: GitBranch, value: String(workKits.length), label: '经验资产', sub: '可复用工作包' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-4">
+                <item.icon className="w-4 h-4 text-accent-500 mb-3" />
+                <div className="text-[24px] font-light text-text-main leading-none mb-1">{item.value}</div>
+                <div className="text-[11px] font-medium text-text-main">{item.label}</div>
+                <div className="text-[10px] text-text-muted mt-1">{item.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10 lg:mb-14">
         {[
           { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: `/materials/${firstSlug}` },
           { value: totalReviews.toLocaleString(), label: '评论样本', sub: '全项目聚合数据', to: `/materials/${firstSlug}` },
           { value: `${submittedTasks}/${allTasks.length}`, label: '分析任务', sub: '已提交 / 总量', to: `/tasks/${firstSlug}` },
-          { value: String(getWorkKits().length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
+          { value: String(workKits.length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
         ].map((s) => (
           <Link key={s.label} to={s.to} className="card-surface rounded-2xl p-6 card-hover">
             <div className="text-[36px] font-light tracking-[-0.03em] text-text-main leading-none mb-2">{s.value}</div>
@@ -75,6 +177,48 @@ export default function Dashboard() {
             <div className="text-[11px] text-text-muted">{s.sub}</div>
           </Link>
         ))}
+      </div>
+
+      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+          <div>
+            <span className="section-title">Next Best Actions</span>
+            <h2 className="text-[20px] font-medium text-text-main mt-2">资产化下一步行动队列</h2>
+            <p className="text-[13px] text-text-muted mt-1">按资料、任务、报告和 Work Kit 状态自动判断每个项目下一步该做什么。</p>
+          </div>
+          <Link to="/archive" className="btn-ghost text-[12px]">
+            查看资产库 <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="grid md:grid-cols-2 gap-3">
+          {actionQueue.map((item) => {
+            const toneClass = {
+              warning: 'bg-warning-soft text-warning border-warning/20',
+              accent: 'bg-accent-500/10 text-accent-600 border-accent-500/20',
+              ai: 'bg-ai-400/10 text-ai-400 border-ai-400/20',
+              kit: 'bg-kit-50 text-kit-600 border-kit-600/20',
+              success: 'bg-success-soft text-success border-success/20',
+            }[item.tone]
+            return (
+              <Link key={item.project.id} to={item.to} className="rounded-2xl border border-border-light bg-bg-primary/50 p-4 hover:border-accent-500/25 transition-colors">
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${toneClass}`}>
+                    <item.icon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3 mb-1">
+                      <div className="text-[13px] font-medium text-text-main truncate">{item.title}</div>
+                      <span className="text-[10px] text-text-muted shrink-0">{item.meta}</span>
+                    </div>
+                    <div className="text-[12px] text-text-secondary truncate mb-1">{item.project.name}</div>
+                    <p className="text-[11px] text-text-muted leading-relaxed">{item.desc}</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-text-muted shrink-0 mt-1" />
+                </div>
+              </Link>
+            )
+          })}
+        </div>
       </div>
 
       <div className="flex items-center justify-between mb-5">
@@ -98,7 +242,7 @@ export default function Dashboard() {
                 {p.status === 'in_progress' && <div className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full bg-accent-500" />}
                 <div className={`p-6 flex-1 ${p.status === 'in_progress' ? 'pt-7' : ''}`}>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-white/3 px-2 py-1 rounded-md">{p.category}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-white/[0.03] px-2 py-1 rounded-md">{p.category}</span>
                     {p.status === 'in_progress' && <span className="w-[6px] h-[6px] rounded-full bg-accent-500 pulse-dot" />}
                     {p.status === 'completed' && <span className="w-[6px] h-[6px] rounded-full bg-success" />}
                   </div>
@@ -115,7 +259,7 @@ export default function Dashboard() {
                     <span>{p.createdAt}</span>
                   </div>
                 </div>
-                <div className="px-6 py-3 bg-white/3/50 border-t border-border-light flex items-center justify-between">
+                <div className="px-6 py-3 bg-white/[0.03]/50 border-t border-border-light flex items-center justify-between">
                   <span className="text-[11px] text-text-muted">{p.team.map((t) => roleLabels[t.role]).join(' · ')}</span>
                   <span className="text-[11px] font-medium text-accent-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                     {p.status === 'in_progress' ? '进入' : p.status === 'completed' ? '查看' : '开始'}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag, BookOpen, Link2, ShieldCheck, Check, MinusCircle, Edit3, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Sparkles, CheckCircle2, RotateCcw, Flag, ThumbsUp, X, ShoppingBag, BookOpen, Link2, ShieldCheck, Check, MinusCircle, Edit3, Plus, Trash2, Package, ArrowRight } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjectBySlug, getTasks, getAIResult, getMaterials, getWorkKits, saveAIResult, updateTask } from '../services/db'
 import { useToast } from '../components/Toast'
@@ -414,9 +414,9 @@ export default function Workspace() {
         )}
       </div>
 
-      <div className="grid grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         {/* Sidebar context */}
-        <div className="col-span-3 space-y-6 bg-white/[0.03] rounded-[24px] p-5 -m-2">
+        <div className="lg:col-span-3 space-y-6 bg-white/[0.03] rounded-[24px] p-5 lg:-m-2">
           <div>
             <span className="section-title">竞品数据</span>
             <div className="mt-3 space-y-2">
@@ -500,7 +500,7 @@ export default function Workspace() {
         </div>
 
         {/* Main content */}
-        <div className="col-span-9">
+        <div className="lg:col-span-9 min-w-0">
           {!showResult && !generating && (
             <div className="card-surface rounded-[24px] p-16 text-center">
               <div className="w-16 h-16 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-6">
@@ -532,7 +532,7 @@ export default function Workspace() {
             <div className="space-y-6">
               <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
                 <div className="absolute right-0 top-0 w-36 h-36 rounded-full bg-accent-500/5 translate-x-12 -translate-y-16" />
-                <div className="relative flex items-start justify-between gap-8">
+                <div className="relative flex flex-col xl:flex-row xl:items-start justify-between gap-5 xl:gap-8">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <ShieldCheck className="w-4 h-4 text-accent-500" />
@@ -543,7 +543,7 @@ export default function Workspace() {
                       系统将公司知识库、成功案例与市场竞品资料并行对比，保留可复用判断，标记需要人工复核或更新的内容。
                     </p>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 shrink-0 w-[300px]">
+                  <div className="grid grid-cols-3 gap-2 shrink-0 w-full xl:w-[300px]">
                     {[
                       ['采纳知识', `${adoptedRecommendations.length} 项`],
                       ['验证来源', `${reviewMats.length} 个竞品`],
@@ -556,7 +556,7 @@ export default function Workspace() {
                     ))}
                   </div>
                 </div>
-                <div className="relative grid grid-cols-2 gap-3 mt-5">
+                <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
                   {adoptedRecommendations.slice(0, 4).map((item) => (
                     <div key={item.id} className="rounded-2xl border border-border-light bg-bg-primary/70 p-3">
                       <div className="flex items-center gap-2 mb-1.5">
@@ -648,7 +648,7 @@ export default function Workspace() {
                           </table>
                           <button
                             onClick={() => handleMatrixAddRow(i)}
-                            className="mt-3 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                            className="mt-3 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                           >
                             <Plus className="w-3.5 h-3.5" /> 添加行
                           </button>
@@ -699,7 +699,7 @@ export default function Workspace() {
                           ))}
                           <button
                             onClick={() => handleListAddItem(i)}
-                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                           >
                             <Plus className="w-3.5 h-3.5" /> 添加项
                           </button>
@@ -740,7 +740,7 @@ export default function Workspace() {
                           ))}
                           <button
                             onClick={() => handleListAddItem(i)}
-                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                           >
                             <Plus className="w-3.5 h-3.5" /> 添加项
                           </button>
@@ -762,7 +762,7 @@ export default function Workspace() {
                       {workspaceEditMode ? (
                         <div className="space-y-4">
                           {section.qa.map((item, j) => (
-                            <div key={j} className="bg-white/3 rounded-2xl p-4 border border-border-light relative group">
+                            <div key={j} className="bg-white/[0.03] rounded-2xl p-4 border border-border-light relative group">
                               <button
                                 onClick={() => handleQADelete(i, j)}
                                 className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
@@ -793,7 +793,7 @@ export default function Workspace() {
                           ))}
                           <button
                             onClick={() => handleQAAdd(i)}
-                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                           >
                             <Plus className="w-3.5 h-3.5" /> 添加问答对
                           </button>
@@ -816,7 +816,7 @@ export default function Workspace() {
                       {workspaceEditMode ? (
                         <div className="space-y-4">
                           {section.quotes.map((q, j) => (
-                            <div key={j} className="bg-white/3 rounded-xl p-4 border border-border-light relative group">
+                            <div key={j} className="bg-white/[0.03] rounded-xl p-4 border border-border-light relative group">
                               <button
                                 onClick={() => handleQuoteDelete(i, j)}
                                 className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
@@ -847,7 +847,7 @@ export default function Workspace() {
                           ))}
                           <button
                             onClick={() => handleQuoteAdd(i)}
-                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                            className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                           >
                             <Plus className="w-3.5 h-3.5" /> 添加原话引用
                           </button>
@@ -885,21 +885,41 @@ export default function Workspace() {
               ))}
 
               {submitted && (
-                <div className="card-surface rounded-[24px] p-6 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-success-soft flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-success" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-[14px] font-medium text-success">已提交到策略报告</p>
-                    <p className="text-[12px] text-text-muted">该分析结果已汇入报告，可在报告页查看。</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button onClick={handleRetract} className="btn-ghost text-[12px] hover:text-error hover:bg-error-soft">
-                      撤回提交
-                    </button>
-                    <Link to={`/tasks/${projectSlug}`} className="btn-primary-filled text-[12px]">
-                      继续其他任务 →
-                    </Link>
+                <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
+                  <div className="absolute right-[-70px] top-[-100px] w-52 h-52 rounded-full bg-success/8" />
+                  <div className="relative flex flex-col lg:flex-row lg:items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-success-soft flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-success" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[15px] font-medium text-text-main mb-1">已进入报告与资产沉淀链路</p>
+                      <p className="text-[12px] text-text-muted leading-relaxed">
+                        该分析结果已汇入策略报告。补齐其他岗位后，可在报告页完成验证并发布为下一次项目可学习的 Work Kit。
+                      </p>
+                      <div className="grid sm:grid-cols-3 gap-2 mt-4">
+                        {[
+                          ['结果状态', '已提交'],
+                          ['资产内容', `${(aiSections || currentResult.sections || []).length} 个区块`],
+                          ['下一步', '报告复核'],
+                        ].map(([label, value]) => (
+                          <div key={label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-3">
+                            <div className="text-[13px] font-medium text-text-main">{value}</div>
+                            <div className="text-[10px] text-text-muted mt-1">{label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 shrink-0 w-full lg:w-auto">
+                      <Link to={`/report/${projectSlug}`} className="btn-primary-filled text-[12px] justify-center">
+                        <Package className="w-4 h-4" /> 去发布 Work Kit
+                      </Link>
+                      <Link to={`/tasks/${projectSlug}`} className="btn-primary text-[12px] justify-center">
+                        继续其他任务 <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                      <button onClick={handleRetract} className="btn-ghost text-[12px] hover:text-error hover:bg-error-soft">
+                        撤回提交
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

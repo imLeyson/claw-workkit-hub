@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, PlusCircle, FolderOpen, LayoutGrid, BarChart3,
-  Archive, Menu, X,
+  Archive, Menu, X, Sparkles, Package, Bot,
 } from 'lucide-react'
 import Logo from './Logo'
+import { getProjectBySlug, getTasks, getWorkKits } from '../services/db'
 
 function isInFlow(pathname: string) {
   return ['/materials', '/tasks', '/workspace', '/report'].some((p) => pathname.startsWith(p))
@@ -16,6 +17,12 @@ function extractSlug(pathname: string): string {
   return '618-hair-dryer'
 }
 
+function extractTaskId(pathname: string): string | undefined {
+  const parts = pathname.split('/').filter(Boolean)
+  if (parts[0] === 'workspace' && parts.length >= 3) return parts[2]
+  return undefined
+}
+
 export default function Sidebar() {
   const location = useLocation()
   const pathname = location.pathname
@@ -23,6 +30,19 @@ export default function Sidebar() {
   const slug = extractSlug(pathname)
   const [expanded, setExpanded] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const project = inFlow ? getProjectBySlug(slug) : undefined
+  const tasks = project ? getTasks(project.id) : []
+  const taskId = extractTaskId(pathname) || tasks[0]?.id
+  const workspacePath = taskId ? `/workspace/${slug}/${taskId}` : `/tasks/${slug}`
+  const submittedCount = tasks.filter((task) => task.status === 'submitted').length
+  const existingKit = project ? getWorkKits().find((kit) => kit.basedOnProjectId === project.id) : undefined
+  const flowSteps = [
+    { path: `/materials/${slug}`, label: '资料', value: project ? '原料' : '入口', done: project ? true : false },
+    { path: `/tasks/${slug}`, label: '任务', value: tasks.length ? `${tasks.length}张` : '待生成', done: tasks.length > 0 },
+    { path: workspacePath, match: `/workspace/${slug}`, label: '工作台', value: submittedCount ? `${submittedCount}项` : '分析', done: submittedCount > 0 },
+    { path: `/report/${slug}`, label: '报告', value: submittedCount ? '复核' : '待提交', done: submittedCount === tasks.length && tasks.length > 0 },
+    { path: '/archive', label: '资产', value: existingKit?.version || '沉淀', done: Boolean(existingKit) },
+  ]
 
   const links = [
     { to: '/', label: '看板', icon: LayoutDashboard, end: true },
@@ -96,13 +116,62 @@ export default function Sidebar() {
             </NavLink>
           )
         })}
+
+        {inFlow && (
+          <div className={`mt-5 pt-5 border-t border-white/[0.06] transition-all duration-200 overflow-hidden ${expanded ? 'opacity-100 max-h-[360px]' : 'opacity-0 max-h-0'}`}>
+            <div className="px-[10px] mb-3">
+              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/35">
+                <Sparkles className="w-3 h-3 text-accent-500" />
+                Asset Flow
+              </div>
+              <div className="text-[11px] text-white/60 mt-1 truncate">{project?.name || '当前项目'}</div>
+            </div>
+            <div className="space-y-1.5">
+              {flowSteps.map((step, index) => {
+                const active = step.path === '/archive' ? pathname.startsWith('/archive') : pathname.startsWith(step.match || step.path)
+                return (
+                  <NavLink
+                    key={step.label}
+                    to={step.path}
+                    className={`group flex items-center gap-2 rounded-xl px-[10px] py-2 transition-colors ${
+                      active ? 'bg-accent-500/15 text-white' : 'text-white/45 hover:bg-white/[0.05] hover:text-white/75'
+                    }`}
+                  >
+                    <div className={`relative w-5 h-5 rounded-full border flex items-center justify-center text-[10px] shrink-0 ${
+                      step.done ? 'border-accent-500 bg-accent-500 text-sidebar' : active ? 'border-accent-500 text-accent-500' : 'border-white/15 text-white/35'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] font-medium truncate">{step.label}</div>
+                      <div className="text-[9px] text-white/30 truncate">{step.value}</div>
+                    </div>
+                  </NavLink>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Bottom status */}
       <div className="px-[10px] pb-4">
         <div className={`border-t border-white/[0.06] pt-3 transition-opacity ${expanded ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="mb-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Package className="w-3.5 h-3.5 text-accent-500" />
+              <span className="text-[11px] font-medium text-white/75 whitespace-nowrap">目标：分析资产化</span>
+            </div>
+            <p className="text-[10px] text-white/35 leading-relaxed">
+              把资料、任务、报告和验证结果沉淀成下一次可复用的 Work Kit。
+            </p>
+            <div className="mt-3 flex items-center justify-between text-[9px] text-white/30">
+              <span>Work Kit</span>
+              <span>{getWorkKits().length} 个资产</span>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
-            <div className="w-[6px] h-[6px] rounded-full bg-accent-500" />
+            <Bot className="w-3.5 h-3.5 text-accent-500" />
             <span className="text-[11px] text-white/40 whitespace-nowrap">PromoKit AI</span>
           </div>
           <div className="text-[10px] text-white/25 mt-1 whitespace-nowrap">电商大促 AI 工作包系统</div>

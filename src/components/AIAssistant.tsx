@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Sparkles, X, Send, Activity, Plus, Flame, MessageSquareText, HelpCircle } from 'lucide-react'
+import { Sparkles, X, Send, Activity, Plus, Flame, MessageSquareText, HelpCircle, PackageCheck } from 'lucide-react'
 import { roleLabels } from '../data/mock'
-import { getProjects, getProjectBySlug, getTasks, getAIResult, addTask, updateTask, getMaterials } from '../services/db'
+import { getProjects, getProjectBySlug, getTasks, getAIResult, addTask, updateTask, getMaterials, getWorkKits } from '../services/db'
 import type { AIResult, Role } from '../types'
 import { useToast } from './Toast'
 
@@ -315,6 +315,72 @@ export default function AIAssistant() {
     streamAIResponse(summary)
   }
 
+  const handleAssetNextStep = () => {
+    if (streaming) return
+    setMessages((prev) => [...prev, { role: 'user', text: '📦 下一步资产化建议' }])
+
+    if (!activeProject) {
+      const kits = getWorkKits()
+      const projects = getProjects()
+      const reusable = kits.filter((kit) => kit.rating >= 4.6).length
+      streamAIResponse(
+        `📦 全局资产化建议：\n\n` +
+        `当前已有 ${projects.length} 个项目、${kits.length} 个 Work Kit，其中 ${reusable} 个适合作为新项目启动模板。\n\n` +
+        `建议下一步：\n` +
+        `1. 如果要启动新项目，优先进入「资产库」选择高评分 Work Kit 复用；\n` +
+        `2. 如果已有项目进行中，打开项目报告页，检查是否已经发布为 Work Kit；\n` +
+        `3. 每次复用后补充学习记录和验证反馈，形成模板迭代历史。\n\n` +
+        `目标不是多做一份报告，而是让下一次大促少走一遍重复路。`
+      )
+      return
+    }
+
+    const mats = getMaterials(activeProject.id)
+    const tasks = getTasks(activeProject.id)
+    const submitted = tasks.filter((task) => getAIResult(task.id)?.submitted)
+    const generated = tasks.filter((task) => Boolean(getAIResult(task.id)?.generatedAt))
+    const existingKit = getWorkKits().find((kit) => kit.basedOnProjectId === activeProject.id)
+    const materialTypes = new Set(mats.map((mat) => mat.type))
+    const missingMaterials = [
+      ['review', '竞品评论'],
+      ['spec', '商品参数'],
+      ['faq', '客服记录'],
+      ['copy_asset', '历史文案'],
+    ].filter(([type]) => !materialTypes.has(type as any)).map(([, label]) => label)
+
+    let next = ''
+    if (mats.length === 0 || !materialTypes.has('review')) {
+      next = `优先补齐资料库，尤其是「竞品评论」。没有真实评论，后面的痛点矩阵和卖点转译会变成空泛判断。`
+    } else if (generated.length < tasks.length) {
+      next = `进入任务卡/工作台，把未生成的岗位任务跑完。当前已生成 ${generated.length}/${tasks.length} 个任务结果。`
+    } else if (submitted.length < tasks.length) {
+      next = `把已生成但未提交的岗位结果提交到报告。当前报告只收到 ${submitted.length}/${tasks.length} 个岗位结果。`
+    } else if (!existingKit) {
+      next = `进入策略报告，完成发布前资产化检查，并点击「发布 Work Kit」。这是把本次分析变成下次资产的关键动作。`
+    } else {
+      next = `当前项目已沉淀为 ${existingKit.version}。建议去资产库补充验证反馈，记录哪些结论应该保留、修订或废弃。`
+    }
+
+    const score = Math.round((
+      (mats.length > 0 ? 25 : 0) +
+      (materialTypes.has('review') ? 15 : 0) +
+      (tasks.length > 0 ? 15 : 0) +
+      (tasks.length ? (generated.length / tasks.length) * 20 : 0) +
+      (tasks.length ? (submitted.length / tasks.length) * 15 : 0) +
+      (existingKit ? 10 : 0)
+    ))
+
+    streamAIResponse(
+      `📦 「${activeProject.name}」资产化诊断：\n\n` +
+      `· 资产化就绪度：${score}%\n` +
+      `· 资料覆盖：${mats.length} 份${missingMaterials.length ? `，缺少 ${missingMaterials.join('、')}` : '，核心类型已覆盖'}\n` +
+      `· 岗位结果：已生成 ${generated.length}/${tasks.length}，已提交 ${submitted.length}/${tasks.length}\n` +
+      `· Work Kit：${existingKit ? `已沉淀 ${existingKit.version}` : '尚未发布'}\n\n` +
+      `建议下一步：${next}\n\n` +
+      `判断标准：只有当资料结构、岗位输出、报告验证和 Work Kit 发布都留下记录，这次分析才真正变成下一次可复用的资产。`
+    )
+  }
+
   // General Page Action Fallback
   const handleGeneralAdvice = (context: string) => {
     if (streaming) return
@@ -436,30 +502,35 @@ export default function AIAssistant() {
   const getActionOptions = (): ActionOption[] => {
     if (activeType === 'dashboard') {
       return [
+        { label: '📦 下一步资产化建议', icon: <PackageCheck className="w-3 h-3 text-accent-500" />, handler: handleAssetNextStep },
         { label: '🔍 智能进度诊断', icon: <Activity className="w-3 h-3 text-accent-500" />, handler: handleDashboardDiagnose },
         { label: '💡 大促策划建议', icon: <HelpCircle className="w-3 h-3 text-accent-500" />, handler: () => handleGeneralAdvice('dashboard') },
       ]
     }
     if (activeType === 'materials') {
       return [
+        { label: '📦 下一步资产化建议', icon: <PackageCheck className="w-3 h-3 text-accent-500" />, handler: handleAssetNextStep },
         { label: '📋 诊断上传完整度', icon: <Activity className="w-3 h-3 text-accent-500" />, handler: handleMaterialsCheck },
         { label: '💡 大促资料推荐', icon: <HelpCircle className="w-3 h-3 text-accent-500" />, handler: () => handleGeneralAdvice('materials') },
       ]
     }
     if (activeType === 'tasks') {
       return [
+        { label: '📦 下一步资产化建议', icon: <PackageCheck className="w-3 h-3 text-accent-500" />, handler: handleAssetNextStep },
         { label: '➕ 智能推荐岗位任务', icon: <Plus className="w-3 h-3 text-accent-500" />, handler: handleRecommendTask },
         { label: '⚡ 批量快速生成说明', icon: <Flame className="w-3 h-3 text-accent-500" />, handler: () => handleGeneralAdvice('tasks') },
       ]
     }
     if (activeType === 'workspace') {
       return [
+        { label: '📦 下一步资产化建议', icon: <PackageCheck className="w-3 h-3 text-accent-500" />, handler: handleAssetNextStep },
         { label: '✨ 提示词指令优化', icon: <Flame className="w-3 h-3 text-accent-500" />, handler: handleOptimizePrompt },
         { label: '📐 自动补全验收标准', icon: <Activity className="w-3 h-3 text-accent-500" />, handler: () => handleGeneralAdvice('workspace') },
       ]
     }
     if (activeType === 'report') {
       return [
+        { label: '📦 下一步资产化建议', icon: <PackageCheck className="w-3 h-3 text-accent-500" />, handler: handleAssetNextStep },
         { label: '📝 提炼核心结论摘要', icon: <MessageSquareText className="w-3 h-3 text-accent-500" />, handler: handleReportSynthesize },
         { label: '📦 快速沉淀为 Work Kit', icon: <HelpCircle className="w-3 h-3 text-accent-500" />, handler: () => handleGeneralAdvice('report') },
       ]
@@ -575,7 +646,7 @@ export default function AIAssistant() {
                         className={`w-full py-2 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                           msg.customAction.applied
                             ? 'bg-success-soft text-success border border-success/20 cursor-default'
-                            : 'bg-accent-500 text-black hover:bg-accent-600 active:scale-98 font-bold'
+                            : 'bg-accent-500 text-black hover:bg-accent-600 active:scale-[0.98] font-bold'
                         }`}
                       >
                         {msg.customAction.applied ? '✓ 已应用成功' : msg.customAction.type === 'add_task' ? '立即注入此任务卡' : '应用此提示词模板'}
@@ -589,7 +660,7 @@ export default function AIAssistant() {
             {/* Typing indicator */}
             {streaming && messages[messages.length - 1]?.role === 'user' && (
               <div className="flex justify-start">
-                <div className="bg-white/3 border border-white/[0.04] rounded-[18px] rounded-tl-none px-4 py-3 flex items-center gap-1.5 shrink-0">
+                <div className="bg-white/[0.03] border border-white/[0.04] rounded-[18px] rounded-tl-none px-4 py-3 flex items-center gap-1.5 shrink-0">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '0ms' }} />
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '300ms' }} />

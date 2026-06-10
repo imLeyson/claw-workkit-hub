@@ -25,7 +25,7 @@ import {
   RotateCcw,
 } from 'lucide-react'
 import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
-import { getProjectBySlug, getTasks, getAIResult, getWorkKits, getMaterials, upsertWorkKitFromProject, saveAIResult } from '../services/db'
+import { getProjectBySlug, getTasks, getAIResult, getWorkKits, getMaterials, upsertWorkKitFromProject, saveAIResult, updateProject } from '../services/db'
 import type { Material, WorkKit, AISection } from '../types'
 import { useToast } from '../components/Toast'
 
@@ -306,7 +306,7 @@ export default function Report() {
   const referencedMaterialIds = new Set(tasks.flatMap((task) => task.inputMaterials))
   const referencedMaterials = materials.filter((item) => referencedMaterialIds.has(item.id))
   const sensitiveCount = materials.filter((item) => item.sensitivity !== 'normal').length
-  const generatedCount = tasks.filter((task) => getAIResult(task.id)).length
+  const generatedCount = tasks.filter((task) => Boolean(getAIResult(task.id)?.generatedAt)).length
   const sourceTagCount = new Set(tasks.flatMap((task) => task.sourceTags)).size
   const latestGeneratedAt = submittedTasks
     .map((task) => getAIResult(task.id)?.generatedAt)
@@ -318,6 +318,39 @@ export default function Report() {
     .filter((kit) => kit.tags.some((tag) => [project.category, project.campaign, '成功案例'].filter(Boolean).includes(tag)))
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 3)
+  const readinessItems = [
+    {
+      label: '岗位结果',
+      value: `${submittedCount}/${tasks.length}`,
+      ready: completionReady,
+      desc: completionReady ? '全部岗位结果已提交，可完整沉淀' : '仍有岗位结果未提交，建议补齐后再发布',
+    },
+    {
+      label: '资料证据',
+      value: `${referencedMaterials.length}/${materials.length}`,
+      ready: referencedMaterials.length > 0 && referencedMaterials.length >= Math.min(materials.length, 3),
+      desc: '沉淀资料结构、引用来源和后续复用入口',
+    },
+    {
+      label: '验证准入',
+      value: sensitiveCount <= 1 ? '可发布' : '需复核',
+      ready: sensitiveCount <= 1,
+      desc: sensitiveCount <= 1 ? '资料风险可控，可进入知识库' : '存在需脱敏或需复核资料',
+    },
+    {
+      label: '执行动作',
+      value: `${completedNextSteps}/${nextSteps.length}`,
+      ready: completedNextSteps > 0,
+      desc: completedNextSteps > 0 ? '已有执行反馈，可辅助判断复用价值' : '尚未勾选执行动作，可先作为观察模板',
+    },
+  ]
+  const readinessScore = Math.round((readinessItems.filter((item) => item.ready).length / readinessItems.length) * 100)
+  const reusableAssets = [
+    { title: '岗位 Prompt 模板', desc: `${roleTabs.length} 个角色的输入、输出格式与判断标准` },
+    { title: '资料结构规则', desc: `${referencedMaterials.length} 份资料与 ${sourceTagCount} 类来源标签` },
+    { title: '验证结论', desc: '保留项、追踪项与人工验证角色' },
+    { title: '执行清单', desc: `${nextSteps.length} 条可复用的大促推进动作` },
+  ]
   const saveDraft = () => {
     localStorage.setItem(`promokit_report_draft_${project.id}`, JSON.stringify(draft))
     setEditMode(false)
@@ -390,6 +423,68 @@ export default function Report() {
             <WorkflowNode icon={Users} label="协作岗位" value={`${roleTabs.length} 岗`} tone="kit" />
             <WorkflowNode icon={Sparkles} label="AI 输出" value={`${submittedCount}/${tasks.length}`} tone="ai" />
             <WorkflowNode icon={ClipboardCheck} label="待办完成" value={`${completedNextSteps}/${nextSteps.length}`} tone="success" />
+          </div>
+        </div>
+      </div>
+
+      {/* Assetization publisher */}
+      <div className="mb-12 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute left-[-120px] bottom-[-140px] w-[300px] h-[300px] rounded-full bg-ai-400/8" />
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-7">
+          <div className="flex flex-col justify-between gap-6">
+            <div>
+              <span className="section-title">Asset Publisher</span>
+              <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mt-3 mb-3">发布前资产化检查</h2>
+              <p className="text-[13px] text-text-secondary leading-relaxed">
+                保存 Work Kit 之前，先确认本次分析是否已经具备可学习、可复用、可验证的条件。达标越高，下一个项目启动时越能直接继承本次经验。
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-accent-500/20 bg-accent-500/[0.045] p-5">
+              <div className="flex items-end justify-between gap-4 mb-4">
+                <div>
+                  <div className="text-[42px] font-light leading-none text-text-main">{readinessScore}%</div>
+                  <div className="text-[11px] text-text-muted mt-1">资产发布就绪度</div>
+                </div>
+                <span className={`tag ${readinessScore >= 75 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                  {readinessScore >= 75 ? '建议发布' : '建议补齐'}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-bg-primary overflow-hidden">
+                <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${readinessScore}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-3">
+            {readinessItems.map((item) => (
+              <div key={item.label} className={`rounded-2xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/60'}`}>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="text-[13px] font-medium text-text-main">{item.label}</div>
+                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${item.ready ? 'bg-success text-white' : 'bg-bg-surface text-text-muted'}`}>
+                    {item.ready ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                  </div>
+                </div>
+                <div className="text-[22px] font-light text-text-main leading-none mb-2">{item.value}</div>
+                <p className="text-[11px] text-text-muted leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative mt-5 pt-5 border-t border-border-light">
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="text-[13px] font-medium text-text-main">保存后将沉淀的资产</div>
+            <button onClick={() => setShowSaveDialog(true)} className="btn-primary">
+              <Package className="w-4 h-4" /> 发布 Work Kit
+            </button>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {reusableAssets.map((asset) => (
+              <div key={asset.title} className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+                <div className="text-[12px] font-medium text-text-main mb-1">{asset.title}</div>
+                <p className="text-[11px] text-text-muted leading-relaxed">{asset.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -658,7 +753,7 @@ export default function Report() {
                                   </table>
                                   <button
                                     onClick={() => handleReportMatrixAddRow(task.id, i)}
-                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-3 py-1.5 rounded-xl border border-border-light transition-all"
                                   >
                                     <Plus className="w-3.5 h-3.5" /> 添加行
                                   </button>
@@ -709,7 +804,7 @@ export default function Report() {
                                   ))}
                                   <button
                                     onClick={() => handleReportListAddItem(task.id, i)}
-                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
+                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
                                   >
                                     <Plus className="w-3 h-3" /> 添加项
                                   </button>
@@ -747,7 +842,7 @@ export default function Report() {
                                   ))}
                                   <button
                                     onClick={() => handleReportListAddItem(task.id, i)}
-                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
+                                    className="mt-1 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-2.5 py-1 rounded-xl border border-border-light transition-all"
                                   >
                                     <Plus className="w-3 h-3" /> 添加项
                                   </button>
@@ -769,7 +864,7 @@ export default function Report() {
                               {editMode ? (
                                 <div className="space-y-4">
                                   {section.qa.map((item, j) => (
-                                    <div key={j} className="bg-white/3 rounded-2xl p-4 border border-border-light relative group">
+                                    <div key={j} className="bg-white/[0.03] rounded-2xl p-4 border border-border-light relative group">
                                       <button
                                         onClick={() => handleReportQADelete(task.id, i, j)}
                                         className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
@@ -800,7 +895,7 @@ export default function Report() {
                                   ))}
                                   <button
                                     onClick={() => handleReportQAAdd(task.id, i)}
-                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
                                   >
                                     <Plus className="w-3.5 h-3.5" /> 添加问答对
                                   </button>
@@ -823,7 +918,7 @@ export default function Report() {
                               {editMode ? (
                                 <div className="space-y-4">
                                   {section.quotes.map((q, j) => (
-                                    <div key={j} className="bg-white/3 rounded-xl p-4 border border-border-light relative group">
+                                    <div key={j} className="bg-white/[0.03] rounded-xl p-4 border border-border-light relative group">
                                       <button
                                         onClick={() => handleReportQuoteDelete(task.id, i, j)}
                                         className="absolute top-3 right-3 p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error-soft opacity-0 group-hover:opacity-100 transition-opacity"
@@ -854,7 +949,7 @@ export default function Report() {
                                   ))}
                                   <button
                                     onClick={() => handleReportQuoteAdd(task.id, i)}
-                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/3 hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
+                                    className="mt-2 text-[11px] text-accent-600 hover:text-accent-500 font-medium flex items-center gap-1 bg-white/[0.03] hover:bg-white/5 px-2.5 py-1.5 rounded-xl border border-border-light transition-all"
                                   >
                                     <Plus className="w-3.5 h-3.5" /> 添加原话引用
                                   </button>
@@ -1165,6 +1260,7 @@ export default function Report() {
                   reuseCount: 0, rating: successRating,
                 }
                 const savedResult = upsertWorkKitFromProject(newKit)
+                updateProject({ ...project, status: 'completed' })
                 setSavedMode(savedResult.mode)
                 setSaved(true); setShowSaveDialog(false)
                 showToast(savedResult.mode === 'created' ? 'Work Kit 已保存到资产库' : `Work Kit 已更新为 ${savedResult.kit.version}`, 'success')
