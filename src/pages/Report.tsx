@@ -69,6 +69,14 @@ function readReportDraft(projectId: string, fallback: ReportDraft): ReportDraft 
   }
 }
 
+function readAssetHandoffs(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
 function CheckItem({ text, id, onToggle }: { text: string; id: string; onToggle?: () => void }) {
   const key = `checklist_${id}`
   const [done, setDone] = useState(() => localStorage.getItem(key) === '1')
@@ -294,6 +302,11 @@ export default function Report() {
   const existingKit = getWorkKits().find((k) => k.basedOnProjectId === project.id)
   const nextVersionLabel = existingKit ? '自动升级版本' : 'v1.0'
   const submittedTasks = tasks.filter((t) => getAIResult(t.id)?.submitted)
+  const projectHandoffs = readAssetHandoffs().filter((handoff) => handoff.projectId === project.id)
+  const handoffTaskIds = new Set(projectHandoffs.map((handoff) => handoff.taskId))
+  const handoffSectionCount = projectHandoffs.reduce((sum, handoff) => sum + (handoff.sectionCount ?? 0), 0)
+  const handoffKnowledgeCount = projectHandoffs.reduce((sum, handoff) => sum + ((handoff.adoptedKnowledge || []).length), 0)
+  const handoffFeedbackCount = projectHandoffs.reduce((sum, handoff) => sum + ((handoff.feedbackItems || []).length), 0)
   const completionReady = tasks.length > 0 && submittedCount === tasks.length
   const coverageReady = roleTabs.length >= 3
   const successRating = markAsSuccess && submittedCount > 0 ? 4.8 : submittedCount > 0 ? 4.3 : 0
@@ -343,12 +356,19 @@ export default function Report() {
       ready: completedNextSteps > 0,
       desc: completedNextSteps > 0 ? '已有执行反馈，可辅助判断复用价值' : '尚未勾选执行动作，可先作为观察模板',
     },
+    {
+      label: '资产交接',
+      value: `${projectHandoffs.length}/${submittedTasks.length || tasks.length}`,
+      ready: projectHandoffs.length > 0 && submittedTasks.every((task) => handoffTaskIds.has(task.id)),
+      desc: projectHandoffs.length ? '工作台交接证据已进入报告链路' : '建议从工作台提交结果，保留来源证据',
+    },
   ]
   const readinessScore = Math.round((readinessItems.filter((item) => item.ready).length / readinessItems.length) * 100)
   const reusableAssets = [
     { title: '岗位 Prompt 模板', desc: `${roleTabs.length} 个角色的输入、输出格式与判断标准` },
     { title: '资料结构规则', desc: `${referencedMaterials.length} 份资料与 ${sourceTagCount} 类来源标签` },
     { title: '验证结论', desc: '保留项、追踪项与人工验证角色' },
+    { title: '资产交接证据', desc: `${projectHandoffs.length} 条交接、${handoffKnowledgeCount} 个知识依据、${handoffFeedbackCount} 条复核标记` },
     { title: '执行清单', desc: `${nextSteps.length} 条可复用的大促推进动作` },
   ]
   const saveDraft = () => {
@@ -485,6 +505,59 @@ export default function Report() {
                 <p className="text-[11px] text-text-muted leading-relaxed">{asset.desc}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-4 rounded-[24px] border border-accent-500/15 bg-accent-500/[0.035] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <ClipboardCheck className="w-4 h-4 text-accent-500" />
+                <div>
+                  <div className="text-[12px] font-medium text-text-main">资产交接证据</div>
+                  <div className="text-[10px] text-text-muted mt-0.5">来自 AI 工作台的提交记录，用于证明结果区块、知识依据和复核标记可追溯。</div>
+                </div>
+              </div>
+              <span className="tag bg-accent-500/10 text-accent-600">{projectHandoffs.length} 条交接 · {handoffSectionCount} 个区块</span>
+            </div>
+            {projectHandoffs.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-3">
+                {projectHandoffs.slice(0, 4).map((handoff) => (
+                  <div key={handoff.id} className="rounded-2xl border border-border-light bg-bg-surface/80 p-4">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0">
+                        <div className="text-[13px] font-medium text-text-main truncate">{handoff.taskTitle}</div>
+                        <div className="text-[10px] text-text-muted mt-1">{handoff.roleLabel} · {new Date(handoff.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <span className="tag bg-success-soft text-success shrink-0">已接收</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {[
+                        ['区块', `${handoff.sectionCount ?? 0}`],
+                        ['知识', `${(handoff.adoptedKnowledge || []).length}`],
+                        ['复核', `${(handoff.feedbackItems || []).length}`],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-xl border border-border-light bg-bg-primary/70 p-2">
+                          <div className="text-[13px] font-medium text-text-main leading-none">{value}</div>
+                          <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(handoff.adoptedKnowledge || []).slice(0, 3).map((item: any) => (
+                        <span key={item.id} className="text-[10px] px-2 py-1 rounded-md bg-bg-primary border border-border-light text-text-muted">
+                          {item.title}
+                        </span>
+                      ))}
+                      {(handoff.adoptedKnowledge || []).length === 0 && (
+                        <span className="text-[10px] text-text-muted">暂无知识依据记录</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] text-text-muted leading-relaxed">
+                还没有接收到工作台交接记录。建议回到 AI 工作台提交分析结果，系统会自动记录区块、知识依据、来源资料和复核标记。
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -1181,7 +1254,7 @@ export default function Report() {
             <div className="grid grid-cols-3 gap-3 mb-4">
               {[
                 { icon: CheckCircle2, label: '结果完整性', value: `${submittedCount}/${tasks.length}`, pass: completionReady },
-                { icon: ShieldCheck, label: '跨岗位覆盖', value: `${roleTabs.length}岗`, pass: coverageReady },
+                { icon: ShieldCheck, label: '资产交接', value: `${projectHandoffs.length}条`, pass: projectHandoffs.length > 0 },
                 { icon: Star, label: '沉淀评分', value: successRating ? String(successRating) : '待定', pass: successRating >= 4.8 },
               ].map((item) => (
                 <div key={item.label} className={`rounded-2xl border p-3 ${item.pass ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/70'}`}>
@@ -1196,6 +1269,7 @@ export default function Report() {
               <div className="flex justify-between gap-4"><span className="text-text-muted">项目</span><span className="font-medium text-right">{project.name}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>
+              <div className="flex justify-between"><span className="text-text-muted">交接证据</span><span className="font-medium">{projectHandoffs.length} 条 · {handoffKnowledgeCount} 个知识依据</span></div>
               {existingKit && <div className="flex justify-between"><span className="text-text-muted">已有版本</span><span className="font-medium">{existingKit.version} · {existingKit.versionHistory.length} 条历史</span></div>}
             </div>
 
@@ -1222,8 +1296,8 @@ export default function Report() {
               <button onClick={() => setShowSaveDialog(false)} className="btn-ghost">取消</button>
               <button onClick={() => {
                 const verificationFeedback = markAsSuccess
-                  ? `验证通过：${submittedCount}/${tasks.length} 个岗位结果已提交，覆盖 ${roleTabs.length} 个岗位，标记为成功案例；人工保留项：${draft.verification.keep}；执行动作 ${completedNextSteps}/${draft.nextSteps.length} 已完成。`
-                  : `已沉淀为观察模板：${submittedCount}/${tasks.length} 个岗位结果已提交；人工备注：${draft.verification.notes}；需继续收集复用反馈后再标星。`
+                  ? `验证通过：${submittedCount}/${tasks.length} 个岗位结果已提交，覆盖 ${roleTabs.length} 个岗位，资产交接 ${projectHandoffs.length} 条，标记为成功案例；人工保留项：${draft.verification.keep}；执行动作 ${completedNextSteps}/${draft.nextSteps.length} 已完成。`
+                  : `已沉淀为观察模板：${submittedCount}/${tasks.length} 个岗位结果已提交，资产交接 ${projectHandoffs.length} 条；人工备注：${draft.verification.notes}；需继续收集复用反馈后再标星。`
                 const manualSections: WorkKit['sections'] = [
                   {
                     title: '人工修订后的报告摘要',

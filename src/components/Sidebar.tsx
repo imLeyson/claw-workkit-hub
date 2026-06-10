@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, PlusCircle, FolderOpen, LayoutGrid, BarChart3,
-  Archive, Menu, X, Sparkles, Package, Bot,
+  Archive, Menu, X, Sparkles, Package, Bot, ArrowRight, ClipboardCheck,
 } from 'lucide-react'
 import Logo from './Logo'
-import { getProjectBySlug, getTasks, getWorkKits } from '../services/db'
+import { getAIResult, getMaterials, getProjectBySlug, getTasks, getWorkKits } from '../services/db'
 
 function isInFlow(pathname: string) {
   return ['/materials', '/tasks', '/workspace', '/report'].some((p) => pathname.startsWith(p))
@@ -23,6 +23,14 @@ function extractTaskId(pathname: string): string | undefined {
   return undefined
 }
 
+function readAssetHandoffs(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
 export default function Sidebar() {
   const location = useLocation()
   const pathname = location.pathname
@@ -32,15 +40,36 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const project = inFlow ? getProjectBySlug(slug) : undefined
   const tasks = project ? getTasks(project.id) : []
+  const materials = project ? getMaterials(project.id) : []
+  const handoffs = project ? readAssetHandoffs().filter((handoff) => handoff.projectId === project.id) : []
   const taskId = extractTaskId(pathname) || tasks[0]?.id
   const workspacePath = taskId ? `/workspace/${slug}/${taskId}` : `/tasks/${slug}`
-  const submittedCount = tasks.filter((task) => task.status === 'submitted').length
+  const submittedCount = tasks.filter((task) => task.status === 'submitted' || getAIResult(task.id)?.submitted).length
   const existingKit = project ? getWorkKits().find((kit) => kit.basedOnProjectId === project.id) : undefined
+  const flowProgressItems = [
+    materials.length > 0,
+    tasks.length > 0,
+    submittedCount > 0,
+    handoffs.length > 0,
+    Boolean(existingKit),
+  ]
+  const flowProgress = project ? Math.round((flowProgressItems.filter(Boolean).length / flowProgressItems.length) * 100) : 0
+  const nextFlowStep = !project
+    ? { label: '选择项目', path: '/' }
+    : materials.length === 0
+      ? { label: '补齐资料', path: `/materials/${slug}` }
+      : tasks.length === 0
+        ? { label: '生成任务', path: `/tasks/${slug}` }
+        : submittedCount === 0
+          ? { label: '进入分析', path: workspacePath }
+          : !existingKit
+            ? { label: '发布 Work Kit', path: `/report/${slug}` }
+            : { label: '查看资产', path: '/archive' }
   const flowSteps = [
     { path: `/materials/${slug}`, label: '资料', value: project ? '原料' : '入口', done: project ? true : false },
     { path: `/tasks/${slug}`, label: '任务', value: tasks.length ? `${tasks.length}张` : '待生成', done: tasks.length > 0 },
     { path: workspacePath, match: `/workspace/${slug}`, label: '工作台', value: submittedCount ? `${submittedCount}项` : '分析', done: submittedCount > 0 },
-    { path: `/report/${slug}`, label: '报告', value: submittedCount ? '复核' : '待提交', done: submittedCount === tasks.length && tasks.length > 0 },
+    { path: `/report/${slug}`, label: '报告', value: handoffs.length ? `${handoffs.length}交接` : '复核', done: handoffs.length > 0 },
     { path: '/archive', label: '资产', value: existingKit?.version || '沉淀', done: Boolean(existingKit) },
   ]
 
@@ -118,7 +147,7 @@ export default function Sidebar() {
         })}
 
         {inFlow && (
-          <div className={`mt-5 pt-5 border-t border-white/[0.06] transition-all duration-200 overflow-hidden ${expanded ? 'opacity-100 max-h-[360px]' : 'opacity-0 max-h-0'}`}>
+          <div className={`mt-5 pt-5 border-t border-white/[0.06] transition-all duration-200 overflow-hidden ${expanded ? 'opacity-100 max-h-[460px]' : 'opacity-0 max-h-0'}`}>
             <div className="px-[10px] mb-3">
               <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/35">
                 <Sparkles className="w-3 h-3 text-accent-500" />
@@ -126,6 +155,19 @@ export default function Sidebar() {
               </div>
               <div className="text-[11px] text-white/60 mt-1 truncate">{project?.name || '当前项目'}</div>
             </div>
+            <NavLink to={nextFlowStep.path} className="mx-[10px] mb-3 block rounded-2xl border border-accent-500/20 bg-accent-500/10 p-3 text-white/80 hover:bg-accent-500/15 transition-colors">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-[11px] font-medium">闭环进度</span>
+                <span className="font-mono text-[12px] text-accent-400">{flowProgress}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-white/10 overflow-hidden mb-2">
+                <div className="h-full rounded-full bg-accent-500" style={{ width: `${flowProgress}%` }} />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] text-white/45 truncate">下一步：{nextFlowStep.label}</span>
+                <ArrowRight className="w-3 h-3 text-accent-400 shrink-0" />
+              </div>
+            </NavLink>
             <div className="space-y-1.5">
               {flowSteps.map((step, index) => {
                 const active = step.path === '/archive' ? pathname.startsWith('/archive') : pathname.startsWith(step.match || step.path)
@@ -149,6 +191,18 @@ export default function Sidebar() {
                   </NavLink>
                 )
               })}
+            </div>
+            <div className="mx-[10px] mt-3 grid grid-cols-2 gap-2">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-2">
+                <ClipboardCheck className="w-3.5 h-3.5 text-accent-500 mb-1.5" />
+                <div className="text-[11px] text-white/75 leading-none">{handoffs.length}</div>
+                <div className="text-[9px] text-white/30 mt-1">交接记录</div>
+              </div>
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-2">
+                <Package className="w-3.5 h-3.5 text-accent-500 mb-1.5" />
+                <div className="text-[11px] text-white/75 leading-none">{existingKit ? existingKit.version : '待发布'}</div>
+                <div className="text-[9px] text-white/30 mt-1">Work Kit</div>
+              </div>
             </div>
           </div>
         )}

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp, Pencil, Plus, X, Package, BookOpen, GitBranch, ShieldCheck } from 'lucide-react'
+import { ArrowRight, UserCircle, Loader2, Sparkles, Copy, ChevronDown, ChevronUp, Pencil, Plus, X, Package, BookOpen, GitBranch, ShieldCheck, ClipboardCheck, FileText, AlertTriangle } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjectBySlug, getMaterials, getTasks, getWorkKits, updateTask, refreshTaskMaterialLinks, addTask } from '../services/db'
 import { useToast } from '../components/Toast'
@@ -20,11 +20,20 @@ const sourceMaterialMap: Record<string, MaterialType> = {
   '历史文案': 'copy_asset',
 }
 
+function readAssetHandoffs(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
 export default function TaskCards() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = getProjectBySlug(projectSlug!)
   const [tasks, setTasks] = useState(project ? getTasks(project.id) : [])
   const materials = project ? getMaterials(project.id) : []
+  const assetHandoffs = project ? readAssetHandoffs().filter((handoff) => handoff.projectId === project.id) : []
 
   // Sync from localStorage on mount and when projectSlug changes
   useEffect(() => {
@@ -165,6 +174,7 @@ export default function TaskCards() {
   const blockedPendingTasks = tasks.filter((t) => t.status === 'pending' && t.inputMaterials.length === 0)
   const submittedTasks = tasks.filter((t) => t.status === 'submitted')
   const generatedTasks = tasks.filter((t) => t.status === 'generated' || t.status === 'submitted')
+  const handedOffTasks = tasks.filter((task) => assetHandoffs.some((handoff) => handoff.taskId === task.id))
   const workKits = getWorkKits()
   const relevantKits = workKits
     .filter((kit) => kit.tags.some((tag) => [project.category, project.campaign, '成功案例'].filter(Boolean).includes(tag)) || kit.includedRoles.some((role) => tasks.some((task) => task.role === role)))
@@ -174,6 +184,7 @@ export default function TaskCards() {
     { icon: BookOpen, label: '学习可复用资产', value: `${relevantKits.length} 个`, desc: '从历史 Work Kit 继承口径' },
     { icon: Sparkles, label: '生成岗位分析', value: `${generatedTasks.length}/${tasks.length}`, desc: '把资料转成结构化结果' },
     { icon: ShieldCheck, label: '提交复核报告', value: `${submittedTasks.length}/${tasks.length}`, desc: '进入报告验证与编辑' },
+    { icon: ClipboardCheck, label: '资产交接记录', value: `${handedOffTasks.length}/${tasks.length}`, desc: '记录结果如何进入报告' },
     { icon: Package, label: '沉淀工作包', value: anyGenerated ? '可推进' : '待分析', desc: '保存为下次启动资产' },
   ]
 
@@ -218,7 +229,7 @@ export default function TaskCards() {
               每张任务卡都会记录输入资料、岗位 Prompt、输出格式和判断标准。完成并提交后，这些内容会汇入报告，最终沉淀为下一次大促可学习、可复用的 Work Kit。
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
             {assetSteps.map((step) => (
               <div key={step.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
@@ -297,6 +308,20 @@ export default function TaskCards() {
             return materialType ? !availableTypes.has(materialType) : false
           })
           const blocked = task.status === 'pending' && inputMats.length === 0
+          const handoff = assetHandoffs.find((item) => item.taskId === task.id)
+          const missingCount = missingTags.length
+          const readinessScore = Math.round(([
+            inputMats.length > 0,
+            missingCount === 0,
+            Boolean(task.promptPreview),
+            Boolean(task.outputFormat),
+            task.judgmentCriteria.length > 0,
+          ].filter(Boolean).length / 5) * 100)
+          const assetOutputs = [
+            { label: 'Prompt', value: task.promptPreview ? '已定义' : '待补充', icon: Sparkles, ready: Boolean(task.promptPreview) },
+            { label: '输出格式', value: task.outputFormat || '待定义', icon: FileText, ready: Boolean(task.outputFormat) },
+            { label: '验收标准', value: `${task.judgmentCriteria.length} 条`, icon: ShieldCheck, ready: task.judgmentCriteria.length > 0 },
+          ]
           return (
             <div key={task.id} className="card-surface rounded-[24px] card-hover overflow-hidden group animate-fade-in-up border-l-[3px] border-l-transparent hover:border-l-accent-400">
               <div className="p-6">
@@ -342,6 +367,50 @@ export default function TaskCards() {
                   {task.sourceTags.map((tag) => (
                     <span key={tag} className={`text-[10px] px-2 py-1 rounded-md ${sourceColorMap[tag] || 'bg-gray-50 text-text-muted'}`}>{tag}</span>
                   ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      {blocked ? <AlertTriangle className="w-4 h-4 text-warning" /> : <ClipboardCheck className="w-4 h-4 text-accent-500" />}
+                      <span className="text-[12px] font-semibold text-text-main">启动就绪度</span>
+                    </div>
+                    <span className={`text-[12px] font-medium ${readinessScore >= 80 ? 'text-success' : readinessScore >= 60 ? 'text-warning' : 'text-text-muted'}`}>{readinessScore}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-bg-surface overflow-hidden mb-3">
+                    <div
+                      className={`h-full rounded-full ${readinessScore >= 80 ? 'bg-success' : readinessScore >= 60 ? 'bg-warning' : 'bg-text-muted'}`}
+                      style={{ width: `${readinessScore}%` }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {assetOutputs.map((item) => (
+                      <div key={item.label} className="rounded-xl border border-border-light bg-bg-surface/75 p-2">
+                        <item.icon className={`w-3.5 h-3.5 mb-1.5 ${item.ready ? 'text-accent-500' : 'text-text-muted'}`} />
+                        <div className="text-[10px] font-medium text-text-main truncate">{item.value}</div>
+                        <div className="text-[9px] text-text-muted mt-0.5">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`mt-3 rounded-2xl border p-3 ${
+                  handoff ? 'border-success/20 bg-success-soft' : task.status === 'submitted' ? 'border-accent-500/20 bg-accent-500/[0.04]' : 'border-border-light bg-bg-primary/35'
+                }`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Package className={`w-4 h-4 shrink-0 ${handoff ? 'text-success' : 'text-accent-500'}`} />
+                      <div className="min-w-0">
+                        <div className="text-[12px] font-medium text-text-main truncate">资产产出：{task.outputFormat || '结构化分析结果'}</div>
+                        <div className="text-[10px] text-text-muted mt-0.5 truncate">
+                          {handoff ? `已交接 ${handoff.sectionCount ?? 0} 个区块 · ${(handoff.adoptedKnowledge || []).length} 个知识依据` : task.status === 'submitted' ? '已提交报告，等待交接记录同步' : '完成分析并提交后进入报告与 Work Kit 链路'}
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${handoff ? 'bg-success/10 text-success' : 'bg-bg-surface text-text-muted'}`}>
+                      {handoff ? '已交接' : '待交接'}
+                    </span>
+                  </div>
                 </div>
               </div>
 

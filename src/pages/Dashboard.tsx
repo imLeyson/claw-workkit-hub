@@ -5,6 +5,14 @@ import { roleLabels } from '../data/mock'
 import { getProjects, getTasks, getAIResult, getWorkKits, getMaterials, deleteProject, resetAllData, updateProject } from '../services/db'
 import type { Project } from '../types'
 
+function readLocalList(key: string): any[] {
+  try {
+    return JSON.parse(localStorage.getItem(key) || '[]')
+  } catch {
+    return []
+  }
+}
+
 export default function Dashboard() {
   const [projects, setProjects] = useState(getProjects())
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -58,14 +66,33 @@ export default function Dashboard() {
   const allTasks = projects.flatMap((p) => getTasks(p.id))
   const submittedTasks = allTasks.filter((t) => getAIResult(t.id)?.submitted).length
   const workKits = getWorkKits()
-  const learningRecords = (() => {
-    try { return JSON.parse(localStorage.getItem('promokit_prelearning_records') || '[]') as any[] }
-    catch { return [] }
-  })()
+  const learningRecords = readLocalList('promokit_prelearning_records')
+  const assetHandoffs = readLocalList('promokit_asset_handoffs')
+  const validationHistory = readLocalList('promokit_validation_history')
   const completedProjects = projects.filter((p) => p.status === 'completed').length
   const assetizedProjects = new Set(workKits.map((kit) => kit.basedOnProjectId)).size
   const assetizationRate = completedProjects > 0 ? Math.round((assetizedProjects / completedProjects) * 100) : 0
   const reuseTotal = workKits.reduce((sum, kit) => sum + kit.reuseCount, 0)
+  const averageLearningPercent = learningRecords.length
+    ? Math.round(learningRecords.reduce((sum, record) => sum + (record.learningPercent || 0), 0) / learningRecords.length)
+    : 0
+  const totalHandoffSections = assetHandoffs.reduce((sum, handoff) => sum + (handoff.sectionCount || 0), 0)
+  const totalHandoffKnowledge = assetHandoffs.reduce((sum, handoff) => sum + ((handoff.adoptedKnowledge || []).length), 0)
+  const projectAssetSignals = projects.map((project) => {
+    const tasks = getTasks(project.id)
+    const materials = getMaterials(project.id)
+    const submitted = tasks.filter((task) => getAIResult(task.id)?.submitted).length
+    const handoffs = assetHandoffs.filter((handoff) => handoff.projectId === project.id)
+    const hasKit = workKits.some((kit) => kit.basedOnProjectId === project.id)
+    const score = Math.round(([
+      materials.length > 0,
+      tasks.length > 0,
+      submitted > 0,
+      handoffs.length > 0,
+      hasKit,
+    ].filter(Boolean).length / 5) * 100)
+    return { project, score, submitted, totalTasks: tasks.length, handoffs: handoffs.length, hasKit }
+  }).sort((a, b) => a.score - b.score)
   const firstSlug = projects[0]?.slug || '618-hair-dryer'
   const actionQueue = projects.map((project) => {
     const tasks = getTasks(project.id)
@@ -177,6 +204,87 @@ export default function Dashboard() {
             <div className="text-[11px] text-text-muted">{s.sub}</div>
           </Link>
         ))}
+      </div>
+
+      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
+        <div className="absolute left-[-110px] bottom-[-140px] w-[280px] h-[280px] rounded-full bg-ai-400/7" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4 mb-5">
+          <div>
+            <span className="section-title">Asset Operations</span>
+            <h2 className="text-[20px] font-medium text-text-main mt-2">资产运营信号</h2>
+            <p className="text-[13px] text-text-muted mt-1 max-w-2xl">
+              汇总学习包、工作台交接、验证历史和 Work Kit 复用情况，判断团队经验是否真的从一次分析流向下一次项目。
+            </p>
+          </div>
+          <Link to="/archive" className="btn-primary text-[12px]">
+            进入资产库 <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="relative grid lg:grid-cols-[0.85fr_1.15fr] gap-4">
+          <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.035] p-5">
+            <div className="flex items-end justify-between gap-4 mb-4">
+              <div>
+                <div className="text-[42px] font-light leading-none text-text-main">{assetizationRate}%</div>
+                <div className="text-[11px] text-text-muted mt-1">项目资产化率</div>
+              </div>
+              <span className={`tag ${assetizationRate >= 70 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                {assetizationRate >= 70 ? '资产化良好' : '继续沉淀'}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-bg-primary overflow-hidden mb-4">
+              <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${assetizationRate}%` }} />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                ['学习度', averageLearningPercent ? `${averageLearningPercent}%` : '待记录'],
+                ['交接区块', `${totalHandoffSections}`],
+                ['验证', `${validationHistory.length}`],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl border border-border-light bg-bg-surface/75 p-3">
+                  <div className="text-[15px] font-medium text-text-main leading-none">{value}</div>
+                  <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[
+              { icon: ClipboardCheck, label: '资产交接', value: `${assetHandoffs.length} 条`, sub: `${totalHandoffKnowledge} 个知识依据进入报告` },
+              { icon: BookOpen, label: '启动前学习', value: `${learningRecords.length} 条`, sub: averageLearningPercent ? `平均学习 ${averageLearningPercent}%` : '等待复用学习记录' },
+              { icon: ShieldCheck, label: '验证历史', value: `${validationHistory.length} 条`, sub: validationHistory[0] ? `最近：${validationHistory[0].status}` : '等待资产验证' },
+              { icon: Package, label: '低闭环项目', value: `${projectAssetSignals.filter((item) => item.score < 80).length} 个`, sub: '优先补齐资料、交接或 Work Kit' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <item.icon className="w-4 h-4 text-accent-500" />
+                  <span className="text-[16px] font-light text-text-main leading-none">{item.value}</span>
+                </div>
+                <div className="text-[12px] font-medium text-text-main">{item.label}</div>
+                <div className="text-[10px] text-text-muted mt-1">{item.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="relative mt-4 rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="text-[12px] font-semibold text-text-main">需要优先补齐的项目</div>
+            <span className="text-[10px] text-text-muted">按资产闭环分排序</span>
+          </div>
+          <div className="grid md:grid-cols-3 gap-2">
+            {projectAssetSignals.slice(0, 3).map((item) => (
+              <Link key={item.project.id} to={item.hasKit ? '/archive' : `/report/${item.project.slug}`} className="rounded-xl border border-border-light bg-bg-surface/80 p-3 hover:border-accent-500/25 transition-colors">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="text-[12px] font-medium text-text-main truncate">{item.project.name}</div>
+                  <span className={`text-[11px] font-medium ${item.score >= 80 ? 'text-success' : item.score >= 60 ? 'text-warning' : 'text-text-muted'}`}>{item.score}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-bg-primary overflow-hidden mb-2">
+                  <div className={`h-full rounded-full ${item.score >= 80 ? 'bg-success' : item.score >= 60 ? 'bg-warning' : 'bg-text-muted'}`} style={{ width: `${item.score}%` }} />
+                </div>
+                <div className="text-[10px] text-text-muted">{item.submitted}/{item.totalTasks} 提交 · {item.handoffs} 交接 · {item.hasKit ? '已入库' : '待 Work Kit'}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6">

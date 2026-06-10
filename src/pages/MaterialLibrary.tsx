@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil, Download, Database, GitBranch, Package, ShieldCheck, Sparkles } from 'lucide-react'
+import { UploadCloud, ArrowRight, FileSpreadsheet, MessageSquareText, ClipboardList, Paperclip, Plus, X, Trash2, Pencil, Download, Database, GitBranch, Package, ShieldCheck, Sparkles, Link2, Layers3 } from 'lucide-react'
 import { materialTypeLabels, aiStatusLabels, platformColors } from '../data/mock'
-import { getProjectBySlug, getMaterials, addMaterial, getProjects, refreshTaskMaterialLinks } from '../services/db'
+import { getProjectBySlug, getMaterials, getTasks, addMaterial, getProjects, refreshTaskMaterialLinks } from '../services/db'
 import { supabase } from '../services/supabase'
 import { useToast } from '../components/Toast'
 import type { Material, Competitor } from '../types'
@@ -66,12 +66,19 @@ const typeColorMap: Record<string, string> = {
 const typeIcons: Record<string, typeof FileSpreadsheet> = {
   review: MessageSquareText, spec: ClipboardList, faq: MessageSquareText, copy_asset: Paperclip,
 }
+const sourceMaterialMap: Record<string, Material['type']> = {
+  '竞品评论': 'review',
+  '商品参数': 'spec',
+  '客服记录': 'faq',
+  '历史文案': 'copy_asset',
+}
 const PLATFORMS = ['天猫', '京东', '抖音商城', '拼多多']
 
 export default function MaterialLibrary() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = getProjectBySlug(projectSlug!)
   const [materials, setMaterials] = useState(project ? getMaterials(project.id) : [])
+  const tasks = project ? getTasks(project.id) : []
   const [competitors, setCompetitors] = useState<Competitor[]>(project?.competitors ?? [])
   const { showToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -270,9 +277,23 @@ export default function MaterialLibrary() {
   const reviewSamples = materials.reduce((sum, item) => sum + (item.reviewCount || 0), 0)
   const riskMaterials = materials.filter((item) => item.sensitivity !== 'normal' || item.aiStatus === 'need_review')
   const assetReadiness = Math.round(((readyTypeCount / materialTypeStats.length) * 0.5 + (requiredReady ? 0.3 : 0) + (riskMaterials.length === 0 ? 0.2 : 0.05)) * 100)
+  const taskLinkedMaterials = tasks.reduce((sum, task) => sum + task.inputMaterials.length, 0)
+  const linkedTaskCount = tasks.filter((task) => task.inputMaterials.length > 0).length
+  const materialTaskMap = materials.map((material) => ({
+    material,
+    linkedTasks: tasks.filter((task) => task.inputMaterials.includes(material.id)),
+  }))
+  const taskInputMap = tasks.map((task) => {
+    const linkedMaterials = materials.filter((material) => task.inputMaterials.includes(material.id))
+    const expectedTypes = task.sourceTags
+      .map((tag) => sourceMaterialMap[tag])
+      .filter(Boolean)
+    const missingTypes = expectedTypes.filter((type) => !linkedMaterials.some((material) => material.type === type))
+    return { task, linkedMaterials, missingTypes }
+  })
   const assetPath = [
     { icon: Database, label: '资料结构化', value: `${materials.length} 份`, desc: '统一评论、参数、客服和文案素材' },
-    { icon: Sparkles, label: '任务输入', value: `${readyTypeCount}/4 类`, desc: '自动关联到岗位任务卡' },
+    { icon: Sparkles, label: '任务输入', value: `${linkedTaskCount}/${tasks.length}`, desc: '自动关联到岗位任务卡' },
     { icon: ShieldCheck, label: '质量准入', value: riskMaterials.length === 0 ? '可用' : `${riskMaterials.length} 待复核`, desc: '标记脱敏与人工复核风险' },
     { icon: Package, label: '资产沉淀', value: requiredReady ? '可推进' : '待补齐', desc: '进入 Work Kit 的资料结构模板' },
   ]
@@ -318,6 +339,96 @@ export default function MaterialLibrary() {
           </div>
           <div className="h-2 rounded-full bg-bg-primary overflow-hidden">
             <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${assetReadiness}%` }} />
+          </div>
+          <div className="mt-4 grid sm:grid-cols-3 gap-2">
+            {[
+              ['任务覆盖', `${linkedTaskCount}/${tasks.length}`, '已有资料可支撑的任务卡'],
+              ['资料引用', `${taskLinkedMaterials}`, '任务卡累计引用资料次数'],
+              ['待复核', `${riskMaterials.length}`, '需脱敏或人工确认的资料'],
+            ].map(([label, value, desc]) => (
+              <div key={label} className="rounded-2xl border border-border-light bg-bg-surface/75 p-3">
+                <div className="text-[17px] font-light text-text-main leading-none">{value}</div>
+                <div className="text-[10px] font-medium text-text-main mt-1">{label}</div>
+                <div className="text-[9px] text-text-muted mt-1">{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-8 rounded-[26px] border border-border-default bg-bg-surface p-5 overflow-hidden relative">
+        <div className="absolute right-[-90px] bottom-[-120px] w-56 h-56 rounded-full bg-ai-400/6" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4 mb-5">
+          <div>
+            <span className="section-title">Input Mapping</span>
+            <h2 className="text-[18px] font-medium text-text-main mt-2">资料如何驱动岗位任务</h2>
+            <p className="text-[12px] text-text-muted leading-relaxed mt-1 max-w-2xl">
+              系统会根据资料类型自动关联到任务卡。这里提前暴露缺口，避免进入 AI 工作台后才发现关键输入不足。
+            </p>
+          </div>
+          <Link to={`/tasks/${projectSlug}`} className="btn-ghost text-[12px]">
+            查看任务卡 <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="relative grid lg:grid-cols-[0.95fr_1.05fr] gap-4">
+          <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Layers3 className="w-4 h-4 text-accent-500" />
+              <span className="text-[12px] font-semibold text-text-main">任务输入准备</span>
+            </div>
+            <div className="space-y-2">
+              {taskInputMap.slice(0, 5).map(({ task, linkedMaterials, missingTypes }) => (
+                <div key={task.id} className="rounded-xl border border-border-light bg-bg-surface/80 p-3">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <div className="text-[12px] font-medium text-text-main truncate">{task.title}</div>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${linkedMaterials.length > 0 && missingTypes.length === 0 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                      {linkedMaterials.length > 0 && missingTypes.length === 0 ? '可启动' : '待补齐'}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {linkedMaterials.slice(0, 3).map((material) => (
+                      <span key={material.id} className="text-[10px] px-2 py-1 rounded-md bg-accent-500/10 text-accent-600">
+                        {materialTypeLabels[material.type]}
+                      </span>
+                    ))}
+                    {missingTypes.map((type) => (
+                      <span key={type} className="text-[10px] px-2 py-1 rounded-md bg-warning-soft text-warning">
+                        缺 {materialTypeLabels[type]}
+                      </span>
+                    ))}
+                    {linkedMaterials.length === 0 && <span className="text-[10px] text-text-muted">暂无资料输入</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Link2 className="w-4 h-4 text-accent-500" />
+              <span className="text-[12px] font-semibold text-text-main">资料复用去向</span>
+            </div>
+            <div className="space-y-2">
+              {materialTaskMap.slice(0, 5).map(({ material, linkedTasks }) => (
+                <div key={material.id} className="rounded-xl border border-border-light bg-bg-surface/80 p-3">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-medium text-text-main truncate">{material.label}</div>
+                      <div className="text-[10px] text-text-muted mt-0.5">{materialTypeLabels[material.type]} · {material.aiStatus === 'need_review' ? '需复核' : '可引用'}</div>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-primary text-text-muted shrink-0">{linkedTasks.length} 任务</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {linkedTasks.slice(0, 3).map((task) => (
+                      <span key={task.id} className="text-[10px] px-2 py-1 rounded-md bg-bg-primary border border-border-light text-text-muted">
+                        {task.title}
+                      </span>
+                    ))}
+                    {linkedTasks.length === 0 && <span className="text-[10px] text-text-muted">尚未被任务引用</span>}
+                  </div>
+                </div>
+              ))}
+              {materials.length === 0 && <p className="text-[11px] text-text-muted leading-relaxed">上传资料后，这里会展示每份资料将被哪些任务卡调用。</p>}
+            </div>
           </div>
         </div>
       </div>
@@ -471,13 +582,26 @@ export default function MaterialLibrary() {
       <div className="space-y-2">
         {materials.map((m) => {
           const Icon = typeIcons[m.type] || FileSpreadsheet
+          const linkedTasks = tasks.filter((task) => task.inputMaterials.includes(m.id))
           return (
-            <div key={m.id} className="card-surface rounded-[16px] p-4 flex items-center gap-4 group cursor-default hover:border-accent-500/20 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
-              <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
-              <div className="flex-1 min-w-0"><div className="text-[13px] font-medium text-text-main truncate">{m.label}</div><div className="text-[10px] text-text-muted">{m.fileName} · {m.uploadedAt}</div></div>
-              <span className={`tag ${typeColorMap[m.type] || 'bg-gray-50 text-text-muted'}`}>{materialTypeLabels[m.type]}</span>
-              <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${aiStatusConfig[m.aiStatus]}`}>{aiStatusLabels[m.aiStatus]}</span>
-              <button onClick={() => handleDeleteMaterial(m.id)} className="w-6 h-6 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" /></button>
+            <div key={m.id} className="card-surface rounded-[18px] p-4 group cursor-default hover:border-accent-500/20 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
+              <div className="flex items-center gap-4">
+                <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
+                <div className="flex-1 min-w-0"><div className="text-[13px] font-medium text-text-main truncate">{m.label}</div><div className="text-[10px] text-text-muted">{m.fileName} · {m.uploadedAt}</div></div>
+                <span className={`tag ${typeColorMap[m.type] || 'bg-gray-50 text-text-muted'}`}>{materialTypeLabels[m.type]}</span>
+                <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${aiStatusConfig[m.aiStatus]}`}>{aiStatusLabels[m.aiStatus]}</span>
+                <button onClick={() => handleDeleteMaterial(m.id)} className="w-6 h-6 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10"><Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" /></button>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2 pl-13">
+                <span className="text-[10px] text-text-muted">引用去向</span>
+                {linkedTasks.length > 0 ? linkedTasks.slice(0, 4).map((task) => (
+                  <span key={task.id} className="text-[10px] px-2 py-1 rounded-md bg-bg-primary border border-border-light text-text-secondary">
+                    {task.title}
+                  </span>
+                )) : (
+                  <span className="text-[10px] px-2 py-1 rounded-md bg-warning-soft text-warning">暂无任务引用</span>
+                )}
+              </div>
             </div>
           )
         })}

@@ -24,25 +24,33 @@ interface ActionOption {
 
 const pageTips: Record<string, string[]> = {
   '/': [
-    '当前在项目看板。您可以点击「智能进度诊断」了解有哪些岗位任务尚未提交。',
-    '若要开启新产品分析，可点击右上角「新建项目」，或到资产库挑选 Work Kit 模版。',
+    '当前在项目看板。建议先查看「资产运营信号」，判断哪些项目需要补交接、补验证或发布 Work Kit。',
+    '若要开启新产品分析，可点击「新建项目」，或到资产库挑选 Work Kit 模版复用。',
   ],
   '/materials': [
-    '当前在资料库。建议上传竞品差评评论数据，以便 AI 能定位最真实的消费者体验点。',
-    '资料齐全后，相关的岗位任务卡会自动激活为「就绪」状态。',
+    '当前在资料库。建议查看「资料如何驱动岗位任务」，确认每份资料会支撑哪些任务卡。',
+    '资料齐全后，相关岗位任务卡会自动激活，并在最终 Work Kit 中沉淀为资料结构模板。',
   ],
   '/tasks': [
-    '当前在分析任务列表。您可以点击「智能推荐岗位任务」，由 AI 针对该类目一键添加专属分析维度。',
-    '也可以点击「批量快速生成」引导，批量初始化所有就绪状态的岗位卡片。',
+    '当前在任务卡列表。建议优先处理「启动就绪度」不足的任务，避免工作台分析缺输入。',
+    '每张任务卡的 Prompt、输出格式和验收标准都会成为后续 Work Kit 的可复用结构。',
   ],
   '/workspace': [
-    '当前在 AI 工作台。您可以点击「提示词指令优化」，让我为您注入大促专用的爆品挖掘框架。',
-    '生成结果后，支持直接点击段落进入编辑，最后点击「提交到报告」进行沉淀。',
+    '当前在 AI 工作台。生成结果后，请先查看「资产化交接」，确认结果区块、知识依据和复核标记是否完整。',
+    '点击「提交到报告」后，系统会保存交接记录，供报告和资产库追溯。',
   ],
   '/report': [
-    '当前在策略报告。您可以点击「提炼核心结论摘要」，自动提取已提交岗位的电商落地建议。',
-    '报告支持多岗位 Tab 切换查看，点击右上角「沉淀为复用工作包」可归档为团队模板。',
+    '当前在策略报告。发布 Work Kit 前，请检查「资产交接证据」是否覆盖关键岗位。',
+    '点击「沉淀为复用工作包」会把岗位结果、验证结论、交接证据和执行清单一并写入资产库。',
   ],
+}
+
+function readLocalList(key: string): any[] {
+  try {
+    return JSON.parse(localStorage.getItem(key) || '[]')
+  } catch {
+    return []
+  }
 }
 
 export default function AIAssistant() {
@@ -85,9 +93,9 @@ export default function AIAssistant() {
     if (messages.length === 0) {
       let greet = '👋 您好！我是 PromoKit AI 助手。'
       if (activeProject) {
-        greet += ` 当前您在处理项目「${activeProject.name}」。\n\n我可以帮您：\n- 🔍 诊断项目整体进度与资料健康度\n- ➕ 智能推荐大促岗位分析任务\n- ✨ 深度优化当前工作台提示词 (Prompt)`
+        greet += ` 当前您在处理项目「${activeProject.name}」。\n\n我可以帮您：\n- 🔍 诊断项目整体进度与资料健康度\n- 📦 判断下一步资产化动作\n- ✨ 优化 Prompt、交接证据和 Work Kit 沉淀路径`
       } else {
-        greet += ' 您可以在此看板管理大促项目。我可以帮您诊断各项目进度，或推荐新建策划大促方案。'
+        greet += ' 您可以在此看板管理大促项目。我可以帮您诊断资产运营信号，找出最该补齐的项目。'
       }
       
       // Use pageTips to show a relevant tip
@@ -148,10 +156,13 @@ export default function AIAssistant() {
     projectsList.forEach((p, idx) => {
       const pTasks = getTasks(p.id)
       const done = pTasks.filter((t) => getAIResult(t.id)?.submitted).length
+      const handoffs = readLocalList('promokit_asset_handoffs').filter((handoff) => handoff.projectId === p.id).length
+      const hasKit = getWorkKits().some((kit) => kit.basedOnProjectId === p.id)
       const pct = pTasks.length > 0 ? Math.round((done / pTasks.length) * 100) : 0
       report += `${idx + 1}. 【${p.name}】（${p.category}）\n`
       report += `   · 进度：${pct}% (已提交 ${done}/${pTasks.length} 个岗位任务)\n`
       report += `   · 竞品数：${p.competitors.length} ｜ 资料数：${getMaterials(p.id).length}\n`
+      report += `   · 资产链路：${handoffs} 条交接记录 ｜ ${hasKit ? '已发布 Work Kit' : '未发布 Work Kit'}\n`
       
       const pendingTasks = pTasks.filter((t) => !getAIResult(t.id)?.submitted).map((t) => t.title)
       if (pendingTasks.length > 0) {
@@ -159,7 +170,7 @@ export default function AIAssistant() {
       }
       report += '\n'
     })
-    report += '💡 优化建议：您可以点击列表进入具体项目，在资料库补充数据或到工作台生成 AI 报告。'
+    report += '💡 优化建议：优先处理没有交接记录或尚未发布 Work Kit 的项目，让分析结果真正进入资产库。'
     streamAIResponse(report)
   }
 
@@ -170,9 +181,10 @@ export default function AIAssistant() {
     
     const mats = getMaterials(activeProject.id)
     const pTasks = getTasks(activeProject.id)
+    const taskInputReady = pTasks.filter((task) => task.inputMaterials.length > 0).length
     
     let diag = `📋 「${activeProject.name}」资料库健康度分析：\n\n`
-    diag += `当前已上传 ${mats.length} 份分析资料：\n`
+    diag += `当前已上传 ${mats.length} 份分析资料，已支撑 ${taskInputReady}/${pTasks.length} 张任务卡：\n`
     
     const counts = { review: 0, spec: 0, faq: 0, copy_asset: 0 }
     mats.forEach((m) => {
@@ -198,7 +210,7 @@ export default function AIAssistant() {
     if (warnings.length > 0) {
       diag += `诊断警告：\n${warnings.join('\n')}`
     } else {
-      diag += `✅ 诊断合格：所有核心岗位的数据输入均已就绪，资料健康，可以进入「任务卡」大批量生成！`
+      diag += `✅ 诊断合格：所有核心岗位的数据输入均已就绪，资料结构可进入任务卡，并可在最终 Work Kit 中复用。`
     }
     
     streamAIResponse(diag)
@@ -340,6 +352,9 @@ export default function AIAssistant() {
     const submitted = tasks.filter((task) => getAIResult(task.id)?.submitted)
     const generated = tasks.filter((task) => Boolean(getAIResult(task.id)?.generatedAt))
     const existingKit = getWorkKits().find((kit) => kit.basedOnProjectId === activeProject.id)
+    const assetHandoffs = readLocalList('promokit_asset_handoffs').filter((handoff) => handoff.projectId === activeProject.id)
+    const learningRecords = readLocalList('promokit_prelearning_records').filter((record) => record.projectId === activeProject.id || record.workKitName?.includes(activeProject.name))
+    const validationHistory = readLocalList('promokit_validation_history')
     const materialTypes = new Set(mats.map((mat) => mat.type))
     const missingMaterials = [
       ['review', '竞品评论'],
@@ -355,6 +370,8 @@ export default function AIAssistant() {
       next = `进入任务卡/工作台，把未生成的岗位任务跑完。当前已生成 ${generated.length}/${tasks.length} 个任务结果。`
     } else if (submitted.length < tasks.length) {
       next = `把已生成但未提交的岗位结果提交到报告。当前报告只收到 ${submitted.length}/${tasks.length} 个岗位结果。`
+    } else if (assetHandoffs.length === 0) {
+      next = `进入已提交任务的工作台，确认「资产化交接」并提交到报告。没有交接记录，报告发布 Work Kit 时会缺少可追溯证据。`
     } else if (!existingKit) {
       next = `进入策略报告，完成发布前资产化检查，并点击「发布 Work Kit」。这是把本次分析变成下次资产的关键动作。`
     } else {
@@ -367,6 +384,7 @@ export default function AIAssistant() {
       (tasks.length > 0 ? 15 : 0) +
       (tasks.length ? (generated.length / tasks.length) * 20 : 0) +
       (tasks.length ? (submitted.length / tasks.length) * 15 : 0) +
+      (assetHandoffs.length > 0 ? 10 : 0) +
       (existingKit ? 10 : 0)
     ))
 
@@ -375,6 +393,9 @@ export default function AIAssistant() {
       `· 资产化就绪度：${score}%\n` +
       `· 资料覆盖：${mats.length} 份${missingMaterials.length ? `，缺少 ${missingMaterials.join('、')}` : '，核心类型已覆盖'}\n` +
       `· 岗位结果：已生成 ${generated.length}/${tasks.length}，已提交 ${submitted.length}/${tasks.length}\n` +
+      `· 资产交接：${assetHandoffs.length} 条记录\n` +
+      `· 启动学习：${learningRecords.length} 条记录\n` +
+      `· 验证历史：${validationHistory.length} 条记录\n` +
       `· Work Kit：${existingKit ? `已沉淀 ${existingKit.version}` : '尚未发布'}\n\n` +
       `建议下一步：${next}\n\n` +
       `判断标准：只有当资料结构、岗位输出、报告验证和 Work Kit 发布都留下记录，这次分析才真正变成下一次可复用的资产。`
@@ -388,19 +409,19 @@ export default function AIAssistant() {
     let reply = ''
     if (context === 'dashboard') {
       q = '💡 大促策划建议'
-      reply = '💡 大促项目策划建议：\n\n1. **确定大促场景**：在项目名称中标明是大促活动（如 618、双11）；\n2. **明确主攻品类**：在创建项目时选择特定的商品类目，有助于 AI 推荐相应的核心指标；\n3. **多岗位协同**：在大促准备期，将任务分配给运营、文案、设计、客服等不同成员，以闭环管理进度。'
+      reply = '💡 大促项目目标建议：\n\n1. **先看资产运营信号**：优先处理缺资料、缺交接、缺验证的项目；\n2. **明确可复用产物**：每个项目不只完成一次分析，还要沉淀资料结构、Prompt、岗位输出和执行清单；\n3. **用 Work Kit 衡量完成度**：当项目能被下一次大促直接复用，才算真正闭环。'
     } else if (context === 'materials') {
       q = '💡 大促资料推荐'
-      reply = '💡 推荐上传以下资料组合以发挥最大效能：\n\n1. **竞品评论 CSV**：包含真实的好评与负评文本，为痛点挖掘提供最直接的土壤；\n2. **产品规格参数表**：以便 AI 深入剖析物理规格，定位性能短板；\n3. **历史文案素材**：如卖点清单，让 AI 在分析时自动对齐品牌自身的话术风格；\n4. **客服历史记录**：最适合用来一键提炼高转化 FAQ 话术。'
+      reply = '💡 推荐上传以下资料组合，并检查「资料如何驱动岗位任务」：\n\n1. **竞品评论 CSV**：支撑痛点矩阵、FAQ 和客服话术；\n2. **产品规格参数表**：支撑卖点翻译、详情页优化和差异化策略；\n3. **历史文案素材**：让 Prompt 继承品牌表达方式；\n4. **客服历史记录**：沉淀高频问题、反驳话术和售前决策依据。'
     } else if (context === 'tasks') {
       q = '⚡ 批量快速生成说明'
-      reply = '⚡ 岗位任务卡操作指导：\n\n1. **关联资料**：部分标注「待补资料」的任务卡需要特定输入，可先到资料库上传；\n2. **一键生成**：点击右上角「生成全部任务卡」，系统会调用模拟分析将待生成的任务卡一并初始化；\n3. **单项精修**：生成后点击任务卡底部的「进入分析」，可进入工作台进行微调、重生成或修改。'
+      reply = '⚡ 岗位任务卡操作指导：\n\n1. **先看启动就绪度**：优先补齐输入资料不足的任务；\n2. **检查三件套**：Prompt、输出格式、验收标准要清楚，后续才可复用；\n3. **进入工作台交接**：生成结果后要完成资产化交接，让任务卡不只是一段分析，而是 Work Kit 的组成模块。'
     } else if (context === 'workspace') {
       q = '📐 自动补全验收标准'
-      reply = '📐 推荐为当前岗位任务补充以下量化验收标准：\n\n1. **评论实例支撑**：所提取出的痛点/卖点必须定位至至少 2 条真实评价原文；\n2. **改进行动明确**：分析结论中提及的运营或设计修改方案必须有可执行的文字细节；\n3. **岗位成果对齐**：输出内容必须能够作为其他岗位（如文案或设计）的直接参考指标。'
+      reply = '📐 推荐为当前岗位任务补充以下量化验收标准：\n\n1. **评论实例支撑**：痛点/卖点需定位至真实评价或明确资料来源；\n2. **改进行动明确**：运营、文案或设计建议要能直接执行；\n3. **岗位成果对齐**：输出内容可被其他岗位继续引用；\n4. **资产交接完整**：提交报告前确认结果区块、知识依据、复核标记都已记录。'
     } else if (context === 'report') {
       q = '📦 快速沉淀为 Work Kit'
-      reply = '📦 如何快速沉淀为 Work Kit 工作包模版：\n\n1. **汇总结论**：确保所有岗位的分析均已在工作台点击「提交到报告」；\n2. **微调润色**：点击「编辑报告」对整篇报告进行细节调整 and 修正；\n3. **保存归档**：点击右上角「沉淀为复用工作包」，输入模版名称及复盘建议。保存后，项目将被归档，下次只需在资产库一键点击「复用」即可建立全新项目！'
+      reply = '📦 如何快速沉淀为 Work Kit 工作包模版：\n\n1. **补齐岗位结果**：确保关键任务都已提交到报告；\n2. **检查交接证据**：确认每个关键结论有来源、负责人和复用去向；\n3. **写清复盘建议**：把适用场景、注意事项和下次启动前要学习的内容写入资产；\n4. **保存归档并验证**：发布 Work Kit 后，在资产库继续记录复用反馈，让资产健康度持续变高。'
     }
     
     setMessages((prev) => [...prev, { role: 'user', text: q }])
@@ -480,11 +501,11 @@ export default function AIAssistant() {
       let replyText = '您可以向我提问任何关于 PromoKit 的问题，或使用上方的快捷指令进行快速诊断。'
       
       const responses: Record<string, string> = {
-        '怎么': '建议从 Dashboard 看板选择一个项目，进入资料库上传竞品评论等数据包，然后前往任务卡页面进行岗位 AI 智能生成。',
-        '如何': '您可以到「资产库」选择已经保存的电商 Work Kit，点击「复用模板」快速创建新项目。',
-        '什么': 'PromoKit AI 是针对电商团队打造的 AI 工作包模板沉淀系统，帮助把每次大促竞品挖掘与策略策划流程标准化、模板化。',
+        '怎么': '建议按「看板诊断 → 资料映射 → 任务卡生成 → 工作台交接 → 报告发布 → Work Kit 验证」推进。目标不是只生成一次结果，而是让这次分析能被下一次大促复用。',
+        '如何': '可以到「资产库」选择健康度较高的 Work Kit，先查看启动前学习包和复用前检查，再创建新项目。这样新项目会继承资料结构、Prompt 经验和验证反馈。',
+        '什么': 'PromoKit AI 是面向电商大促团队的 AI 工作包资产化系统，用来沉淀资料结构、Prompt、岗位分析结果、交接证据和复用验证反馈。',
         '创建': '点击侧边栏的「新建项目」即可开始，表单中会引导您填写项目名称、目类和关联竞品。',
-        '上传': '进入对应项目的资料库，拖拽或点击上传 CSV 文件即可。系统会自动按评论、参数等类型分类识别。',
+        '上传': '进入对应项目的资料库，拖拽或点击上传资料。上传后建议查看「资料如何驱动岗位任务」，确认每份资料会支撑哪些任务卡和后续 Work Kit 模板。',
       }
       
       for (const [k, v] of Object.entries(responses)) {

@@ -159,10 +159,22 @@ export default function CreateProject() {
     const note = learningNotes[item.id]?.trim()
     return `${item.title}：${note || item.apply}`
   })
+  const noteCount = Object.values(learningNotes).filter((note) => note.trim()).length
+  const promptInjectionPreview = learnedItems.slice(0, 3).map((item) => {
+    const note = learningNotes[item.id]?.trim()
+    return note ? `${item.title}：${note}` : `${item.title}：${item.apply}`
+  })
   const plannedTaskCount = workKit
     ? workKit.sections.filter((section) => roles.some((role) => role.checked && role.role === section.role)).length
     : roles.filter((role) => role.checked).length
   const selectedRoleCount = roles.filter((role) => role.checked).length
+  const learningReadiness = workKit
+    ? [
+        { label: '已学习', value: `${learnedCount}/${learningItems.length}`, desc: learningPercent >= 60 ? '可进入项目创建' : '建议继续学习关键项' },
+        { label: '学习笔记', value: `${noteCount} 条`, desc: noteCount ? '会写入任务 Prompt' : '可补充沿用/避坑说明' },
+        { label: 'Prompt 继承', value: `${plannedTaskCount} 张`, desc: '任务卡会带上学习记录' },
+      ]
+    : []
   const launchAssets = workKit
     ? [
         { label: '继承任务模板', value: `${plannedTaskCount} 张`, desc: '从历史 Work Kit 复用岗位任务结构' },
@@ -425,6 +437,16 @@ export default function CreateProject() {
               <div className="h-full rounded-full bg-accent-500 transition-all" style={{ width: `${learningPercent}%` }} />
             </div>
 
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              {learningReadiness.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-3">
+                  <div className="text-[16px] font-light text-text-main leading-none">{item.value}</div>
+                  <div className="text-[10px] font-medium text-text-main mt-1">{item.label}</div>
+                  <div className="text-[9px] text-text-muted leading-snug mt-1">{item.desc}</div>
+                </div>
+              ))}
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-[0.78fr_1.22fr] gap-4">
               <div className="space-y-2">
                 {learningItems.map((item, index) => {
@@ -501,6 +523,17 @@ export default function CreateProject() {
                         <ListChecks className="w-3.5 h-3.5" />如何带入新项目
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">{activeLearningItem.apply}</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-accent-500/[0.04] border border-accent-500/20 p-3">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold text-accent-600 mb-2">
+                        <Sparkles className="w-3.5 h-3.5" />将写入任务卡
+                      </div>
+                      <p className="text-[12px] text-text-secondary leading-relaxed">
+                        {learnedIds.includes(activeLearningItem.id)
+                          ? (learningNotes[activeLearningItem.id]?.trim() || activeLearningItem.apply)
+                          : '标记学会后，这条学习记录会进入新项目任务卡 Prompt，提醒对应岗位说明沿用与修订依据。'}
+                      </p>
                     </div>
 
                     <div>
@@ -629,9 +662,47 @@ export default function CreateProject() {
 
         {step === 2 && workKit && (
           <div className="space-y-8">
-            <p className="text-[13px] text-text-secondary leading-relaxed bg-accent-500/[0.03] rounded-xl p-4">
-              模板已预设 {workKit.includedRoles.length} 个岗位角色、{workKit.sections.length} 个任务模板和资料结构。你只需补充活动信息即可启动项目。
-            </p>
+            <div className="rounded-[24px] border border-accent-500/20 bg-accent-500/[0.04] p-5">
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Launch Handoff</div>
+                  <h3 className="text-[16px] font-medium text-text-main">启动前继承摘要</h3>
+                  <p className="text-[12px] text-text-secondary leading-relaxed mt-1">
+                    模板已预设 {workKit.includedRoles.length} 个岗位角色、{workKit.sections.length} 个任务模板和资料结构。创建后会把学习记录写入对应任务卡。
+                  </p>
+                </div>
+                <div className="w-14 h-14 rounded-2xl bg-bg-surface border border-border-light flex flex-col items-center justify-center shrink-0">
+                  <span className="text-[18px] font-light text-accent-600 leading-none">{learningPercent}%</span>
+                  <span className="text-[9px] text-text-muted mt-1">学习度</span>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-3 gap-2 mb-4">
+                {[
+                  ['任务卡', `${plannedTaskCount} 张`],
+                  ['学习记录', `${learnedCount} 条`],
+                  ['笔记', `${noteCount} 条`],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-2xl border border-border-light bg-bg-surface/80 p-3">
+                    <div className="text-[16px] font-light text-text-main leading-none">{value}</div>
+                    <div className="text-[10px] text-text-muted mt-1">{label}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-2xl bg-bg-surface/80 border border-border-light p-3">
+                <div className="flex items-center gap-2 text-[11px] font-semibold text-text-main mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-accent-500" />Prompt 注入预览
+                </div>
+                {promptInjectionPreview.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {promptInjectionPreview.map((item) => (
+                      <p key={item} className="text-[11px] text-text-secondary leading-relaxed line-clamp-2">{item}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-text-muted leading-relaxed">还没有标记学习项。建议至少学习资料结构与一个岗位任务，创建后的任务卡会更具体。</p>
+                )}
+              </div>
+            </div>
             {errors.campaign && <p className="text-[12px] text-error">{errors.campaign}</p>}
             <div>
               <label className="block text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted mb-3">活动名称 *</label>

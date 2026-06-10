@@ -25,6 +25,22 @@ function readLearningRecords(): any[] {
   }
 }
 
+function readValidationHistory(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_validation_history') || '[]')
+  } catch {
+    return []
+  }
+}
+
+function readAssetHandoffs(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
 function buildValidationRows(kit: WorkKit) {
   const hasCopy = kit.includedRoles.includes('copywriting')
   const hasService = kit.includedRoles.includes('customer_service')
@@ -60,6 +76,33 @@ function buildValidationRows(kit: WorkKit) {
   ]
 }
 
+function getValidationSummary(kit: WorkKit, decisions?: Record<string, ValidationDecision>) {
+  if (!decisions) return null
+  const rows = buildValidationRows(kit)
+  const keep = rows.filter((row) => decisions[row.id] === 'keep').length
+  const revise = rows.filter((row) => decisions[row.id] === 'revise').length
+  return {
+    keep,
+    revise,
+    total: rows.length,
+    status: revise > 0 ? '需要修订' : '验证通过',
+  }
+}
+
+function getKitHealth(kit: WorkKit, validationSummary: ReturnType<typeof getValidationSummary>, learningRecordCount: number) {
+  const score = Math.min(100, Math.round(
+    kit.rating * 12 +
+    Math.min(kit.reuseCount, 8) * 3 +
+    Math.min(kit.includedRoles.length, 5) * 4 +
+    Math.min(kit.versionHistory.length, 4) * 4 +
+    (validationSummary ? validationSummary.keep * 5 - validationSummary.revise * 4 : 0) +
+    Math.min(learningRecordCount, 4) * 3,
+  ))
+  if (score >= 82) return { score, label: '优先复用', desc: '验证与复用信号较强，适合作为新项目启动模板', tone: 'success' as const }
+  if (score >= 64) return { score, label: '建议复核', desc: '可复用，但启动前建议先查看验证和版本历史', tone: 'warning' as const }
+  return { score, label: '观察模板', desc: '复用前需要补充反馈、验证或版本迭代记录', tone: 'muted' as const }
+}
+
 export default function Archive() {
   const navigate = useNavigate()
   const [reuseKit, setReuseKit] = useState<string | null>(null)
@@ -70,6 +113,8 @@ export default function Archive() {
   const [kits] = useState(getWorkKits())
   const [validationRuns, setValidationRuns] = useState<Record<string, Record<string, ValidationDecision>>>(readValidationState)
   const [learningRecords] = useState(readLearningRecords)
+  const [validationHistory, setValidationHistory] = useState(readValidationHistory)
+  const [assetHandoffs] = useState(readAssetHandoffs)
   const [draftValidation, setDraftValidation] = useState<Record<string, ValidationDecision>>({})
   const { showToast } = useToast()
   const [editKit, setEditKit] = useState<WorkKit | null>(null)
@@ -89,6 +134,9 @@ export default function Archive() {
   const avgSaving = learningCount > 0
     ? Math.round(learningRecords.reduce((sum, record) => sum + (record.estimatedSaving ?? 0), 0) / learningCount)
     : 0
+  const handoffCount = assetHandoffs.length
+  const handoffSectionCount = assetHandoffs.reduce((sum, handoff) => sum + (handoff.sectionCount ?? 0), 0)
+  const handoffKnowledgeCount = assetHandoffs.reduce((sum, handoff) => sum + ((handoff.adoptedKnowledge || []).length), 0)
 
   const openValidation = (id: string) => {
     const kit = kits.find((k) => k.id === id)
@@ -101,10 +149,26 @@ export default function Archive() {
 
   const saveValidation = () => {
     if (!validationKit) return
+    const kit = kits.find((item) => item.id === validationKit)
+    if (!kit) return
     const next = { ...validationRuns, [validationKit]: draftValidation }
     setValidationRuns(next)
     localStorage.setItem('promokit_validation_runs', JSON.stringify(next))
+    const summary = getValidationSummary(kit, draftValidation)
+    const historyItem = {
+      kitId: kit.id,
+      kitName: kit.name,
+      status: summary?.status || '待判断',
+      keep: summary?.keep || 0,
+      revise: summary?.revise || 0,
+      total: summary?.total || 0,
+      createdAt: new Date().toISOString(),
+    }
+    const nextHistory = [historyItem, ...validationHistory].slice(0, 50)
+    setValidationHistory(nextHistory)
+    localStorage.setItem('promokit_validation_history', JSON.stringify(nextHistory))
     setValidationKit(null)
+    showToast('验证结论已保存到资产库', 'success')
   }
 
   // Filter by tag + text search
@@ -139,13 +203,14 @@ export default function Archive() {
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
         {[
           { icon: Package, value: String(kits.length), label: 'Work Kit 模板', sub: '可复用分析流程' },
           { icon: TrendingUp, value: String(totalReuse), label: '累计复用次数', sub: '跨项目经验传承' },
           { icon: Star, value: String(successKits.length), label: '已验证成功案例', sub: `评分 ≥ 4.8` },
           { icon: ShieldCheck, value: String(validatedCount), label: '对比验证记录', sub: '保留/修订决策' },
           { icon: BookOpen, value: String(learningCount), label: '启动前学习', sub: `平均评分 ${avgRating}` },
+          { icon: FileText, value: String(handoffCount), label: '资产交接', sub: `${handoffSectionCount} 个结果区块` },
         ].map((s) => (
           <div key={s.label} className="card-surface rounded-2xl p-5 flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
@@ -174,7 +239,7 @@ export default function Archive() {
             {[
               ['学习记录', `${learningCount} 条`, '启动前学习包的使用痕迹'],
               ['复用强度', `${totalReuse} 次`, '模板被再次用于项目'],
-              ['平均学习', `${avgLearningPercent}%`, avgLearningPercent ? `预计节省 ${avgSaving}%` : '等待复用记录'],
+              ['资产交接', `${handoffCount} 条`, handoffCount ? `${handoffKnowledgeCount} 个知识依据进入报告` : '等待工作台提交'],
             ].map(([label, value, sub]) => (
               <div key={label} className="rounded-2xl bg-bg-primary/70 border border-border-light p-4">
                 <div className="text-[24px] font-light text-text-main leading-none mb-2">{value}</div>
@@ -183,6 +248,108 @@ export default function Archive() {
               </div>
             ))}
           </div>
+        </div>
+        <div className="relative mt-5 grid lg:grid-cols-[1.2fr_0.8fr] gap-3">
+            <div className="rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div>
+                  <div className="text-[12px] font-medium text-text-main">复用学习收益</div>
+                  <div className="text-[10px] text-text-muted mt-0.5">启动前学习是否真正减少重复工作</div>
+                </div>
+                <span className="tag bg-ai-400/10 text-ai-400">平均学习 {avgLearningPercent}%</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['学习记录', `${learningCount}`],
+                  ['预计节省', avgSaving ? `${avgSaving}%` : '待评估'],
+                  ['验证历史', `${validationHistory.length}`],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-3">
+                    <div className="text-[17px] font-light text-text-main leading-none">{value}</div>
+                    <div className="text-[10px] text-text-muted mt-1">{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <ShieldCheck className="w-4 h-4 text-accent-500" />
+                <span className="text-[12px] font-medium text-text-main">最近验证</span>
+              </div>
+              {validationHistory[0] ? (
+                <div>
+                  <div className="text-[12px] font-medium text-text-main truncate">{validationHistory[0].kitName}</div>
+                  <div className="text-[10px] text-text-muted mt-1">{new Date(validationHistory[0].createdAt).toLocaleString()}</div>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {[
+                      ['状态', validationHistory[0].status],
+                      ['保留', `${validationHistory[0].keep}`],
+                      ['修订', `${validationHistory[0].revise}`],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-2">
+                        <div className="text-[11px] font-medium text-text-main truncate">{value}</div>
+                        <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[11px] text-text-muted leading-relaxed">还没有验证记录。点击任一 Work Kit 的“启动验证”，保存后会在这里形成经验轨迹。</p>
+              )}
+            </div>
+        </div>
+        <div className="relative mt-3 rounded-2xl border border-accent-500/15 bg-accent-500/[0.035] p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-accent-500" />
+              <div>
+                <div className="text-[12px] font-medium text-text-main">最近资产交接</div>
+                <div className="text-[10px] text-text-muted mt-0.5">工作台提交的分析结果如何进入报告与 Work Kit 资产链路</div>
+              </div>
+            </div>
+            <span className="tag bg-accent-500/10 text-accent-600">{handoffCount} 条交接</span>
+          </div>
+          {assetHandoffs.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-3">
+              {assetHandoffs.slice(0, 4).map((handoff) => (
+                <div key={handoff.id} className="rounded-2xl border border-border-light bg-bg-surface/80 p-4">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-medium text-text-main truncate">{handoff.taskTitle}</div>
+                      <div className="text-[10px] text-text-muted mt-1 truncate">{handoff.projectName} · {handoff.roleLabel}</div>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-success-soft text-success shrink-0">已交接</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    {[
+                      ['区块', `${handoff.sectionCount ?? 0}`],
+                      ['知识', `${(handoff.adoptedKnowledge || []).length}`],
+                      ['复核', `${(handoff.feedbackItems || []).length}`],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-xl border border-border-light bg-bg-primary/70 p-2">
+                        <div className="text-[13px] font-medium text-text-main leading-none">{value}</div>
+                        <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(handoff.adoptedKnowledge || []).slice(0, 3).map((item: any) => (
+                      <span key={item.id} className="text-[10px] px-2 py-1 rounded-md bg-bg-primary text-text-muted border border-border-light">
+                        {item.title}
+                      </span>
+                    ))}
+                    {(handoff.adoptedKnowledge || []).length === 0 && (
+                      <span className="text-[10px] text-text-muted">暂无知识依据记录</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[11px] text-text-muted leading-relaxed">
+              还没有资产交接记录。进入工作台生成分析并提交到报告后，这里会记录结果区块、采纳知识、来源资料和复核标记。
+            </p>
+          )}
         </div>
         {learningRecords.length > 0 && (
           <div className="relative mt-5 grid md:grid-cols-2 gap-3">
@@ -356,6 +523,8 @@ export default function Archive() {
             const showHistory = expandedHistory[wk.id] ?? false
             const sourceProject = getProjects().find((p) => p.id === wk.basedOnProjectId)
             const kitLearningRecords = learningRecords.filter((record) => record.workKitId === wk.id)
+            const validationSummary = getValidationSummary(wk, validationRuns[wk.id])
+            const health = getKitHealth(wk, validationSummary, kitLearningRecords.length)
             return (
               <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden animate-fade-in-up">
                 <div className="p-6 pb-0">
@@ -377,6 +546,73 @@ export default function Archive() {
                     {wk.tags.map((tag) => (
                       <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-text-muted">{tag}</span>
                     ))}
+                  </div>
+                  <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4 mb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                      <div>
+                        <div className="text-[12px] font-semibold text-text-main">资产健康度 · {health.label}</div>
+                        <div className="text-[10px] text-text-muted mt-1">{health.desc}</div>
+                      </div>
+                      <div className={`text-[24px] font-light leading-none ${
+                        health.tone === 'success' ? 'text-success' : health.tone === 'warning' ? 'text-warning' : 'text-text-muted'
+                      }`}>{health.score}</div>
+                    </div>
+                    <div className="h-2 rounded-full bg-bg-surface overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          health.tone === 'success' ? 'bg-success' : health.tone === 'warning' ? 'bg-warning' : 'bg-text-muted'
+                        }`}
+                        style={{ width: `${health.score}%` }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 mt-3">
+                      {[
+                        ['评分', wk.rating.toFixed(1)],
+                        ['复用', `${wk.reuseCount}`],
+                        ['版本', `${wk.versionHistory.length}`],
+                        ['学习', `${kitLearningRecords.length}`],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-2">
+                          <div className="text-[12px] font-medium text-text-main">{value}</div>
+                          <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className={`rounded-2xl border p-4 mb-5 ${
+                    validationSummary
+                      ? validationSummary.revise > 0
+                        ? 'border-warning/20 bg-warning-soft'
+                        : 'border-success/20 bg-success-soft'
+                      : 'border-border-light bg-bg-primary/45'
+                  }`}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className={`w-4 h-4 ${
+                          validationSummary
+                            ? validationSummary.revise > 0 ? 'text-warning' : 'text-success'
+                            : 'text-text-muted'
+                        }`} />
+                        <span className="text-[12px] font-semibold text-text-main">
+                          {validationSummary ? `验证结论：${validationSummary.status}` : '验证结论：待运行'}
+                        </span>
+                      </div>
+                      <button onClick={() => openValidation(wk.id)} className="text-[11px] font-medium text-accent-600 hover:text-accent-500">
+                        {validationSummary ? '重新验证' : '启动验证'}
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      {[
+                        ['保留项', validationSummary ? `${validationSummary.keep}` : '-'],
+                        ['修订项', validationSummary ? `${validationSummary.revise}` : '-'],
+                        ['验证角色', validationSummary ? `${validationSummary.total}` : '3'],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-xl bg-bg-surface/75 border border-border-light p-3">
+                          <div className="text-[16px] font-light text-text-main leading-none">{value}</div>
+                          <div className="text-[10px] text-text-muted mt-1">{label}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -528,26 +764,126 @@ export default function Archive() {
       {reuseKit && (() => {
         const wk = kits.find((k) => k.id === reuseKit)
         if (!wk) return null
+        const kitLearningRecords = learningRecords.filter((record) => record.workKitId === wk.id)
+        const validationSummary = getValidationSummary(wk, validationRuns[wk.id])
+        const health = getKitHealth(wk, validationSummary, kitLearningRecords.length)
+        const preflightItems = [
+          {
+            label: '验证结论',
+            value: validationSummary ? validationSummary.status : '待验证',
+            desc: validationSummary ? `${validationSummary.keep}/${validationSummary.total} 项建议保留` : '建议先运行一次资产验证',
+            icon: ShieldCheck,
+            tone: validationSummary?.revise ? 'warning' : validationSummary ? 'success' : 'muted',
+          },
+          {
+            label: '启动前学习',
+            value: kitLearningRecords.length ? `${kitLearningRecords.length} 条记录` : '即将生成',
+            desc: kitLearningRecords.length ? '已有复用前学习痕迹，可继续继承' : '创建时会带出学习包与关键经验',
+            icon: BookOpen,
+            tone: kitLearningRecords.length ? 'success' : 'muted',
+          },
+          {
+            label: '任务模板',
+            value: `${wk.sections.length} 个模块`,
+            desc: `${wk.includedRoles.length} 个岗位角色将自动预填`,
+            icon: GitBranch,
+            tone: 'success',
+          },
+        ]
         return (
-          <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-            <div className="bg-bg-surface rounded-[24px] p-6 w-[460px] shadow-xl">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center shrink-0"><Package className="w-5 h-5 text-accent-500" /></div>
-                <div>
-                  <h3 className="text-[16px] font-medium text-text-main">复用 "{wk.name}"</h3>
-                  <p className="text-[12px] text-text-muted">基于此模板创建新的大促分析项目</p>
+          <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50 px-4">
+            <div className="bg-bg-surface rounded-[28px] p-6 w-[680px] max-w-full shadow-2xl border border-border-light">
+              <div className="flex items-start justify-between gap-5 mb-5">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
+                    <Package className="w-5 h-5 text-accent-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Reuse Preflight · 复用前检查</div>
+                    <h3 className="text-[18px] font-medium text-text-main truncate">复用 "{wk.name}"</h3>
+                    <p className="text-[12px] text-text-muted mt-1">在创建新项目之前，先确认这个工作包是否值得直接继承。</p>
+                  </div>
+                </div>
+                <div className={`rounded-2xl px-4 py-3 text-center shrink-0 ${
+                  health.tone === 'success'
+                    ? 'bg-success-soft text-success'
+                    : health.tone === 'warning'
+                      ? 'bg-warning-soft text-warning'
+                      : 'bg-bg-primary text-text-muted'
+                }`}>
+                  <div className="text-[26px] font-light leading-none">{health.score}</div>
+                  <div className="text-[10px] font-medium mt-1">{health.label}</div>
                 </div>
               </div>
-              <div className="bg-bg-primary rounded-2xl p-4 mb-4 space-y-2 text-[12px]">
-                <div className="flex justify-between"><span className="text-text-muted">模板版本</span><span className="font-medium text-text-main">{wk.version} · 复用 {wk.reuseCount} 次</span></div>
-                <div className="flex justify-between"><span className="text-text-muted">预填岗位</span><span className="font-medium text-text-main">{wk.includedRoles.map((r) => roleLabels[r]).join('、')}</span></div>
-                <div className="flex justify-between"><span className="text-text-muted">任务模板</span><span className="font-medium text-text-main">{wk.sections.length} 个</span></div>
-                <div className="flex justify-between"><span className="text-text-muted">资料结构</span><span className="font-medium text-text-main text-right max-w-[220px] leading-snug">{wk.materialStructure}</span></div>
+
+              <div className="grid grid-cols-[1fr_1.1fr] gap-4 mb-4">
+                <div className="rounded-2xl border border-border-light bg-bg-primary/70 p-4">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="text-[12px] font-semibold text-text-main">资产健康度</div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-bg-surface text-text-muted">{wk.version} · 复用 {wk.reuseCount} 次</span>
+                  </div>
+                  <p className="text-[12px] text-text-secondary leading-relaxed mb-4">{health.desc}</p>
+                  <div className="h-2 rounded-full bg-bg-surface overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        health.tone === 'success' ? 'bg-success' : health.tone === 'warning' ? 'bg-warning' : 'bg-text-muted'
+                      }`}
+                      style={{ width: `${health.score}%` }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {[
+                      ['评分', wk.rating.toFixed(1)],
+                      ['版本', `${wk.versionHistory.length}`],
+                      ['复用', `${wk.reuseCount}`],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-xl bg-bg-surface/80 border border-border-light p-2">
+                        <div className="text-[12px] font-medium text-text-main">{value}</div>
+                        <div className="text-[9px] text-text-muted mt-0.5">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+                  <div className="text-[12px] font-semibold text-text-main mb-3">复用前检查</div>
+                  <div className="space-y-2.5">
+                    {preflightItems.map((item) => {
+                      const Icon = item.icon
+                      return (
+                        <div key={item.label} className="flex items-center gap-3 rounded-xl border border-border-light bg-bg-surface/80 p-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                            item.tone === 'success'
+                              ? 'bg-success-soft text-success'
+                              : item.tone === 'warning'
+                                ? 'bg-warning-soft text-warning'
+                                : 'bg-bg-primary text-text-muted'
+                          }`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[12px] font-medium text-text-main">{item.label}</span>
+                              <span className="text-[11px] text-text-secondary shrink-0">{item.value}</span>
+                            </div>
+                            <div className="text-[10px] text-text-muted mt-0.5 truncate">{item.desc}</div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
-              <div className="bg-accent-500/[0.05] rounded-2xl p-3.5 mb-5 text-center">
-                <p className="text-[12px] text-accent-500 leading-relaxed">
+
+              <div className="bg-bg-primary rounded-2xl p-4 mb-4 space-y-2 text-[12px]">
+                <div className="flex justify-between gap-4"><span className="text-text-muted">预填岗位</span><span className="font-medium text-text-main text-right">{wk.includedRoles.map((r) => roleLabels[r]).join('、')}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-text-muted">资料结构</span><span className="font-medium text-text-main text-right max-w-[360px] leading-snug">{wk.materialStructure}</span></div>
+              </div>
+
+              <div className="bg-accent-500/[0.05] rounded-2xl p-3.5 mb-5">
+                <p className="text-[12px] text-accent-600 leading-relaxed">
                   <Sparkles className="w-3.5 h-3.5 inline mr-1" />
-                  基于此模板创建新项目，{wk.includedRoles.length} 个岗位角色和资料结构将自动预填。你只需补充活动信息即可开始。
+                  基于此模板创建新项目后，系统会自动带出岗位、任务结构与启动前学习包；你只需补充本次活动信息，再决定是否先修订模板。
                 </p>
               </div>
               <div className="flex items-center gap-2 justify-end">

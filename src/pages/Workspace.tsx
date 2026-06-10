@@ -18,6 +18,14 @@ interface KnowledgeRecommendation {
   verification: string
 }
 
+function readAssetHandoffs(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
 function buildMockSections(task: TaskCard, materialCount: number): AISection[] {
   const roleLabel = roleLabels[task.role]
   return [
@@ -149,6 +157,29 @@ export default function Workspace() {
   const knowledgeRecommendations = buildKnowledgeRecommendations(project, task, inputMats, getWorkKits())
   const adoptedIds = adoptedKnowledgeIds.length > 0 ? adoptedKnowledgeIds : knowledgeRecommendations.slice(0, 2).map((item) => item.id)
   const adoptedRecommendations = knowledgeRecommendations.filter((item) => adoptedIds.includes(item.id))
+  const resultSectionCount = (aiSections || currentResult?.sections || []).length
+  const assetHandoffItems = [
+    {
+      label: '结果区块',
+      value: showResult && currentResult ? `${resultSectionCount} 个` : '待生成',
+      desc: '会进入策略报告，作为后续 Work Kit 的输出结构',
+    },
+    {
+      label: '采纳知识',
+      value: `${adoptedRecommendations.length} 项`,
+      desc: '保存成功案例、资料与 Prompt 的引用依据',
+    },
+    {
+      label: '复核标记',
+      value: feedbackItems.length ? `${feedbackItems.length} 条` : '0 条',
+      desc: feedbackItems.length ? '会作为版本修订线索' : '暂无异常，可继续人工复核',
+    },
+    {
+      label: '来源资料',
+      value: `${inputMats.length} 份`,
+      desc: '保留本次分析依赖的资料范围',
+    },
+  ]
 
   const toggleKnowledge = (id: string) => {
     setAdoptedKnowledgeIds((prev) => {
@@ -332,6 +363,28 @@ export default function Workspace() {
     setSubmitted(true)
     setCurrentResult(submittedResult)
     saveAIResult(submittedResult)
+    const handoffs = readAssetHandoffs()
+    const handoff = {
+      id: `handoff-${Date.now()}`,
+      projectId: project.id,
+      projectName: project.name,
+      taskId: task.id,
+      taskTitle: task.title,
+      role: task.role,
+      roleLabel: roleLabels[task.role],
+      resultId: submittedResult.id,
+      sectionCount: submittedResult.sections.length,
+      adoptedKnowledge: adoptedRecommendations.map((item) => ({
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        relevance: item.relevance,
+      })),
+      materialIds: inputMats.map((material) => material.id),
+      feedbackItems,
+      createdAt: new Date().toISOString(),
+    }
+    localStorage.setItem('promokit_asset_handoffs', JSON.stringify([handoff, ...handoffs].slice(0, 80)))
     if (task) {
       updateTask({ ...task, status: 'submitted' })
     }
@@ -582,6 +635,50 @@ export default function Workspace() {
                 <button onClick={handleGenerate} className="btn-ghost text-[12px]">
                   <RotateCcw className="w-3.5 h-3.5" /> 重新生成
                 </button>
+              </div>
+
+              <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
+                <div className="absolute right-[-80px] bottom-[-110px] w-56 h-56 rounded-full bg-ai-400/8" />
+                <div className="relative flex flex-col xl:flex-row xl:items-start justify-between gap-5 mb-5">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Package className="w-4 h-4 text-accent-500" />
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-600">Asset Handoff · 资产化交接</span>
+                    </div>
+                    <h3 className="text-[18px] font-medium text-text-main mb-2">提交前确认这份结果会沉淀成什么</h3>
+                    <p className="text-[13px] text-text-muted leading-relaxed max-w-2xl">
+                      系统会把分析区块、采纳知识、异常标记和来源资料一起送入策略报告，作为后续发布 Work Kit 时的可追溯资产来源。
+                    </p>
+                  </div>
+                  <div className={`rounded-2xl px-4 py-3 text-center shrink-0 ${
+                    submitted ? 'bg-success-soft text-success' : 'bg-accent-500/[0.08] text-accent-600'
+                  }`}>
+                    <div className="text-[22px] font-light leading-none">{submitted ? '已提交' : '待提交'}</div>
+                    <div className="text-[10px] font-medium mt-1">{submitted ? '报告链路已接收' : '确认后进入报告'}</div>
+                  </div>
+                </div>
+                <div className="relative grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                  {assetHandoffItems.map((item) => (
+                    <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/70 p-4">
+                      <div className="text-[18px] font-light text-text-main leading-none mb-2">{item.value}</div>
+                      <div className="text-[12px] font-medium text-text-main">{item.label}</div>
+                      <p className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                {adoptedRecommendations.length > 0 && (
+                  <div className="relative mt-4 rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+                    <div className="text-[11px] font-semibold text-text-main mb-3">将一并带入报告的知识依据</div>
+                    <div className="flex flex-wrap gap-2">
+                      {adoptedRecommendations.map((item) => (
+                        <span key={item.id} className="inline-flex items-center gap-1.5 rounded-full bg-bg-surface border border-border-light px-2.5 py-1 text-[10px] text-text-secondary">
+                          <BookOpen className="w-3 h-3 text-accent-500" />
+                          {item.title}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {(aiSections || currentResult.sections || []).map((section, i) => (
