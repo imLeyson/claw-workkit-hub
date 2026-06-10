@@ -20,7 +20,7 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       <circle cx="50" cy="45" r="42" fill="none" stroke={theme === 'dark' ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.02)'} strokeWidth="0.2" />
     </svg>
   ),
-  1: (theme) => (
+  1: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs><radialGradient id="accent1" cx="12%" cy="88%"><stop offset="0%" stopColor="rgba(224,123,76,0.06)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
       <rect width="100" height="100" fill="url(#accent1)" />
@@ -31,7 +31,7 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       <line x1="85" y1="16" x2="90" y2="16" stroke="rgba(0,0,0,0.03)" strokeWidth="0.3" strokeLinecap="round" />
     </svg>
   ),
-  2: (theme) => (
+  2: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs><radialGradient id="accent2" cx="90%" cy="10%"><stop offset="0%" stopColor="rgba(224,123,76,0.08)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
       <rect width="100" height="100" fill="url(#accent2)" />
@@ -39,7 +39,7 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       <rect x="88" y="10" width="4" height="4" rx="1" fill="none" stroke="rgba(224,123,76,0.08)" strokeWidth="0.3" />
     </svg>
   ),
-  3: (theme) => (
+  3: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs><pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.4" fill="rgba(224,123,76,0.08)" /></pattern></defs>
       <rect width="100" height="100" fill="url(#grid)" />
@@ -47,7 +47,7 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       <rect width="100" height="100" fill="url(#accent3)" />
     </svg>
   ),
-  4: (theme) => (
+  4: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs><radialGradient id="glow4" cx="48%" cy="40%"><stop offset="0%" stopColor="rgba(224,123,76,0.10)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
       <rect width="100" height="100" fill="url(#glow4)" />
@@ -58,7 +58,7 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       )))}
     </svg>
   ),
-  5: (theme) => (
+  5: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <circle cx="92" cy="8" r="16" fill="none" stroke="rgba(224,123,76,0.06)" strokeWidth="0.6" />
       <circle cx="92" cy="8" r="20" fill="none" stroke="rgba(224,123,76,0.04)" strokeWidth="0.4" />
@@ -66,14 +66,14 @@ const decorVariants: Record<number, (t: 'light' | 'dark') => React.ReactNode> = 
       <line x1="15" y1="18" x2="28" y2="18" stroke="rgba(0,0,0,0.04)" strokeWidth="0.5" strokeLinecap="round" />
     </svg>
   ),
-  6: (theme) => (
+  6: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <rect x="0" y="0" width="48" height="100" fill="rgba(0,0,0,0.008)" />
       <rect x="50" y="0" width="50" height="100" fill="rgba(224,123,76,0.02)" />
       <line x1="49" y1="0" x2="49" y2="100" stroke="rgba(224,123,76,0.08)" strokeWidth="0.3" strokeDasharray="1 2" />
     </svg>
   ),
-  7: (theme) => (
+  7: (_) => (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs><radialGradient id="accent7" cx="95%" cy="5%"><stop offset="0%" stopColor="rgba(224,123,76,0.04)" /><stop offset="100%" stopColor="transparent" /></radialGradient></defs>
       <rect width="100" height="100" fill="url(#accent7)" />
