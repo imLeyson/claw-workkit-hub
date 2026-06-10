@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp, ShieldCheck, Bot, AlertTriangle, CheckCircle2, Pencil, SlidersHorizontal } from 'lucide-react'
+import { Repeat, Star, Package, Sparkles, ChevronDown, ChevronUp, GitBranch, FileText, Database, Users, Lightbulb, ArrowRight, Search, BookOpen, TrendingUp, ShieldCheck, Bot, AlertTriangle, CheckCircle2, Pencil, SlidersHorizontal, Rocket } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjects, getWorkKits } from '../services/db'
 import { useToast } from '../components/Toast'
@@ -36,6 +36,14 @@ function readValidationHistory(): any[] {
 function readAssetHandoffs(): any[] {
   try {
     return JSON.parse(localStorage.getItem('promokit_asset_handoffs') || '[]')
+  } catch {
+    return []
+  }
+}
+
+function readPublishHistory(): any[] {
+  try {
+    return JSON.parse(localStorage.getItem('promokit_asset_publish_history') || '[]')
   } catch {
     return []
   }
@@ -115,6 +123,7 @@ export default function Archive() {
   const [learningRecords] = useState(readLearningRecords)
   const [validationHistory, setValidationHistory] = useState(readValidationHistory)
   const [assetHandoffs] = useState(readAssetHandoffs)
+  const [publishHistory] = useState(readPublishHistory)
   const [draftValidation, setDraftValidation] = useState<Record<string, ValidationDecision>>({})
   const { showToast } = useToast()
   const [editKit, setEditKit] = useState<WorkKit | null>(null)
@@ -135,8 +144,11 @@ export default function Archive() {
     ? Math.round(learningRecords.reduce((sum, record) => sum + (record.estimatedSaving ?? 0), 0) / learningCount)
     : 0
   const handoffCount = assetHandoffs.length
-  const handoffSectionCount = assetHandoffs.reduce((sum, handoff) => sum + (handoff.sectionCount ?? 0), 0)
   const handoffKnowledgeCount = assetHandoffs.reduce((sum, handoff) => sum + ((handoff.adoptedKnowledge || []).length), 0)
+  const publishCount = publishHistory.length
+  const avgPublishReadiness = publishCount > 0
+    ? Math.round(publishHistory.reduce((sum, item) => sum + (item.readinessScore ?? 0), 0) / publishCount)
+    : 0
 
   const openValidation = (id: string) => {
     const kit = kits.find((k) => k.id === id)
@@ -210,11 +222,11 @@ export default function Archive() {
           { icon: Star, value: String(successKits.length), label: '已验证成功案例', sub: `评分 ≥ 4.8` },
           { icon: ShieldCheck, value: String(validatedCount), label: '对比验证记录', sub: '保留/修订决策' },
           { icon: BookOpen, value: String(learningCount), label: '启动前学习', sub: `平均评分 ${avgRating}` },
-          { icon: FileText, value: String(handoffCount), label: '资产交接', sub: `${handoffSectionCount} 个结果区块` },
+          { icon: Rocket, value: String(publishCount), label: '资产发布', sub: avgPublishReadiness ? `平均就绪 ${avgPublishReadiness}%` : '等待发布记录' },
         ].map((s) => (
-          <div key={s.label} className="card-surface rounded-2xl p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
-              <s.icon className="w-5 h-5 text-accent-500" />
+          <div key={s.label} className="data-metric p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center shrink-0">
+              <s.icon className="w-5 h-5 text-text-muted" />
             </div>
             <div>
               <div className="text-[22px] font-light tracking-[-0.02em] text-text-main leading-none mb-0.5">{s.value}</div>
@@ -225,9 +237,8 @@ export default function Archive() {
         ))}
       </div>
 
-      <div className="card-surface rounded-[28px] p-6 mb-8 overflow-hidden relative">
-        <div className="absolute -right-16 -top-20 w-56 h-56 rounded-full bg-ai-400/6" />
-        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
+      <div className="data-panel p-5 mb-8">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
           <div>
             <div className="text-[11px] font-semibold text-ai-400 uppercase tracking-[0.08em] mb-2">Experience Loop · 经验传承轨迹</div>
             <h2 className="text-[22px] font-medium text-text-main mb-2">从一次分析到下一次启动</h2>
@@ -235,13 +246,14 @@ export default function Archive() {
               这里记录 Work Kit 被学习、复用和验证的过程。团队不只保存结果，还能看见哪些经验正在被下一次项目吸收。
             </p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-3">
+          <div className="grid sm:grid-cols-4 gap-3">
             {[
+              ['资产发布', `${publishCount} 次`, publishCount ? `平均就绪 ${avgPublishReadiness}%` : '等待报告页发布'],
               ['学习记录', `${learningCount} 条`, '启动前学习包的使用痕迹'],
               ['复用强度', `${totalReuse} 次`, '模板被再次用于项目'],
               ['资产交接', `${handoffCount} 条`, handoffCount ? `${handoffKnowledgeCount} 个知识依据进入报告` : '等待工作台提交'],
             ].map(([label, value, sub]) => (
-              <div key={label} className="rounded-2xl bg-bg-primary/70 border border-border-light p-4">
+              <div key={label} className="data-metric p-4">
                 <div className="text-[24px] font-light text-text-main leading-none mb-2">{value}</div>
                 <div className="text-[12px] font-medium text-text-main">{label}</div>
                 <div className="text-[10px] text-text-muted mt-1">{sub}</div>
@@ -249,8 +261,8 @@ export default function Archive() {
             ))}
           </div>
         </div>
-        <div className="relative mt-5 grid lg:grid-cols-[1.2fr_0.8fr] gap-3">
-            <div className="rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+        <div className="mt-5 grid lg:grid-cols-3 gap-3">
+            <div className="data-metric p-4">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div>
                   <div className="text-[12px] font-medium text-text-main">复用学习收益</div>
@@ -264,14 +276,40 @@ export default function Archive() {
                   ['预计节省', avgSaving ? `${avgSaving}%` : '待评估'],
                   ['验证历史', `${validationHistory.length}`],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-3">
+                  <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-3">
                     <div className="text-[17px] font-light text-text-main leading-none">{value}</div>
                     <div className="text-[10px] text-text-muted mt-1">{label}</div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+            <div className="data-metric p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Rocket className="w-4 h-4 text-accent-500" />
+                <span className="text-[12px] font-medium text-text-main">最近发布</span>
+              </div>
+              {publishHistory[0] ? (
+                <div>
+                  <div className="text-[12px] font-medium text-text-main truncate">{publishHistory[0].workKitName}</div>
+                  <div className="text-[10px] text-text-muted mt-1">{new Date(publishHistory[0].createdAt).toLocaleString()}</div>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {[
+                      ['版本', publishHistory[0].version],
+                      ['就绪', `${publishHistory[0].readinessScore ?? 0}%`],
+                      ['学习', `${(publishHistory[0].learningItems || []).length}`],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-2">
+                        <div className="text-[11px] font-medium text-text-main truncate">{value}</div>
+                        <div className="text-[9px] text-text-muted mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[11px] text-text-muted leading-relaxed">还没有发布历史。报告页保存 Work Kit 后，这里会记录版本、就绪度和学习包内容。</p>
+              )}
+            </div>
+            <div className="data-metric p-4">
               <div className="flex items-center gap-2 mb-3">
                 <ShieldCheck className="w-4 h-4 text-accent-500" />
                 <span className="text-[12px] font-medium text-text-main">最近验证</span>
@@ -286,7 +324,7 @@ export default function Archive() {
                       ['保留', `${validationHistory[0].keep}`],
                       ['修订', `${validationHistory[0].revise}`],
                     ].map(([label, value]) => (
-                      <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-2">
+                      <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-2">
                         <div className="text-[11px] font-medium text-text-main truncate">{value}</div>
                         <div className="text-[9px] text-text-muted mt-1">{label}</div>
                       </div>
@@ -382,9 +420,8 @@ export default function Archive() {
       </div>
 
       {/* Validation console — 纪要建议：固定流程 + 小智能体对比 */}
-      <div className="card-surface rounded-[26px] p-6 mb-8 overflow-hidden relative">
-        <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-accent-500/5 translate-x-20 -translate-y-24" />
-        <div className="relative flex items-start justify-between gap-8">
+      <div className="action-panel p-5 mb-8">
+        <div className="flex items-start justify-between gap-8">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
               <Bot className="w-5 h-5 text-accent-500" />
@@ -403,7 +440,7 @@ export default function Archive() {
               ['智能体', '3 个'],
               ['动作', '保留/修订'],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl bg-bg-primary/70 border border-border-light p-3 text-center">
+              <div key={label} className="data-metric p-3 text-center">
                 <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
                 <div className="text-[10px] text-text-muted">{label}</div>
               </div>
@@ -413,9 +450,9 @@ export default function Archive() {
       </div>
 
       {/* Learning CTA — 纪要建议：启动新项目前先学习 */}
-      <div className="bg-accent-500/[0.04] rounded-2xl p-5 border border-accent-500/15 mb-8 flex items-center justify-between">
+      <div className="action-panel p-4 mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-accent-500/15 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-bg-primary border border-border-light flex items-center justify-center">
             <BookOpen className="w-4.5 h-4.5 text-accent-600" />
           </div>
           <div>
@@ -438,7 +475,7 @@ export default function Archive() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="搜索 Work Kit 模板名称、应用场景或技术标签..."
-            className="w-full pl-11 pr-16 py-3.5 bg-bg-surface border border-border-default rounded-2xl text-[13px] focus:outline-none focus:border-accent-500/50 focus:ring-4 focus:ring-accent-500/5 text-text-main placeholder-text-placeholder shadow-sm transition-all duration-300"
+            className="w-full pl-11 pr-16 py-3 bg-bg-surface border border-border-default rounded-xl text-[13px] focus:outline-none focus:border-accent-500/50 text-text-main placeholder-text-placeholder transition-colors"
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-mono text-text-placeholder bg-white/5 border border-border-light px-2 py-1 rounded-md max-sm:hidden">
             <span>ESC</span>
@@ -456,7 +493,7 @@ export default function Archive() {
               onClick={() => setFilterTag(null)}
               className={`text-[12px] px-4 py-2 rounded-xl border transition-all cursor-pointer ${
                 !filterTag
-                  ? 'bg-accent-500 border-accent-500 text-white shadow-md shadow-accent-500/15'
+                  ? 'bg-accent-500 border-accent-500 text-white'
                   : 'bg-bg-surface border-border-default text-text-secondary hover:border-accent-500/30 hover:text-accent-500 hover:bg-accent-500/[0.01]'
               }`}
             >
@@ -470,7 +507,7 @@ export default function Archive() {
                   onClick={() => setFilterTag(isActive ? null : tag)}
                   className={`text-[12px] px-4 py-2 rounded-xl border transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-accent-500 border-accent-500 text-white shadow-md shadow-accent-500/15'
+                      ? 'bg-accent-500 border-accent-500 text-white'
                       : 'bg-bg-surface border-border-default text-text-secondary hover:border-accent-500/30 hover:text-accent-500 hover:bg-accent-500/[0.01]'
                   }`}
                 >
@@ -491,8 +528,8 @@ export default function Archive() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {successKits.map((k) => (
-              <div key={k.id} className="bg-bg-surface rounded-2xl p-4 border border-amber-500/20 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => setReuseKit(k.id)}>
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+              <div key={k.id} className="action-card p-4 flex items-center gap-4 cursor-pointer" onClick={() => setReuseKit(k.id)}>
+                <div className="w-10 h-10 rounded-lg bg-bg-primary border border-border-light flex items-center justify-center shrink-0">
                   <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -509,7 +546,7 @@ export default function Archive() {
       {/* Work Kit List */}
       {filteredKits.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-xl bg-bg-surface border border-border-light flex items-center justify-center mx-auto mb-4">
             <Package className="w-7 h-7 text-text-muted" />
           </div>
           <p className="text-[14px] text-text-muted">{searchText ? '没有匹配的 Work Kit' : '暂无 AI 工作包'}</p>
@@ -518,7 +555,7 @@ export default function Archive() {
           </p>
         </div>
       ) : (
-        <div className="space-y-5 stagger">
+        <div className="space-y-4">
           {filteredKits.map((wk) => {
             const showHistory = expandedHistory[wk.id] ?? false
             const sourceProject = getProjects().find((p) => p.id === wk.basedOnProjectId)
@@ -526,8 +563,8 @@ export default function Archive() {
             const validationSummary = getValidationSummary(wk, validationRuns[wk.id])
             const health = getKitHealth(wk, validationSummary, kitLearningRecords.length)
             return (
-              <div key={wk.id} className="card-surface rounded-[24px] overflow-hidden animate-fade-in-up">
-                <div className="p-6 pb-0">
+              <div key={wk.id} className="action-card overflow-hidden">
+                <div className="p-5 pb-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-accent-50 text-accent-600">{wk.version}</span>
@@ -544,10 +581,10 @@ export default function Archive() {
                   <p className="text-[13px] text-text-secondary leading-relaxed mb-4">{wk.description}</p>
                   <div className="flex flex-wrap items-center gap-2 mb-5">
                     {wk.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-text-muted">{tag}</span>
+                      <span key={tag} className="text-[10px] px-2 py-1 rounded-md bg-bg-primary border border-border-light text-text-muted">{tag}</span>
                     ))}
                   </div>
-                  <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4 mb-4">
+                  <div className="data-metric p-4 mb-4">
                     <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                       <div>
                         <div className="text-[12px] font-semibold text-text-main">资产健康度 · {health.label}</div>
@@ -572,7 +609,7 @@ export default function Archive() {
                         ['版本', `${wk.versionHistory.length}`],
                         ['学习', `${kitLearningRecords.length}`],
                       ].map(([label, value]) => (
-                        <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-2">
+                        <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-2">
                           <div className="text-[12px] font-medium text-text-main">{value}</div>
                           <div className="text-[9px] text-text-muted mt-1">{label}</div>
                         </div>
@@ -726,7 +763,7 @@ export default function Archive() {
                 )}
 
                 {/* Footer */}
-                <div className="px-6 py-4 mt-5 bg-white/[0.03] border-t border-border-light flex items-center justify-between">
+                <div className="px-5 py-4 mt-5 bg-bg-primary/45 border-t border-border-light flex items-center justify-between">
                   <div className="text-[11px] text-text-muted">
                     来源项目：
                     {sourceProject ? (
@@ -792,7 +829,7 @@ export default function Archive() {
         ]
         return (
           <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50 px-4">
-            <div className="bg-bg-surface rounded-[28px] p-6 w-[680px] max-w-full shadow-2xl border border-border-light">
+            <div className="bg-bg-surface rounded-xl p-6 w-[680px] max-w-full shadow-xl border border-border-light">
               <div className="flex items-start justify-between gap-5 mb-5">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
@@ -845,7 +882,7 @@ export default function Archive() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+                <div className="action-panel p-4">
                   <div className="text-[12px] font-semibold text-text-main mb-3">复用前检查</div>
                   <div className="space-y-2.5">
                     {preflightItems.map((item) => {
@@ -880,7 +917,7 @@ export default function Archive() {
                 <div className="flex justify-between gap-4"><span className="text-text-muted">资料结构</span><span className="font-medium text-text-main text-right max-w-[360px] leading-snug">{wk.materialStructure}</span></div>
               </div>
 
-              <div className="bg-accent-500/[0.05] rounded-2xl p-3.5 mb-5">
+              <div className="rounded-xl border border-border-light bg-bg-primary/70 p-3.5 mb-5">
                 <p className="text-[12px] text-accent-600 leading-relaxed">
                   <Sparkles className="w-3.5 h-3.5 inline mr-1" />
                   基于此模板创建新项目后，系统会自动带出岗位、任务结构与启动前学习包；你只需补充本次活动信息，再决定是否先修订模板。
@@ -903,7 +940,7 @@ export default function Archive() {
         const reviseCount = rows.filter((row) => draftValidation[row.id] === 'revise').length
         return (
           <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50">
-            <div className="bg-bg-surface rounded-[28px] p-6 w-[760px] max-h-[86vh] overflow-auto shadow-2xl">
+            <div className="bg-bg-surface rounded-xl p-6 w-[760px] max-h-[86vh] overflow-auto shadow-xl border border-border-light">
               <div className="flex items-start justify-between gap-6 mb-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
@@ -926,7 +963,7 @@ export default function Archive() {
                   <div className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">公司知识库</div>
                   <p className="text-[13px] text-text-secondary leading-relaxed">{wk.materialStructure}</p>
                 </div>
-                <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+                <div className="action-panel p-4">
                   <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-2">市场竞品参照</div>
                   <p className="text-[13px] text-text-secondary leading-relaxed">竞品评论、详情页话术、直播脚本、用户反馈和外部优秀流程。</p>
                 </div>
@@ -980,7 +1017,7 @@ export default function Archive() {
                 })}
               </div>
 
-              <div className="mt-6 rounded-2xl bg-accent-500/[0.05] border border-accent-500/15 p-4 flex items-start gap-3">
+              <div className="mt-6 rounded-xl bg-bg-primary/70 border border-border-light p-4 flex items-start gap-3">
                 <Sparkles className="w-4 h-4 text-accent-500 mt-0.5 shrink-0" />
                 <p className="text-[12px] text-text-secondary leading-relaxed">
                   保存后，本次验证会成为资产库的验证记录；下一次创建项目或执行任务时，可优先采用“保留”项，并对“修订”项进行人工复核。
@@ -1000,7 +1037,7 @@ export default function Archive() {
 
       {editKit && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={() => setEditKit(null)}>
-          <div className="bg-bg-surface rounded-[24px] p-6 w-[500px] shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-bg-surface rounded-xl p-6 w-[500px] shadow-xl border border-border-light" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
                 <Pencil className="w-5 h-5 text-accent-500" />

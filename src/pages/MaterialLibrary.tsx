@@ -299,25 +299,24 @@ export default function MaterialLibrary() {
   ]
 
   return (
-    <div className="max-w-5xl">
-      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute right-[-80px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
-        <div className="relative grid lg:grid-cols-[0.95fr_1.05fr] gap-7">
+    <div className="max-w-6xl">
+      <div className="mb-8 data-panel p-5">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4">
               <GitBranch className="w-3.5 h-3.5" />
-              Material Asset Hub
+              资料库
             </div>
-            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把原始资料整理成可复用分析资产</h1>
+            <h1 className="text-[28px] font-medium tracking-[-0.02em] text-text-main mb-2">资料输入与任务映射</h1>
             <p className="text-[14px] text-text-secondary leading-relaxed max-w-xl">
-              资料库不只是上传入口。它会把竞品评论、商品参数、客服记录和历史文案结构化，自动关联到岗位任务，并在最终 Work Kit 中沉淀为下一次项目可复用的资料模板。
+              上传竞品评论、商品参数、客服记录和历史文案，并确认它们会支撑哪些岗位任务。先补齐输入，再进入任务卡和 AI 工作台。
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {assetPath.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+              <div key={item.label} className="data-metric p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <item.icon className="w-4 h-4 text-accent-500" />
+                  <item.icon className="w-4 h-4 text-text-muted" />
                   <span className="font-mono text-[11px] text-accent-600">{item.value}</span>
                 </div>
                 <div className="text-[12px] font-medium text-text-main">{item.label}</div>
@@ -326,7 +325,7 @@ export default function MaterialLibrary() {
             ))}
           </div>
         </div>
-        <div className="relative mt-5 rounded-[24px] border border-accent-500/15 bg-accent-500/[0.035] p-5">
+        <div className="mt-5 data-metric p-5">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <div>
               <div className="text-[13px] font-medium text-text-main">资料资产化就绪度</div>
@@ -346,7 +345,7 @@ export default function MaterialLibrary() {
               ['资料引用', `${taskLinkedMaterials}`, '任务卡累计引用资料次数'],
               ['待复核', `${riskMaterials.length}`, '需脱敏或人工确认的资料'],
             ].map(([label, value, desc]) => (
-              <div key={label} className="rounded-2xl border border-border-light bg-bg-surface/75 p-3">
+              <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-3">
                 <div className="text-[17px] font-light text-text-main leading-none">{value}</div>
                 <div className="text-[10px] font-medium text-text-main mt-1">{label}</div>
                 <div className="text-[9px] text-text-muted mt-1">{desc}</div>
@@ -356,9 +355,8 @@ export default function MaterialLibrary() {
         </div>
       </div>
 
-      <div className="mb-8 rounded-[26px] border border-border-default bg-bg-surface p-5 overflow-hidden relative">
-        <div className="absolute right-[-90px] bottom-[-120px] w-56 h-56 rounded-full bg-ai-400/6" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4 mb-5">
+      <div className="mb-8 action-panel p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
           <div>
             <span className="section-title">Input Mapping</span>
             <h2 className="text-[18px] font-medium text-text-main mt-2">资料如何驱动岗位任务</h2>
@@ -370,15 +368,15 @@ export default function MaterialLibrary() {
             查看任务卡 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-        <div className="relative grid lg:grid-cols-[0.95fr_1.05fr] gap-4">
-          <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-4">
+          <div className="data-metric p-4">
             <div className="flex items-center gap-2 mb-3">
               <Layers3 className="w-4 h-4 text-accent-500" />
               <span className="text-[12px] font-semibold text-text-main">任务输入准备</span>
             </div>
             <div className="space-y-2">
               {taskInputMap.slice(0, 5).map(({ task, linkedMaterials, missingTypes }) => (
-                <div key={task.id} className="rounded-xl border border-border-light bg-bg-surface/80 p-3">
+                <div key={task.id} className="action-card p-3">
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <div className="text-[12px] font-medium text-text-main truncate">{task.title}</div>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${linkedMaterials.length > 0 && missingTypes.length === 0 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
@@ -402,14 +400,14 @@ export default function MaterialLibrary() {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+          <div className="data-metric p-4">
             <div className="flex items-center gap-2 mb-3">
               <Link2 className="w-4 h-4 text-accent-500" />
               <span className="text-[12px] font-semibold text-text-main">资料复用去向</span>
             </div>
             <div className="space-y-2">
               {materialTaskMap.slice(0, 5).map(({ material, linkedTasks }) => (
-                <div key={material.id} className="rounded-xl border border-border-light bg-bg-surface/80 p-3">
+                <div key={material.id} className="rounded-lg border border-border-light bg-bg-surface p-3">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="min-w-0">
                       <div className="text-[12px] font-medium text-text-main truncate">{material.label}</div>
@@ -445,7 +443,7 @@ export default function MaterialLibrary() {
         {materialTypeStats.map((item) => {
           const Icon = typeIcons[item.type] || FileSpreadsheet
           return (
-            <div key={item.type} className={`rounded-2xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : item.required ? 'border-warning/20 bg-warning-soft' : 'border-border-light bg-bg-surface'}`}>
+            <div key={item.type} className={`data-metric p-4 ${item.ready ? 'border-success/20 bg-success-soft' : item.required ? 'border-warning/20 bg-warning-soft' : ''}`}>
               <div className="flex items-start justify-between gap-3 mb-4">
                 <Icon className={`w-4 h-4 ${item.ready ? 'text-success' : item.required ? 'text-warning' : 'text-text-muted'}`} />
                 <span className="text-[20px] font-light text-text-main leading-none">{item.count}</span>
@@ -461,8 +459,8 @@ export default function MaterialLibrary() {
       </div>
 
       {/* Upload */}
-      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`border-2 border-dashed rounded-[24px] p-8 text-center mb-10 transition-all cursor-pointer group ${uploading ? 'border-accent-300 bg-accent-500/[0.08]' : 'border-border-default hover:border-accent-300 hover:bg-accent-500/[0.08]'}`}>
-        <div className="w-14 h-14 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`action-panel p-6 text-center mb-10 cursor-pointer group border-dashed ${uploading ? 'border-accent-300 bg-accent-50/60' : 'hover:border-accent-300'}`}>
+        <div className="w-12 h-12 rounded-xl bg-bg-primary border border-border-light flex items-center justify-center mx-auto mb-4 transition-colors group-hover:border-accent-300 group-hover:bg-accent-50">
           {uploading ? (
             <div className="w-6 h-6 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
           ) : (
@@ -476,17 +474,17 @@ export default function MaterialLibrary() {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); downloadTemplate() }}
-            className="inline-flex items-center gap-2 rounded-xl border border-accent-500/20 bg-bg-surface px-4 py-2 text-[12px] font-medium text-accent-500 shadow-sm shadow-accent-100/40 transition-colors hover:border-accent-300 hover:bg-accent-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-surface px-4 py-2 text-[12px] font-medium text-accent-600 transition-colors hover:border-accent-300 hover:bg-accent-50"
           >
             <Download className="h-3.5 w-3.5" />
             下载 CSV 模板
           </button>
         </div>
-        <div className="mx-auto mb-4 max-w-2xl rounded-2xl border border-border-light bg-bg-surface/70 px-4 py-3 text-left">
+        <div className="mx-auto mb-4 max-w-2xl rounded-xl border border-border-light bg-bg-primary/60 px-4 py-3 text-left">
           <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
           <div className="flex flex-wrap gap-1.5">
             {['类型', '竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容'].map((field) => (
-              <span key={field} className={`rounded-lg px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-500' : 'bg-gray-50 text-text-muted'}`}>
+              <span key={field} className={`rounded-md px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-600' : 'bg-bg-surface text-text-muted'}`}>
                 {field}
               </span>
             ))}
@@ -495,7 +493,7 @@ export default function MaterialLibrary() {
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {['导入评论表', '导入商品参数', '导入客服记录', '导入历史文案'].map((label) => (
             <span key={label} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}
-              className="text-[11px] px-3 py-1.5 rounded-[10px] cursor-pointer bg-white/5 text-text-muted hover:bg-accent-50 hover:text-accent-600 transition-colors"
+              className="text-[11px] px-3 py-1.5 rounded-lg cursor-pointer border border-border-light bg-bg-surface text-text-muted hover:border-accent-300 hover:text-accent-600 transition-colors"
             >{label}</span>
           ))}
         </div>
@@ -511,7 +509,7 @@ export default function MaterialLibrary() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         {competitors.map((comp, i) => (
-          <div key={i} className="card-surface rounded-[20px] p-5 bg-gradient-to-b from-bg-surface to-accent-500/[0.10]/20 relative group">
+          <div key={i} className="action-card p-5 relative group">
             <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => openEditComp(i)} className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-accent-50 transition-colors">
                 <Pencil className="w-3 h-3 text-text-muted" />
@@ -551,7 +549,7 @@ export default function MaterialLibrary() {
       {/* Comp form modal */}
       {showCompForm && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={() => setShowCompForm(false)}>
-          <div className="bg-bg-surface rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-bg-surface rounded-xl p-6 w-[480px] max-w-[90vw] shadow-xl border border-border-light" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-medium text-text-main">{editingIndex !== null ? '编辑竞品' : '添加竞品商品'}</h3>
               <button onClick={() => setShowCompForm(false)} className="p-1 rounded-lg hover:bg-white/[0.06]"><X className="w-4 h-4 text-text-muted" /></button>

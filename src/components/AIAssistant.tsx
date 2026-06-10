@@ -567,9 +567,9 @@ export default function AIAssistant() {
       {!open && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-gradient-to-r from-accent-500 to-accent-600 text-black flex items-center gap-2 shadow-[0_12px_24px_rgba(224,123,76,0.3)] hover:scale-105 transition-all cursor-pointer group hover-lift active:scale-95 ai-pulse"
+          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-bg-surface border border-border-default text-text-main flex items-center gap-2 shadow-sm hover:border-accent-500/35 transition-colors cursor-pointer active:scale-95"
         >
-          <Sparkles className="w-4 h-4 animate-pulse" />
+          <Sparkles className="w-4 h-4 text-accent-500" />
           <span className="text-[12px] font-semibold tracking-wide">AI 助手</span>
         </button>
       )}
@@ -577,39 +577,39 @@ export default function AIAssistant() {
       {/* Chat panel */}
       {open && (
         <div 
-          className="fixed bottom-6 right-6 z-50 w-[390px] max-w-[calc(100vw-32px)] bg-[#141416]/90 backdrop-blur-xl border border-white/[0.08] rounded-[24px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden animate-scale-in" 
+          className="fixed bottom-6 right-6 z-50 w-[390px] max-w-[calc(100vw-32px)] bg-bg-surface border border-border-default rounded-xl shadow-xl flex flex-col overflow-hidden" 
           style={{ height: '510px', maxHeight: 'calc(100vh - 100px)' }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.05] shrink-0">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border-light shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-xl bg-accent-500/10 flex items-center justify-center border border-accent-500/20">
+              <div className="w-7 h-7 rounded-lg bg-bg-primary flex items-center justify-center border border-border-light">
                 <Sparkles className="w-4 h-4 text-accent-500" />
               </div>
               <div>
                 <span className="text-[13px] font-semibold text-text-main flex items-center gap-1.5">
                   AI 智能顾问
-                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-success" />
                 </span>
                 <p className="text-[10px] text-text-muted mt-0.5">
                   {activeProject ? `当前对齐：${activeProject.name}` : '全局看板状态'}
                 </p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+            <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-bg-primary transition-colors cursor-pointer">
               <X className="w-4 h-4 text-text-muted hover:text-text-main" />
             </button>
           </div>
 
           {/* Page-specific Quick Commands Drawer */}
           {actionOptions.length > 0 && (
-            <div className="px-5 py-2.5 bg-white/[0.02] border-b border-white/[0.05] shrink-0 flex items-center gap-2 overflow-x-auto select-none no-scrollbar">
+            <div className="px-5 py-2.5 bg-bg-primary/45 border-b border-border-light shrink-0 flex items-center gap-2 overflow-x-auto select-none no-scrollbar">
               {actionOptions.map((opt) => (
                 <button
                   key={opt.label}
                   onClick={opt.handler}
                   disabled={streaming}
-                  className="shrink-0 text-[10px] px-3 py-1.5 rounded-full bg-white/5 border border-white/[0.04] text-text-secondary hover:border-accent-500/30 hover:text-accent-500 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="shrink-0 text-[10px] px-3 py-1.5 rounded-lg bg-bg-surface border border-border-light text-text-secondary hover:border-accent-500/30 hover:text-accent-500 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {opt.icon}
                   <span>{opt.label}</span>
@@ -625,8 +625,8 @@ export default function AIAssistant() {
                 <div 
                   className={`max-w-[88%] rounded-[18px] px-4 py-3 text-[12px] leading-relaxed whitespace-pre-wrap ${
                     msg.role === 'user'
-                      ? 'bg-gradient-to-r from-accent-500 to-accent-600 text-black font-medium rounded-tr-none shadow-[0_4px_16px_rgba(224,123,76,0.2)]'
-                      : 'bg-white/[0.03] border border-white/[0.05] text-text-secondary rounded-tl-none font-light'
+                      ? 'bg-accent-500 text-black font-medium rounded-tr-none'
+                      : 'bg-bg-primary border border-border-light text-text-secondary rounded-tl-none'
                   }`}
                 >
                   {msg.text}
@@ -638,9 +638,9 @@ export default function AIAssistant() {
 
                   {/* Custom Action Cards rendering */}
                   {msg.customAction && (
-                    <div className="mt-4 p-3.5 bg-black/40 border border-white/[0.06] rounded-xl space-y-2.5">
+                    <div className="mt-4 p-3.5 bg-bg-primary border border-border-light rounded-xl space-y-2.5">
                       <div className="flex items-center gap-1.5 text-[10px] font-semibold text-accent-500 uppercase tracking-wider">
-                        <Sparkles className="w-3 h-3 animate-pulse" />
+                        <Sparkles className="w-3 h-3" />
                         <span>推荐执行动作</span>
                       </div>
                       
@@ -648,7 +648,7 @@ export default function AIAssistant() {
                         <>
                           <div className="text-[12.5px] font-medium text-text-main">{msg.customAction.payload.title}</div>
                           <p className="text-[11px] text-text-muted leading-relaxed font-light">{msg.customAction.payload.description}</p>
-                          <div className="flex items-center justify-between text-[10px] text-text-muted mt-1 bg-white/[0.02] p-1.5 rounded">
+                          <div className="flex items-center justify-between text-[10px] text-text-muted mt-1 bg-bg-surface p-1.5 rounded">
                             <span>岗位：{roleLabels[msg.customAction.payload.role as Role]}岗</span>
                             <span>输出：{msg.customAction.payload.outputFormat.split('：')[0]}</span>
                           </div>
@@ -656,7 +656,7 @@ export default function AIAssistant() {
                       )}
 
                       {msg.customAction.type === 'apply_prompt' && (
-                        <div className="text-[11px] text-text-muted leading-relaxed font-light line-clamp-3 bg-white/[0.02] p-2 rounded border border-white/[0.04] font-mono">
+                        <div className="text-[11px] text-text-muted leading-relaxed font-light line-clamp-3 bg-bg-surface p-2 rounded border border-border-light font-mono">
                           {msg.customAction.payload.prompt}
                         </div>
                       )}
@@ -681,7 +681,7 @@ export default function AIAssistant() {
             {/* Typing indicator */}
             {streaming && messages[messages.length - 1]?.role === 'user' && (
               <div className="flex justify-start">
-                <div className="bg-white/[0.03] border border-white/[0.04] rounded-[18px] rounded-tl-none px-4 py-3 flex items-center gap-1.5 shrink-0">
+                <div className="bg-bg-primary border border-border-light rounded-[18px] rounded-tl-none px-4 py-3 flex items-center gap-1.5 shrink-0">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '0ms' }} />
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -693,7 +693,7 @@ export default function AIAssistant() {
           </div>
 
           {/* Input text block */}
-          <div className="px-5 py-4 border-t border-white/[0.05] shrink-0 flex items-center gap-3 bg-black/[0.15]">
+          <div className="px-5 py-4 border-t border-border-light shrink-0 flex items-center gap-3 bg-bg-primary/45">
             <input
               type="text"
               value={input}
@@ -702,7 +702,7 @@ export default function AIAssistant() {
                 if (e.key === 'Enter') handleSend()
               }}
               placeholder="向 AI 咨询关于大促工作包的任何问题..."
-              className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-[12px] text-text-main placeholder:text-text-placeholder outline-none focus:border-accent-500/40 transition-all focus:bg-white/[0.07]"
+              className="flex-1 bg-bg-surface border border-border-default rounded-xl px-3.5 py-2.5 text-[12px] text-text-main placeholder:text-text-placeholder outline-none focus:border-accent-500/40 transition-colors"
             />
             <button
               onClick={handleSend}

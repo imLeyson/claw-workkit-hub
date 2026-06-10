@@ -342,15 +342,14 @@ export default function CreateProject() {
         </p>
       </div>
 
-      <div className="mb-8 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute right-[-120px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
-        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-center">
+      <div className="mb-8 data-panel p-5">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-5 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-4">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4">
               <GitBranch className="w-3.5 h-3.5" />
-              Launch to Asset
+              项目配置
             </div>
-            <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mb-3">
+            <h2 className="text-[22px] font-medium tracking-[-0.02em] text-text-main mb-2">
               {workKit ? '从历史成功案例启动新项目' : '从项目创建开始规划资产沉淀'}
             </h2>
             <p className="text-[13px] text-text-secondary leading-relaxed max-w-xl">
@@ -361,7 +360,7 @@ export default function CreateProject() {
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {launchAssets.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+              <div key={item.label} className="data-metric p-4">
                 <div className="text-[22px] font-light text-text-main leading-none mb-2">{item.value}</div>
                 <div className="text-[12px] font-medium text-text-main">{item.label}</div>
                 <div className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</div>
@@ -374,9 +373,8 @@ export default function CreateProject() {
       {/* Template info card (persistent in template mode) */}
       {workKit && (
         <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-6 mb-10">
-          <div className="card-surface rounded-[28px] p-6 overflow-hidden relative">
-            <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-accent-500/5" />
-            <div className="relative flex items-start gap-4 mb-6">
+          <div className="data-panel p-5">
+            <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
                 <Package className="w-5 h-5 text-accent-500" />
               </div>
@@ -397,7 +395,7 @@ export default function CreateProject() {
                 ['岗位', `${workKit.includedRoles.length} 个`],
                 ['任务', `${workKit.sections.length} 个`],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-2xl bg-bg-primary/65 border border-border-light p-3 text-center">
+                <div key={label} className="data-metric p-3 text-center">
                   <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
                   <div className="text-[10px] text-text-muted">{label}</div>
                 </div>
@@ -421,7 +419,7 @@ export default function CreateProject() {
             </div>
           </div>
 
-          <div className="card-surface rounded-[28px] p-6">
+          <div className="action-panel p-5">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Pre-learning Pack</div>
@@ -439,7 +437,7 @@ export default function CreateProject() {
 
             <div className="grid grid-cols-3 gap-2 mb-5">
               {learningReadiness.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-3">
+                <div key={item.label} className="data-metric p-3">
                   <div className="text-[16px] font-light text-text-main leading-none">{item.value}</div>
                   <div className="text-[10px] font-medium text-text-main mt-1">{item.label}</div>
                   <div className="text-[9px] text-text-muted leading-snug mt-1">{item.desc}</div>

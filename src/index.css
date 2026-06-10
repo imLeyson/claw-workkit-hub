@@ -88,18 +88,45 @@ body {
 .card-surface {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 .card-hover {
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
 }
 [data-theme="dark"] .card-hover:hover {
   border-color: rgba(255,255,255,0.14);
   background: #222225;
 }
 [data-theme="light"] .card-hover:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(20,20,20,0.06);
+}
+
+.data-panel {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+}
+.data-metric {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 10px;
+}
+.action-panel {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+}
+.action-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 10px;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+.action-card:hover {
+  border-color: color-mix(in srgb, var(--color-accent-500) 34%, var(--color-border-default));
+}
+[data-theme="light"] .action-card:hover {
+  box-shadow: 0 8px 20px rgba(28,28,30,0.07);
 }
 
 /* ── Typography ── */

@@ -70,7 +70,8 @@ export default function Dashboard() {
   const assetHandoffs = readLocalList('promokit_asset_handoffs')
   const validationHistory = readLocalList('promokit_validation_history')
   const completedProjects = projects.filter((p) => p.status === 'completed').length
-  const assetizedProjects = new Set(workKits.map((kit) => kit.basedOnProjectId)).size
+  const completedProjectIds = new Set(projects.filter((p) => p.status === 'completed').map((p) => p.id))
+  const assetizedProjects = new Set(workKits.map((kit) => kit.basedOnProjectId).filter((id) => completedProjectIds.has(id))).size
   const assetizationRate = completedProjects > 0 ? Math.round((assetizedProjects / completedProjects) * 100) : 0
   const reuseTotal = workKits.reduce((sum, kit) => sum + kit.reuseCount, 0)
   const averageLearningPercent = learningRecords.length
@@ -78,6 +79,12 @@ export default function Dashboard() {
     : 0
   const totalHandoffSections = assetHandoffs.reduce((sum, handoff) => sum + (handoff.sectionCount || 0), 0)
   const totalHandoffKnowledge = assetHandoffs.reduce((sum, handoff) => sum + ((handoff.adoptedKnowledge || []).length), 0)
+  const northStarScore = Math.round((
+    Math.min(assetizationRate, 100) * 0.36 +
+    Math.min(averageLearningPercent || 0, 100) * 0.22 +
+    Math.min(assetHandoffs.length * 18, 100) * 0.22 +
+    Math.min(validationHistory.length * 22, 100) * 0.2
+  ))
   const projectAssetSignals = projects.map((project) => {
     const tasks = getTasks(project.id)
     const materials = getMaterials(project.id)
@@ -158,19 +165,43 @@ export default function Dashboard() {
   }).slice(0, 4)
 
   return (
-    <div className="max-w-5xl">
-      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute right-[-90px] top-[-140px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
-        <div className="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-7 items-center">
+    <div className="max-w-6xl">
+      <div className="mb-8 rounded-2xl border border-border-default bg-bg-surface p-5">
+        <div className="grid xl:grid-cols-[1fr_520px] gap-5 items-stretch">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+            <div className="inline-flex items-center gap-2 border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4 rounded-lg">
               <GitBranch className="w-3.5 h-3.5" />
-              分析资产化闭环
+              今日工作台
             </div>
-            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把每一次分析变成下一次可复用的起点</h1>
-            <p className="text-[14px] text-text-secondary leading-relaxed max-w-2xl">
-              看板现在追踪项目执行、报告沉淀、Work Kit 复用和启动前学习记录，帮助团队判断经验是否真的被传承，而不只是完成了一份报告。
+            <h1 className="text-[28px] font-medium tracking-[-0.02em] text-text-main mb-2">大促分析资产运营台</h1>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-2xl mb-5">
+              关注项目推进、资料输入、岗位结果和 Work Kit 沉淀情况。优先处理右侧行动队列中的项目，让分析能真正进入下一次复用。
             </p>
+            <div className="rounded-xl border border-border-light bg-bg-primary/50 p-4">
+              <div className="flex items-center justify-between gap-4 mb-3">
+                <div>
+                  <div className="text-[12px] font-semibold text-text-main">本周目标</div>
+                  <div className="text-[12px] text-text-muted mt-1">把已完成分析沉淀成可复用、可验证的 Work Kit</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[28px] font-light text-text-main leading-none">{northStarScore}%</div>
+                  <div className="text-[10px] text-text-muted mt-1">闭环成熟度</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {[
+                  ['学习', learningRecords.length ? `${learningRecords.length} 条` : '待记录'],
+                  ['交接', assetHandoffs.length ? `${assetHandoffs.length} 条` : '待提交'],
+                  ['复用', reuseTotal ? `${reuseTotal} 次` : '待复用'],
+                  ['验证', validationHistory.length ? `${validationHistory.length} 次` : '待验证'],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-border-light bg-bg-surface px-3 py-2">
+                    <div className="text-[10px] text-text-muted">{label}</div>
+                    <div className="text-[12px] font-medium text-text-main mt-0.5">{value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -179,8 +210,8 @@ export default function Dashboard() {
               { icon: Sparkles, value: String(reuseTotal), label: '模板复用', sub: 'Work Kit 累计复用' },
               { icon: GitBranch, value: String(workKits.length), label: '经验资产', sub: '可复用工作包' },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-4">
-                <item.icon className="w-4 h-4 text-accent-500 mb-3" />
+              <div key={item.label} className="rounded-xl border border-border-light bg-bg-primary/50 p-4">
+                <item.icon className="w-4 h-4 text-text-muted mb-3" />
                 <div className="text-[24px] font-light text-text-main leading-none mb-1">{item.value}</div>
                 <div className="text-[11px] font-medium text-text-main">{item.label}</div>
                 <div className="text-[10px] text-text-muted mt-1">{item.sub}</div>
@@ -190,25 +221,26 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10 lg:mb-14">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {[
           { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: `/materials/${firstSlug}` },
           { value: totalReviews.toLocaleString(), label: '评论样本', sub: '全项目聚合数据', to: `/materials/${firstSlug}` },
           { value: `${submittedTasks}/${allTasks.length}`, label: '分析任务', sub: '已提交 / 总量', to: `/tasks/${firstSlug}` },
           { value: String(workKits.length), label: 'Work Kit', sub: '可复用模板资产', to: '/archive' },
         ].map((s) => (
-          <Link key={s.label} to={s.to} className="card-surface rounded-2xl p-6 card-hover">
-            <div className="text-[36px] font-light tracking-[-0.03em] text-text-main leading-none mb-2">{s.value}</div>
-            <div className="h-px w-8 bg-accent-400 mb-3" />
+          <Link key={s.label} to={s.to} className="action-card p-5 group">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="text-[32px] font-light tracking-[-0.03em] text-text-main leading-none">{s.value}</div>
+              <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent-600 transition-colors" />
+            </div>
             <div className="text-[12px] font-semibold text-text-main mb-1">{s.label}</div>
             <div className="text-[11px] text-text-muted">{s.sub}</div>
           </Link>
         ))}
       </div>
 
-      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute left-[-110px] bottom-[-140px] w-[280px] h-[280px] rounded-full bg-ai-400/7" />
-        <div className="relative flex flex-wrap items-start justify-between gap-4 mb-5">
+      <div className="mb-8 data-panel p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
           <div>
             <span className="section-title">Asset Operations</span>
             <h2 className="text-[20px] font-medium text-text-main mt-2">资产运营信号</h2>
@@ -220,8 +252,8 @@ export default function Dashboard() {
             进入资产库 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-        <div className="relative grid lg:grid-cols-[0.85fr_1.15fr] gap-4">
-          <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.035] p-5">
+        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-4">
+          <div className="data-metric p-5">
             <div className="flex items-end justify-between gap-4 mb-4">
               <div>
                 <div className="text-[42px] font-light leading-none text-text-main">{assetizationRate}%</div>
@@ -240,7 +272,7 @@ export default function Dashboard() {
                 ['交接区块', `${totalHandoffSections}`],
                 ['验证', `${validationHistory.length}`],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-border-light bg-bg-surface/75 p-3">
+                <div key={label} className="rounded-lg border border-border-light bg-bg-surface p-3">
                   <div className="text-[15px] font-medium text-text-main leading-none">{value}</div>
                   <div className="text-[9px] text-text-muted mt-1">{label}</div>
                 </div>
@@ -254,9 +286,9 @@ export default function Dashboard() {
               { icon: ShieldCheck, label: '验证历史', value: `${validationHistory.length} 条`, sub: validationHistory[0] ? `最近：${validationHistory[0].status}` : '等待资产验证' },
               { icon: Package, label: '低闭环项目', value: `${projectAssetSignals.filter((item) => item.score < 80).length} 个`, sub: '优先补齐资料、交接或 Work Kit' },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+              <div key={item.label} className="data-metric p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <item.icon className="w-4 h-4 text-accent-500" />
+                  <item.icon className="w-4 h-4 text-text-muted" />
                   <span className="text-[16px] font-light text-text-main leading-none">{item.value}</span>
                 </div>
                 <div className="text-[12px] font-medium text-text-main">{item.label}</div>
@@ -265,14 +297,14 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-        <div className="relative mt-4 rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+        <div className="mt-4 rounded-xl border border-border-light bg-bg-primary/45 p-4">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="text-[12px] font-semibold text-text-main">需要优先补齐的项目</div>
             <span className="text-[10px] text-text-muted">按资产闭环分排序</span>
           </div>
           <div className="grid md:grid-cols-3 gap-2">
             {projectAssetSignals.slice(0, 3).map((item) => (
-              <Link key={item.project.id} to={item.hasKit ? '/archive' : `/report/${item.project.slug}`} className="rounded-xl border border-border-light bg-bg-surface/80 p-3 hover:border-accent-500/25 transition-colors">
+              <Link key={item.project.id} to={item.hasKit ? '/archive' : `/report/${item.project.slug}`} className="action-card p-3">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="text-[12px] font-medium text-text-main truncate">{item.project.name}</div>
                   <span className={`text-[11px] font-medium ${item.score >= 80 ? 'text-success' : item.score >= 60 ? 'text-warning' : 'text-text-muted'}`}>{item.score}%</span>
@@ -287,7 +319,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6">
+      <div className="mb-8 action-panel p-5">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
           <div>
             <span className="section-title">Next Best Actions</span>
@@ -308,7 +340,7 @@ export default function Dashboard() {
               success: 'bg-success-soft text-success border-success/20',
             }[item.tone]
             return (
-              <Link key={item.project.id} to={item.to} className="rounded-2xl border border-border-light bg-bg-primary/50 p-4 hover:border-accent-500/25 transition-colors">
+              <Link key={item.project.id} to={item.to} className="action-card p-4 group">
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${toneClass}`}>
                     <item.icon className="w-4 h-4" />
@@ -321,7 +353,7 @@ export default function Dashboard() {
                     <div className="text-[12px] text-text-secondary truncate mb-1">{item.project.name}</div>
                     <p className="text-[11px] text-text-muted leading-relaxed">{item.desc}</p>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-text-muted shrink-0 mt-1" />
+                  <ArrowRight className="w-3.5 h-3.5 text-text-muted group-hover:text-accent-600 shrink-0 mt-1 transition-colors" />
                 </div>
               </Link>
             )
@@ -339,16 +371,26 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
         {projects.map((p) => {
           const tasks = getTasks(p.id)
+          const materials = getMaterials(p.id)
           const done = tasks.filter((t) => getAIResult(t.id)?.submitted).length
           const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0
+          const projectHandoffs = assetHandoffs.filter((handoff) => handoff.projectId === p.id)
+          const hasKit = workKits.some((kit) => kit.basedOnProjectId === p.id)
+          const assetSteps = [
+            { label: '资料', done: materials.length > 0 },
+            { label: '任务', done: done > 0 },
+            { label: '交接', done: projectHandoffs.length > 0 },
+            { label: 'Work Kit', done: hasKit },
+          ]
+          const assetScore = Math.round((assetSteps.filter((step) => step.done).length / assetSteps.length) * 100)
           return (
             <div key={p.id} className="relative group/card">
               <Link
                 to={p.status === 'in_progress' ? `/materials/${p.slug}` : p.status === 'completed' ? `/report/${p.slug}` : `/tasks/${p.slug}`}
-                className="card-surface rounded-[24px] card-hover overflow-hidden flex flex-col relative block"
+                className="action-card overflow-hidden flex flex-col relative block"
               >
                 {p.status === 'in_progress' && <div className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full bg-accent-500" />}
-                <div className={`p-6 flex-1 ${p.status === 'in_progress' ? 'pt-7' : ''}`}>
+                <div className={`p-5 flex-1 ${p.status === 'in_progress' ? 'pt-6' : ''}`}>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-white/[0.03] px-2 py-1 rounded-md">{p.category}</span>
                     {p.status === 'in_progress' && <span className="w-[6px] h-[6px] rounded-full bg-accent-500 pulse-dot" />}
@@ -362,12 +404,25 @@ export default function Dashboard() {
                     </div>
                     <span className="text-[10px] font-medium text-text-muted">{done}/{tasks.length}</span>
                   </div>
+                  <div className="rounded-xl border border-border-light bg-bg-primary/45 p-3 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-semibold text-text-muted uppercase tracking-[0.08em]">资产链路</span>
+                      <span className={`text-[10px] font-medium ${assetScore >= 75 ? 'text-success' : assetScore >= 50 ? 'text-warning' : 'text-text-muted'}`}>{assetScore}%</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {assetSteps.map((step) => (
+                        <div key={step.label} className={`h-7 rounded-lg border flex items-center justify-center text-[9px] font-medium ${step.done ? 'border-accent-500/20 bg-accent-500/10 text-accent-600' : 'border-border-light bg-bg-surface/70 text-text-muted'}`}>
+                          {step.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex items-center justify-between text-[11px] text-text-muted">
                     <span className="flex items-center gap-1"><Target className="w-3 h-3" />{p.competitors.length} 竞品</span>
                     <span>{p.createdAt}</span>
                   </div>
                 </div>
-                <div className="px-6 py-3 bg-white/[0.03]/50 border-t border-border-light flex items-center justify-between">
+                <div className="px-5 py-3 bg-bg-primary/50 border-t border-border-light flex items-center justify-between">
                   <span className="text-[11px] text-text-muted">{p.team.map((t) => roleLabels[t.role]).join(' · ')}</span>
                   <span className="text-[11px] font-medium text-accent-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                     {p.status === 'in_progress' ? '进入' : p.status === 'completed' ? '查看' : '开始'}

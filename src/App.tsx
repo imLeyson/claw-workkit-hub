@@ -72,8 +72,8 @@ function AppContent() {
   return (
     <div className="flex min-h-screen bg-bg-primary">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen">
-        <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-4 lg:px-10">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
+        <header className="h-12 shrink-0 bg-bg-primary flex items-center justify-between px-4 lg:px-10 min-w-0">
           <div className="max-lg:hidden"><Breadcrumb /></div>
           <div className="flex items-center gap-3">
             <button onClick={toggleTheme} className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-main hover:bg-white/5 transition-colors" title={theme === 'dark' ? '切换浅色模式' : '切换深色模式'}>
@@ -95,7 +95,7 @@ function AppContent() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 min-w-0 overflow-auto">
           {!isSupabaseConfigured && (
             <div className="text-center py-1 bg-accent-50/30 border-b border-accent-500/10 text-[10px] text-accent-400 font-medium">
               本地 Demo · 数据保存在浏览器

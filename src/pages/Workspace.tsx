@@ -469,7 +469,7 @@ export default function Workspace() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         {/* Sidebar context */}
-        <div className="lg:col-span-3 space-y-6 bg-white/[0.03] rounded-[24px] p-5 lg:-m-2">
+        <div className="lg:col-span-3 space-y-5 data-panel p-5">
           <div>
             <span className="section-title">竞品数据</span>
             <div className="mt-3 space-y-2">
@@ -488,7 +488,7 @@ export default function Workspace() {
             <span className="section-title">Prompt</span>
             <p className="mt-3 text-[13px] text-text-muted leading-relaxed">{task.promptPreview}</p>
           </div>
-          <div className="rounded-[22px] border border-accent-500/15 bg-accent-500/[0.035] p-4">
+          <div className="action-panel p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="section-title">智能知识关联</span>
               <span className="text-[10px] font-semibold text-accent-600">{adoptedRecommendations.length}/5 已采纳</span>
@@ -500,14 +500,14 @@ export default function Workspace() {
                   <button
                     key={item.id}
                     onClick={() => toggleKnowledge(item.id)}
-                    className={`w-full text-left rounded-2xl border p-3 transition-all ${
+                    className={`w-full text-left rounded-lg border p-3 transition-colors ${
                       adopted
-                        ? 'border-accent-500/25 bg-bg-surface shadow-sm shadow-accent-500/5'
+                        ? 'border-accent-500/25 bg-bg-surface'
                         : 'border-border-light bg-bg-surface/55 hover:border-accent-500/15'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${adopted ? 'bg-accent-500 text-white' : 'bg-white/5 text-text-muted'}`}>
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${adopted ? 'bg-accent-500 text-white' : 'bg-bg-primary text-text-muted'}`}>
                         {adopted ? <Check className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -539,7 +539,7 @@ export default function Workspace() {
               </ul>
             </div>
           )}
-          <div className="bg-accent-500/[0.04] rounded-2xl p-4 border border-accent-500/15">
+          <div className="data-metric p-4">
             <span className="section-title">竞品对比智能体</span>
             <p className="mt-2 text-[11px] text-text-muted leading-relaxed">
               系统可引入小型智能体（如话术对比、卖点验证），自动将分析结果与市场竞品进行横向对比，标记差异点与优化建议。
@@ -555,7 +555,7 @@ export default function Workspace() {
         {/* Main content */}
         <div className="lg:col-span-9 min-w-0">
           {!showResult && !generating && (
-            <div className="card-surface rounded-[24px] p-16 text-center">
+            <div className="action-panel p-14 text-center">
               <div className="w-16 h-16 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-6">
                 <Sparkles className="w-8 h-8 text-accent-500" />
               </div>
@@ -570,7 +570,7 @@ export default function Workspace() {
           )}
 
           {generating && (
-            <div className="card-surface rounded-[24px] p-16 text-center">
+            <div className="data-panel p-14 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-6">
                 {[0, 150, 300].map((d) => (
                   <div key={d} className="w-2.5 h-2.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: `${d}ms` }} />
@@ -583,13 +583,12 @@ export default function Workspace() {
 
           {showResult && currentResult && (
             <div className="space-y-6">
-              <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
-                <div className="absolute right-0 top-0 w-36 h-36 rounded-full bg-accent-500/5 translate-x-12 -translate-y-16" />
-                <div className="relative flex flex-col xl:flex-row xl:items-start justify-between gap-5 xl:gap-8">
+              <div className="data-panel p-5">
+                <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-5 xl:gap-8">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <ShieldCheck className="w-4 h-4 text-accent-500" />
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-600">验证角色 · 内外知识库对比</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">验证角色 · 内外知识库对比</span>
                     </div>
                     <h3 className="text-[18px] font-medium text-text-main mb-2">已把采纳知识项纳入本次分析口径</h3>
                     <p className="text-[13px] text-text-muted leading-relaxed max-w-xl">
@@ -602,16 +601,16 @@ export default function Workspace() {
                       ['验证来源', `${reviewMats.length} 个竞品`],
                       ['待复核', feedbackItems.length ? `${feedbackItems.length} 条` : '0 条'],
                     ].map(([label, value]) => (
-                      <div key={label} className="rounded-2xl border border-border-light bg-bg-primary/70 p-3 text-center">
+                      <div key={label} className="data-metric p-3 text-center">
                         <div className="text-[18px] font-light text-text-main leading-none mb-1">{value}</div>
                         <div className="text-[10px] text-text-muted">{label}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
                   {adoptedRecommendations.slice(0, 4).map((item) => (
-                    <div key={item.id} className="rounded-2xl border border-border-light bg-bg-primary/70 p-3">
+                    <div key={item.id} className="rounded-lg border border-border-light bg-bg-primary/70 p-3">
                       <div className="flex items-center gap-2 mb-1.5">
                         <Link2 className="w-3.5 h-3.5 text-accent-500" />
                         <span className="text-[12px] font-medium text-text-main truncate">{item.title}</span>
@@ -621,7 +620,7 @@ export default function Workspace() {
                   ))}
                 </div>
                 {adoptedRecommendations.length === 0 && (
-                  <div className="relative mt-5 rounded-2xl border border-warning/20 bg-warning-soft p-4 flex items-center gap-3">
+                  <div className="mt-5 rounded-lg border border-warning/20 bg-warning-soft p-4 flex items-center gap-3">
                     <MinusCircle className="w-4 h-4 text-warning" />
                     <p className="text-[12px] text-warning">当前未采纳知识项，建议至少选择一个成功案例或高相关资料再生成。</p>
                   </div>
@@ -637,29 +636,28 @@ export default function Workspace() {
                 </button>
               </div>
 
-              <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
-                <div className="absolute right-[-80px] bottom-[-110px] w-56 h-56 rounded-full bg-ai-400/8" />
-                <div className="relative flex flex-col xl:flex-row xl:items-start justify-between gap-5 mb-5">
+              <div className="action-panel p-5">
+                <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-5 mb-5">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Package className="w-4 h-4 text-accent-500" />
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-600">Asset Handoff · 资产化交接</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Asset Handoff · 资产化交接</span>
                     </div>
                     <h3 className="text-[18px] font-medium text-text-main mb-2">提交前确认这份结果会沉淀成什么</h3>
                     <p className="text-[13px] text-text-muted leading-relaxed max-w-2xl">
                       系统会把分析区块、采纳知识、异常标记和来源资料一起送入策略报告，作为后续发布 Work Kit 时的可追溯资产来源。
                     </p>
                   </div>
-                  <div className={`rounded-2xl px-4 py-3 text-center shrink-0 ${
+                  <div className={`rounded-xl px-4 py-3 text-center shrink-0 ${
                     submitted ? 'bg-success-soft text-success' : 'bg-accent-500/[0.08] text-accent-600'
                   }`}>
                     <div className="text-[22px] font-light leading-none">{submitted ? '已提交' : '待提交'}</div>
                     <div className="text-[10px] font-medium mt-1">{submitted ? '报告链路已接收' : '确认后进入报告'}</div>
                   </div>
                 </div>
-                <div className="relative grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
                   {assetHandoffItems.map((item) => (
-                    <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/70 p-4">
+                    <div key={item.label} className="data-metric p-4">
                       <div className="text-[18px] font-light text-text-main leading-none mb-2">{item.value}</div>
                       <div className="text-[12px] font-medium text-text-main">{item.label}</div>
                       <p className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</p>
@@ -667,7 +665,7 @@ export default function Workspace() {
                   ))}
                 </div>
                 {adoptedRecommendations.length > 0 && (
-                  <div className="relative mt-4 rounded-2xl border border-border-light bg-bg-primary/50 p-4">
+                  <div className="mt-4 rounded-xl border border-border-light bg-bg-primary/50 p-4">
                     <div className="text-[11px] font-semibold text-text-main mb-3">将一并带入报告的知识依据</div>
                     <div className="flex flex-wrap gap-2">
                       {adoptedRecommendations.map((item) => (
@@ -682,7 +680,7 @@ export default function Workspace() {
               </div>
 
               {(aiSections || currentResult.sections || []).map((section, i) => (
-                <div key={i} className="card-surface rounded-[24px] p-6 animate-fade-in-up">
+                <div key={i} className="data-panel p-5">
                   {workspaceEditMode ? (
                     <div className="mb-5 flex flex-col gap-1">
                       <label className="text-[10px] text-text-muted font-medium uppercase tracking-[0.08em]">区块标题</label>
@@ -982,9 +980,8 @@ export default function Workspace() {
               ))}
 
               {submitted && (
-                <div className="card-surface rounded-[24px] p-6 overflow-hidden relative">
-                  <div className="absolute right-[-70px] top-[-100px] w-52 h-52 rounded-full bg-success/8" />
-                  <div className="relative flex flex-col lg:flex-row lg:items-start gap-4">
+                <div className="data-panel p-5">
+                  <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                     <div className="w-11 h-11 rounded-xl bg-success-soft flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-5 h-5 text-success" />
                     </div>
@@ -999,7 +996,7 @@ export default function Workspace() {
                           ['资产内容', `${(aiSections || currentResult.sections || []).length} 个区块`],
                           ['下一步', '报告复核'],
                         ].map(([label, value]) => (
-                          <div key={label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-3">
+                          <div key={label} className="data-metric p-3">
                             <div className="text-[13px] font-medium text-text-main">{value}</div>
                             <div className="text-[10px] text-text-muted mt-1">{label}</div>
                           </div>
@@ -1028,7 +1025,7 @@ export default function Workspace() {
       {/* Feedback modal */}
       {showFeedbackModal && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-[24px] p-6 w-[400px] shadow-xl">
+          <div className="bg-bg-surface rounded-xl p-6 w-[400px] shadow-xl border border-border-light">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-medium text-text-main">标记异常</h3>
               <button onClick={() => { setShowFeedbackModal(false); setFeedbackText('') }} className="p-1"><X className="w-4 h-4 text-text-muted" /></button>

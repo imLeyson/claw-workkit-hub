@@ -215,25 +215,24 @@ export default function TaskCards() {
   }, [tasks, isGenerating, showToast, readyPendingTasks, blockedPendingTasks])
 
   return (
-    <div className="max-w-5xl">
-      <div className="mb-10 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute right-[-90px] top-[-150px] w-[320px] h-[320px] rounded-full bg-accent-500/8" />
-        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-7">
+    <div className="max-w-6xl">
+      <div className="mb-8 data-panel p-5">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4">
               <GitBranch className="w-3.5 h-3.5" />
-              Work Kit Assembly
+              任务卡
             </div>
-            <h1 className="text-[34px] font-light tracking-[-0.03em] text-text-main mb-3">把岗位任务装配成可复用工作包</h1>
+            <h1 className="text-[28px] font-medium tracking-[-0.02em] text-text-main mb-2">岗位任务与生成状态</h1>
             <p className="text-[14px] text-text-secondary leading-relaxed max-w-xl">
-              每张任务卡都会记录输入资料、岗位 Prompt、输出格式和判断标准。完成并提交后，这些内容会汇入报告，最终沉淀为下一次大促可学习、可复用的 Work Kit。
+              查看每个岗位的输入资料、Prompt、输出格式和验收标准。可启动的任务进入工作台生成，已完成的任务提交到报告。
             </p>
           </div>
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
             {assetSteps.map((step) => (
-              <div key={step.label} className="rounded-2xl border border-border-light bg-bg-primary/55 p-4">
+              <div key={step.label} className="data-metric p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <step.icon className="w-4 h-4 text-accent-500" />
+                  <step.icon className="w-4 h-4 text-text-muted" />
                   <span className="font-mono text-[11px] text-accent-600">{step.value}</span>
                 </div>
                 <div className="text-[12px] font-medium text-text-main">{step.label}</div>
@@ -278,18 +277,18 @@ export default function TaskCards() {
       </div>
 
       {/* Smart association — collapsible */}
-      <div className="mb-10 bg-accent-500/[0.04] rounded-2xl border border-accent-500/15 overflow-hidden">
+      <div className="mb-8 action-panel overflow-hidden">
         <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-            <span className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.06em]">智能知识库 · 推荐 {relevantKits.length} 个高复用 Work Kit</span>
+            <span className="text-[11px] font-semibold text-text-main uppercase tracking-[0.06em]">可参考模板 · {relevantKits.length} 个高复用 Work Kit</span>
           </div>
           {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
         </button>
         {showAssociation && (
         <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           {relevantKits.map((k) => (
-            <Link key={k.id} to="/archive" className="bg-bg-surface rounded-xl p-3 border border-accent-500/15 text-[11px] hover:shadow-sm transition-shadow">
+            <Link key={k.id} to="/archive" className="action-card p-3 text-[11px]">
               <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 12)}{k.name.length > 12 ? '...' : ''}</div>
               <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次</div>
             </Link>
@@ -299,7 +298,7 @@ export default function TaskCards() {
       </div>
 
       {/* Task card grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 stagger">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tasks.map((task) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
           const availableTypes = new Set(inputMats.map((m) => m.type))
@@ -323,8 +322,8 @@ export default function TaskCards() {
             { label: '验收标准', value: `${task.judgmentCriteria.length} 条`, icon: ShieldCheck, ready: task.judgmentCriteria.length > 0 },
           ]
           return (
-            <div key={task.id} className="card-surface rounded-[24px] card-hover overflow-hidden group animate-fade-in-up border-l-[3px] border-l-transparent hover:border-l-accent-400">
-              <div className="p-6">
+            <div key={task.id} className="action-card overflow-hidden group border-l-[3px] border-l-transparent hover:border-l-accent-400">
+              <div className="p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -334,7 +333,7 @@ export default function TaskCards() {
                           e.preventDefault()
                           openEditTask(task)
                         }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-white/10 text-text-muted hover:text-accent-500 cursor-pointer flex items-center justify-center"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-bg-primary text-text-muted hover:text-accent-500 cursor-pointer flex items-center justify-center"
                         title="编辑任务"
                       >
                         <Pencil className="w-3 h-3" />
@@ -345,7 +344,7 @@ export default function TaskCards() {
                   <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
                     task.status === 'generated' ? 'bg-kit-50 text-kit-600' :
-                    task.status === 'ready' ? 'bg-accent-500/10 text-accent-400' : blocked ? 'bg-warning-soft text-warning' : 'bg-white/5 text-text-muted'
+                    task.status === 'ready' ? 'bg-accent-500/10 text-accent-600' : blocked ? 'bg-warning-soft text-warning' : 'bg-bg-primary text-text-muted'
                   }`}>
                     {task.status === 'submitted' ? '已提交' : task.status === 'generated' ? '已生成' : task.status === 'ready' ? '待分析' : blocked ? '待补资料' : '待生成'}
                   </span>
@@ -369,7 +368,7 @@ export default function TaskCards() {
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+                <div className="mt-5 data-metric p-4">
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-2">
                       {blocked ? <AlertTriangle className="w-4 h-4 text-warning" /> : <ClipboardCheck className="w-4 h-4 text-accent-500" />}
@@ -385,7 +384,7 @@ export default function TaskCards() {
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {assetOutputs.map((item) => (
-                      <div key={item.label} className="rounded-xl border border-border-light bg-bg-surface/75 p-2">
+                      <div key={item.label} className="rounded-lg border border-border-light bg-bg-surface p-2">
                         <item.icon className={`w-3.5 h-3.5 mb-1.5 ${item.ready ? 'text-accent-500' : 'text-text-muted'}`} />
                         <div className="text-[10px] font-medium text-text-main truncate">{item.value}</div>
                         <div className="text-[9px] text-text-muted mt-0.5">{item.label}</div>
@@ -394,7 +393,7 @@ export default function TaskCards() {
                   </div>
                 </div>
 
-                <div className={`mt-3 rounded-2xl border p-3 ${
+                <div className={`mt-3 rounded-xl border p-3 ${
                   handoff ? 'border-success/20 bg-success-soft' : task.status === 'submitted' ? 'border-accent-500/20 bg-accent-500/[0.04]' : 'border-border-light bg-bg-primary/35'
                 }`}>
                   <div className="flex items-center justify-between gap-3">
@@ -414,7 +413,7 @@ export default function TaskCards() {
                 </div>
               </div>
 
-              <div className="px-6 py-3 bg-white/[0.03] border-t border-border-light flex items-center justify-between">
+              <div className="px-5 py-3 bg-bg-primary/45 border-t border-border-light flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-[12px] text-text-muted">
                     <UserCircle className="w-3.5 h-3.5" />{task.assignedTo}

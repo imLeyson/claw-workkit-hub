@@ -7,14 +7,14 @@ interface ThemeState {
   toggle: () => void
 }
 
-const ThemeContext = createContext<ThemeState>({ theme: 'dark', toggle: () => {} })
+const ThemeContext = createContext<ThemeState>({ theme: 'light', toggle: () => {} })
 
 export function useTheme() { return useContext(ThemeContext) }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('promokit_theme')
-    return (saved === 'light' || saved === 'dark') ? saved : 'dark'
+    return (saved === 'light' || saved === 'dark') ? saved : 'light'
   })
 
   useEffect(() => {

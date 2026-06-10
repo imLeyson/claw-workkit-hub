@@ -23,6 +23,7 @@ import {
   Plus,
   Trash2,
   RotateCcw,
+  BookOpen,
 } from 'lucide-react'
 import { roleLabels, reportSummaries, reportNextSteps } from '../data/mock'
 import { getProjectBySlug, getTasks, getAIResult, getWorkKits, getMaterials, upsertWorkKitFromProject, saveAIResult, updateProject } from '../services/db'
@@ -147,6 +148,7 @@ export default function Report() {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [saved, setSaved] = useState(false)
   const [savedMode, setSavedMode] = useState<'created' | 'updated'>('created')
+  const [savedKit, setSavedKit] = useState<WorkKit | null>(null)
   const [markAsSuccess, setMarkAsSuccess] = useState(true)
   const [executionRefresh, setExecutionRefresh] = useState(0)
   const [editMode, setEditMode] = useState(false)
@@ -318,6 +320,7 @@ export default function Report() {
   const totalReviewSamples = materials.reduce((sum, item) => sum + (item.reviewCount || 0), 0)
   const referencedMaterialIds = new Set(tasks.flatMap((task) => task.inputMaterials))
   const referencedMaterials = materials.filter((item) => referencedMaterialIds.has(item.id))
+  const referencedMaterialTypeLabels = [...new Set(referencedMaterials.map((item) => materialTypeLabels[item.type] || item.label))]
   const sensitiveCount = materials.filter((item) => item.sensitivity !== 'normal').length
   const generatedCount = tasks.filter((task) => Boolean(getAIResult(task.id)?.generatedAt)).length
   const sourceTagCount = new Set(tasks.flatMap((task) => task.sourceTags)).size
@@ -371,6 +374,34 @@ export default function Report() {
     { title: '资产交接证据', desc: `${projectHandoffs.length} 条交接、${handoffKnowledgeCount} 个知识依据、${handoffFeedbackCount} 条复核标记` },
     { title: '执行清单', desc: `${nextSteps.length} 条可复用的大促推进动作` },
   ]
+  const launchLearningPreview = [
+    {
+      label: '先学资料结构',
+      value: `${referencedMaterials.length || materials.length} 份资料`,
+      desc: referencedMaterials.length
+        ? `下次项目会优先提示复用 ${referencedMaterialTypeLabels.slice(0, 3).join('、')} 的字段结构。`
+        : '保存后会沉淀当前项目的资料类型，作为新项目上传清单。',
+    },
+    {
+      label: '再学岗位方法',
+      value: `${submittedTasks.length} 个结果`,
+      desc: submittedTasks[0]
+        ? `以「${submittedTasks[0].title}」等已提交结果作为任务卡学习样本。`
+        : '补齐岗位结果后，任务卡会带出可继承的 Prompt、输出格式和验收标准。',
+    },
+    {
+      label: '最后学验证决策',
+      value: projectHandoffs.length ? `${projectHandoffs.length} 条交接` : '待交接',
+      desc: projectHandoffs.length
+        ? `交接证据会告诉下次项目哪些知识依据可沿用，哪些需要重新复核。`
+        : '建议先从工作台提交资产化交接，避免 Work Kit 只有结论没有来源。',
+    },
+  ]
+  const publishReceiptItems = [
+    { label: '启动学习包', value: `${launchLearningPreview.length} 项`, desc: '新项目复用前先学习资料、岗位方法和验证决策' },
+    { label: '资产内容', value: `${reusableAssets.length} 类`, desc: 'Prompt、资料规则、验证结论、交接证据和执行清单' },
+    { label: '版本记录', value: savedKit?.version || nextVersionLabel, desc: savedMode === 'updated' ? '已写入原 Work Kit 版本历史' : '已创建首个可复用版本' },
+  ]
   const saveDraft = () => {
     localStorage.setItem(`promokit_report_draft_${project.id}`, JSON.stringify(draft))
     setEditMode(false)
@@ -406,14 +437,13 @@ export default function Report() {
           </div>
         </div>
         <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
-          <div className="rounded-[28px] border border-border-default bg-bg-surface p-7 overflow-hidden relative">
-            <div className="absolute right-[-80px] top-[-120px] w-[280px] h-[280px] rounded-full bg-accent-500/10" />
-            <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-ai-400/20 bg-ai-400/10 px-3 py-1 text-[11px] text-ai-400 mb-5">
+          <div className="data-panel p-6">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4">
                 <GitBranch className="w-3.5 h-3.5" />
-                从资料到策略再到知识沉淀的闭环报告
+                策略报告
               </div>
-              <h1 className="text-[40px] font-light tracking-[-0.03em] text-text-main mb-4">大促策略报告</h1>
+              <h1 className="text-[30px] font-medium tracking-[-0.02em] text-text-main mb-3">大促策略报告</h1>
               <p className="text-[15px] text-text-secondary max-w-2xl leading-relaxed mb-6">
                 {project.name} 已完成 {submittedCount}/{tasks.length} 个岗位分析，系统将资料引用、AI 输出、验证准入、执行进度和 Work Kit 沉淀串成一条可追踪链路。
               </p>
@@ -448,9 +478,8 @@ export default function Report() {
       </div>
 
       {/* Assetization publisher */}
-      <div className="mb-12 rounded-[28px] border border-border-default bg-bg-surface p-6 overflow-hidden relative">
-        <div className="absolute left-[-120px] bottom-[-140px] w-[300px] h-[300px] rounded-full bg-ai-400/8" />
-        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-7">
+      <div className="mb-10 action-panel p-5">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
           <div className="flex flex-col justify-between gap-6">
             <div>
               <span className="section-title">Asset Publisher</span>
@@ -459,7 +488,7 @@ export default function Report() {
                 保存 Work Kit 之前，先确认本次分析是否已经具备可学习、可复用、可验证的条件。达标越高，下一个项目启动时越能直接继承本次经验。
               </p>
             </div>
-            <div className="rounded-[24px] border border-accent-500/20 bg-accent-500/[0.045] p-5">
+            <div className="data-metric p-5">
               <div className="flex items-end justify-between gap-4 mb-4">
                 <div>
                   <div className="text-[42px] font-light leading-none text-text-main">{readinessScore}%</div>
@@ -477,10 +506,10 @@ export default function Report() {
 
           <div className="grid md:grid-cols-2 gap-3">
             {readinessItems.map((item) => (
-              <div key={item.label} className={`rounded-2xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/60'}`}>
+              <div key={item.label} className={`rounded-xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/60'}`}>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="text-[13px] font-medium text-text-main">{item.label}</div>
-                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${item.ready ? 'bg-success text-white' : 'bg-bg-surface text-text-muted'}`}>
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${item.ready ? 'bg-success text-white' : 'bg-bg-surface text-text-muted'}`}>
                     {item.ready ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
                   </div>
                 </div>
@@ -491,7 +520,7 @@ export default function Report() {
           </div>
         </div>
 
-        <div className="relative mt-5 pt-5 border-t border-border-light">
+        <div className="mt-5 pt-5 border-t border-border-light">
           <div className="flex items-center justify-between gap-4 mb-3">
             <div className="text-[13px] font-medium text-text-main">保存后将沉淀的资产</div>
             <button onClick={() => setShowSaveDialog(true)} className="btn-primary">
@@ -500,13 +529,13 @@ export default function Report() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {reusableAssets.map((asset) => (
-              <div key={asset.title} className="rounded-2xl border border-border-light bg-bg-primary/45 p-4">
+              <div key={asset.title} className="data-metric p-4">
                 <div className="text-[12px] font-medium text-text-main mb-1">{asset.title}</div>
                 <p className="text-[11px] text-text-muted leading-relaxed">{asset.desc}</p>
               </div>
             ))}
           </div>
-          <div className="mt-4 rounded-[24px] border border-accent-500/15 bg-accent-500/[0.035] p-4">
+          <div className="mt-4 rounded-xl border border-border-light bg-bg-primary/45 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <ClipboardCheck className="w-4 h-4 text-accent-500" />
@@ -520,7 +549,7 @@ export default function Report() {
             {projectHandoffs.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-3">
                 {projectHandoffs.slice(0, 4).map((handoff) => (
-                  <div key={handoff.id} className="rounded-2xl border border-border-light bg-bg-surface/80 p-4">
+                  <div key={handoff.id} className="rounded-lg border border-border-light bg-bg-surface p-4">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="min-w-0">
                         <div className="text-[13px] font-medium text-text-main truncate">{handoff.taskTitle}</div>
@@ -534,7 +563,7 @@ export default function Report() {
                         ['知识', `${(handoff.adoptedKnowledge || []).length}`],
                         ['复核', `${(handoff.feedbackItems || []).length}`],
                       ].map(([label, value]) => (
-                        <div key={label} className="rounded-xl border border-border-light bg-bg-primary/70 p-2">
+                        <div key={label} className="rounded-lg border border-border-light bg-bg-primary/70 p-2">
                           <div className="text-[13px] font-medium text-text-main leading-none">{value}</div>
                           <div className="text-[9px] text-text-muted mt-1">{label}</div>
                         </div>
@@ -563,7 +592,7 @@ export default function Report() {
       </div>
 
       {/* Closure map */}
-      <div className="mb-12 rounded-[24px] border border-border-default bg-bg-surface p-5">
+      <div className="mb-10 data-panel p-5">
         <div className="flex items-center justify-between gap-4 mb-5">
           <div>
             <span className="section-title">Closed Loop</span>
@@ -573,7 +602,7 @@ export default function Report() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
           {closureSteps.map((step, index) => (
-            <div key={step.label} className="relative rounded-2xl border border-border-light bg-bg-primary/45 p-4 min-h-[148px]">
+            <div key={step.label} className="relative data-metric p-4 min-h-[148px]">
               {index < closureSteps.length - 1 && <div className="hidden xl:block absolute top-8 right-[-18px] w-8 h-px bg-border-default" />}
               <div className="w-9 h-9 rounded-xl bg-accent-500/10 text-accent-600 flex items-center justify-center mb-4">
                 <step.icon className="w-4 h-4" />
@@ -590,7 +619,7 @@ export default function Report() {
 
       {/* Evidence and usage */}
       <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6 mb-12">
-        <section className="rounded-[24px] border border-border-default bg-bg-surface p-5">
+        <section className="data-panel p-5">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
               <span className="section-title">Input Evidence</span>
@@ -618,7 +647,7 @@ export default function Report() {
           </div>
         </section>
 
-        <section className="rounded-[24px] border border-border-default bg-bg-surface p-5">
+        <section className="data-panel p-5">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
               <span className="section-title">AI Workflow</span>
@@ -664,7 +693,7 @@ export default function Report() {
       </div>
 
       {/* Executive summary */}
-      <div className="mb-12 rounded-[24px] border border-border-default bg-bg-surface p-6">
+      <div className="mb-10 data-panel p-5">
         <div className="flex items-center justify-between gap-4 mb-5">
           <div>
             <span className="section-title">Executive Summary</span>
@@ -713,7 +742,7 @@ export default function Report() {
       </div>
 
       {/* Role tabs - vertical nav */}
-      <div className="rounded-[24px] border border-border-default bg-bg-surface p-6">
+      <div className="data-panel p-5">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div>
             <span className="section-title">Role Outputs</span>
@@ -761,7 +790,7 @@ export default function Report() {
                     )}
                   </div>
                   {result?.submitted ? (
-                    <div className="space-y-3 animate-fade-in-up">
+                    <div className="space-y-3">
                       {result.sections.map((section, i) => (
                         <div key={i} className="rounded-[20px] border border-border-light bg-bg-primary/45 p-5">
                           {editMode ? (
@@ -1072,7 +1101,7 @@ export default function Report() {
       </div>
 
       {/* Verification review */}
-      <div className="mt-12 bg-accent-500/[0.04] rounded-[24px] p-6 border border-accent-500/15">
+      <div className="mt-10 action-panel p-5">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-xl bg-accent-500/15 flex items-center justify-center">
             <CheckCircle2 className="w-4 h-4 text-accent-600" />
@@ -1138,7 +1167,7 @@ export default function Report() {
 
       {/* Next steps */}
       <div className="mt-12 grid lg:grid-cols-[1fr_0.72fr] gap-6">
-        <section className="rounded-[24px] border border-border-default bg-bg-surface p-6">
+        <section className="data-panel p-5">
           <div className="flex items-start justify-between gap-4 mb-5">
             <div>
               <span className="section-title">Execution Board</span>
@@ -1191,7 +1220,7 @@ export default function Report() {
           </div>
         </section>
 
-        <section className="rounded-[24px] border border-border-default bg-bg-surface p-6">
+        <section className="action-panel p-5">
           <span className="section-title">Knowledge Return</span>
           <h2 className="text-[18px] font-medium text-text-main mt-2 mb-5">报告如何回流为下次可用资产</h2>
           <div className="space-y-3">
@@ -1242,55 +1271,92 @@ export default function Report() {
       {/* Save dialog */}
       {showSaveDialog && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-[28px] p-6 w-[520px] shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="bg-bg-surface rounded-[28px] p-6 w-[760px] max-w-[94vw] shadow-xl border border-border-light">
+            <div className="flex items-start justify-between gap-5 mb-5">
+              <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Package className="w-5 h-5 text-accent-500" /></div>
               <div>
                 <h3 className="font-medium text-text-main">沉淀为复用工作包</h3>
-                <p className="text-[12px] text-text-muted">保存流程、验证结论和成功标记，下次大促直接复用。</p>
+                  <p className="text-[12px] text-text-muted">保存流程、验证结论和启动学习包，下次大促直接复用。</p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.05] px-4 py-3 text-center shrink-0">
+                <div className="text-[26px] font-light text-text-main leading-none">{readinessScore}%</div>
+                <div className="text-[10px] text-text-muted mt-1">发布就绪度</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {[
-                { icon: CheckCircle2, label: '结果完整性', value: `${submittedCount}/${tasks.length}`, pass: completionReady },
-                { icon: ShieldCheck, label: '资产交接', value: `${projectHandoffs.length}条`, pass: projectHandoffs.length > 0 },
-                { icon: Star, label: '沉淀评分', value: successRating ? String(successRating) : '待定', pass: successRating >= 4.8 },
-              ].map((item) => (
-                <div key={item.label} className={`rounded-2xl border p-3 ${item.pass ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/70'}`}>
-                  <item.icon className={`w-4 h-4 mb-2 ${item.pass ? 'text-success' : 'text-text-muted'}`} />
-                  <div className="text-[18px] font-light text-text-main leading-none mb-1">{item.value}</div>
-                  <div className="text-[10px] text-text-muted">{item.label}</div>
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-4 mb-4">
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { icon: CheckCircle2, label: '结果', value: `${submittedCount}/${tasks.length}`, pass: completionReady },
+                    { icon: ShieldCheck, label: '交接', value: `${projectHandoffs.length}条`, pass: projectHandoffs.length > 0 },
+                    { icon: Star, label: '评分', value: successRating ? String(successRating) : '待定', pass: successRating >= 4.8 },
+                  ].map((item) => (
+                    <div key={item.label} className={`rounded-2xl border p-3 ${item.pass ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/70'}`}>
+                      <item.icon className={`w-4 h-4 mb-2 ${item.pass ? 'text-success' : 'text-text-muted'}`} />
+                      <div className="text-[18px] font-light text-text-main leading-none mb-1">{item.value}</div>
+                      <div className="text-[10px] text-text-muted">{item.label}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="bg-white/5 rounded-2xl p-4 mb-4 text-[12px] space-y-1.5">
-              <div className="flex justify-between gap-4"><span className="text-text-muted">项目</span><span className="font-medium text-right">{project.name}</span></div>
-              <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
-              <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>
-              <div className="flex justify-between"><span className="text-text-muted">交接证据</span><span className="font-medium">{projectHandoffs.length} 条 · {handoffKnowledgeCount} 个知识依据</span></div>
-              {existingKit && <div className="flex justify-between"><span className="text-text-muted">已有版本</span><span className="font-medium">{existingKit.version} · {existingKit.versionHistory.length} 条历史</span></div>}
-            </div>
-
-            <button
-              onClick={() => setMarkAsSuccess((v) => !v)}
-              className={`w-full rounded-2xl border p-4 mb-5 text-left transition-colors ${
-                markAsSuccess ? 'border-amber-500/25 bg-amber-500/10' : 'border-border-light bg-bg-primary/60'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${markAsSuccess ? 'bg-amber-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
-                  <Star className={`w-4.5 h-4.5 ${markAsSuccess ? 'fill-white' : ''}`} />
+                <div className="bg-white/5 rounded-2xl p-4 text-[12px] space-y-1.5">
+                  <div className="flex justify-between gap-4"><span className="text-text-muted">项目</span><span className="font-medium text-right">{project.name}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">交接证据</span><span className="font-medium">{projectHandoffs.length} 条 · {handoffKnowledgeCount} 个知识依据</span></div>
+                  {existingKit && <div className="flex justify-between"><span className="text-text-muted">已有版本</span><span className="font-medium">{existingKit.version} · {existingKit.versionHistory.length} 条历史</span></div>}
                 </div>
-                <div>
-                  <div className="text-[13px] font-medium text-text-main mb-1">标记为已验证成功案例</div>
-                  <p className="text-[12px] text-text-muted leading-relaxed">
-                    项目沉淀后评分写入 {markAsSuccess ? '4.8' : '4.3'}，成功案例会在资产库优先展示，供新项目启动前学习。
-                  </p>
+
+                <button
+                  onClick={() => setMarkAsSuccess((v) => !v)}
+                  className={`w-full rounded-2xl border p-4 text-left transition-colors ${
+                    markAsSuccess ? 'border-amber-500/25 bg-amber-500/10' : 'border-border-light bg-bg-primary/60'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${markAsSuccess ? 'bg-amber-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
+                      <Star className={`w-4.5 h-4.5 ${markAsSuccess ? 'fill-white' : ''}`} />
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-medium text-text-main mb-1">标记为已验证成功案例</div>
+                      <p className="text-[12px] text-text-muted leading-relaxed">
+                        项目沉淀后评分写入 {markAsSuccess ? '4.8' : '4.3'}，成功案例会在资产库优先展示，供新项目启动前学习。
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em]">Launch Learning Pack</div>
+                    <div className="text-[14px] font-medium text-text-main mt-1">下次启动前会学习什么</div>
+                  </div>
+                  <BookOpen className="w-5 h-5 text-accent-500" />
+                </div>
+                <div className="space-y-2.5">
+                  {launchLearningPreview.map((item, index) => (
+                    <div key={item.label} className="rounded-xl border border-border-light bg-bg-surface/85 p-3">
+                      <div className="flex items-center justify-between gap-3 mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-lg bg-accent-500/10 text-accent-600 flex items-center justify-center text-[10px] font-mono">{index + 1}</span>
+                          <span className="text-[12px] font-medium text-text-main">{item.label}</span>
+                        </div>
+                        <span className="text-[11px] text-text-secondary shrink-0">{item.value}</span>
+                      </div>
+                      <p className="text-[10px] text-text-muted leading-relaxed pl-7">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 rounded-xl bg-bg-primary/70 border border-border-light p-3 text-[11px] text-text-secondary leading-relaxed">
+                  保存后，新项目从资产库复用此 Work Kit 时，会先进入启动前学习包，而不是直接复制旧结论。
                 </div>
               </div>
-            </button>
+            </div>
 
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => setShowSaveDialog(false)} className="btn-ghost">取消</button>
@@ -1322,7 +1388,7 @@ export default function Report() {
                   description: `基于「${project.name}」项目沉淀的分析流程。`,
                   scenario: project.campaign || '大促分析',
                   includedRoles: roleTabs,
-                  materialStructure: '竞品评论 · 商品参数 · 客服记录',
+                  materialStructure: referencedMaterialTypeLabels.length ? referencedMaterialTypeLabels.join(' · ') : '竞品评论 · 商品参数 · 客服记录',
                   sections: [
                     ...manualSections,
                     ...submittedTasks.map((t) => ({ title: t.title, role: t.role, content: getAIResult(t.id)?.sections || [] })),
@@ -1334,9 +1400,31 @@ export default function Report() {
                   reuseCount: 0, rating: successRating,
                 }
                 const savedResult = upsertWorkKitFromProject(newKit)
+                try {
+                  const publishHistory = JSON.parse(localStorage.getItem('promokit_asset_publish_history' ) || '[]')
+                  localStorage.setItem('promokit_asset_publish_history', JSON.stringify([
+                    {
+                      id: `publish_${Date.now()}`,
+                      projectId: project.id,
+                      projectName: project.name,
+                      workKitId: savedResult.kit.id,
+                      workKitName: savedResult.kit.name,
+                      version: savedResult.kit.version,
+                      mode: savedResult.mode,
+                      readinessScore,
+                      learningItems: launchLearningPreview.map((item) => item.label),
+                      reusableAssetCount: reusableAssets.length,
+                      handoffCount: projectHandoffs.length,
+                      createdAt: new Date().toISOString(),
+                    },
+                    ...publishHistory,
+                  ].slice(0, 40)))
+                } catch { /* local publish history is optional */ }
                 updateProject({ ...project, status: 'completed' })
                 setSavedMode(savedResult.mode)
+                setSavedKit(savedResult.kit)
                 setSaved(true); setShowSaveDialog(false)
+                window.dispatchEvent(new Event('promokit_db_update'))
                 showToast(savedResult.mode === 'created' ? 'Work Kit 已保存到资产库' : `Work Kit 已更新为 ${savedResult.kit.version}`, 'success')
               }} className="btn-primary-filled">确认保存</button>
             </div>
@@ -1345,17 +1433,45 @@ export default function Report() {
       )}
       {saved && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-[24px] p-8 w-[400px] shadow-xl text-center">
-            <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center mx-auto mb-4"><TrendingUp className="w-7 h-7 text-success" /></div>
-            <h3 className="text-[18px] font-medium text-text-main mb-2">{savedMode === 'created' ? 'Work Kit 已沉淀' : 'Work Kit 已更新'}</h3>
-            <p className="text-[13px] text-text-muted mb-6">
+          <div className="bg-bg-surface rounded-[28px] p-7 w-[560px] max-w-[92vw] shadow-xl border border-border-light">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center shrink-0"><TrendingUp className="w-7 h-7 text-success" /></div>
+              <div className="min-w-0">
+                <div className="text-[11px] font-semibold text-success uppercase tracking-[0.08em] mb-1">Asset Receipt</div>
+                <h3 className="text-[20px] font-medium text-text-main mb-2">{savedMode === 'created' ? 'Work Kit 已沉淀' : 'Work Kit 已更新'}</h3>
+                <p className="text-[13px] text-text-muted leading-relaxed">
               {markAsSuccess
                 ? `已将「${project.name}」标记为可优先学习的成功案例。`
                 : savedMode === 'created' ? `已将「${project.name}」的分析流程保存为观察模板。` : `已将「${project.name}」的最新报告结果同步到原工作包版本历史。`}
-            </p>
-            <div className="flex items-center justify-center gap-3">
+                </p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-2 mb-5">
+              {publishReceiptItems.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-3">
+                  <div className="text-[17px] font-light text-text-main leading-none mb-1">{item.value}</div>
+                  <div className="text-[11px] font-medium text-text-main">{item.label}</div>
+                  <div className="text-[9px] text-text-muted leading-relaxed mt-1">{item.desc}</div>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.04] p-4 mb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <BookOpen className="w-4 h-4 text-accent-500" />
+                <span className="text-[12px] font-semibold text-text-main">下次启动将继承</span>
+              </div>
+              <div className="grid gap-1.5">
+                {launchLearningPreview.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between gap-3 text-[11px]">
+                    <span className="text-text-secondary">{item.label}</span>
+                    <span className="text-text-muted text-right">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3">
               <button onClick={() => setSaved(false)} className="btn-ghost">关闭</button>
-              <button onClick={() => navigate('/archive')} className="btn-primary-filled">查看资产库 <ArrowRight className="w-4 h-4" /></button>
+              <button onClick={() => navigate('/archive')} className="btn-primary-filled">去资产库验证 <ArrowRight className="w-4 h-4" /></button>
             </div>
           </div>
         </div>
