@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, PlusCircle, FolderOpen, LayoutGrid, BarChart3,
-  Archive, Menu, X, Sparkles, Package, Bot, ArrowRight, ClipboardCheck,
+  Archive, Sparkles, Package, Bot, ArrowRight, ClipboardCheck,
 } from 'lucide-react'
 import Logo from './Logo'
 import { getAIResult, getMaterials, getProjectBySlug, getTasks, getWorkKits } from '../services/db'
@@ -37,7 +37,6 @@ export default function Sidebar() {
   const inFlow = isInFlow(pathname)
   const slug = extractSlug(pathname)
   const [expanded, setExpanded] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
   const project = inFlow ? getProjectBySlug(slug) : undefined
   const tasks = project ? getTasks(project.id) : []
   const materials = project ? getMaterials(project.id) : []
@@ -88,21 +87,8 @@ export default function Sidebar() {
   })
 
   return (
-    <>
-      {/* Mobile toggle */}
-      <button
-        onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-3 left-3 z-50 w-9 h-9 rounded-xl bg-sidebar flex items-center justify-center"
-      >
-        {mobileOpen ? <X className="w-4 h-4 text-white" /> : <Menu className="w-4 h-4 text-white" />}
-      </button>
-      {/* Overlay */}
-      {mobileOpen && <div className="lg:hidden fixed inset-0 bg-black/40 z-30" onClick={() => setMobileOpen(false)} />}
-      <aside
-        className={`shrink-0 bg-sidebar min-h-screen flex flex-col transition-all duration-300 ease-out overflow-hidden z-40
-          ${mobileOpen ? 'fixed left-0 top-0 bottom-0 w-[220px]' : 'max-lg:hidden'}
-          ${expanded ? 'w-[220px]' : 'w-[56px]'}
-        `}
+    <aside
+        className={`shrink-0 bg-sidebar min-h-screen flex flex-col transition-all duration-300 ease-out overflow-hidden z-40 ${expanded ? 'w-[220px]' : 'w-[56px]'}`}
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
       >
@@ -211,16 +197,16 @@ export default function Sidebar() {
       {/* Bottom status */}
       <div className="px-[10px] pb-4">
         <div className={`border-t border-white/[0.06] pt-3 transition-opacity ${expanded ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="mb-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3">
+          <div className="mb-3 rounded-xl border border-white/[0.08] bg-white/[0.035] p-3">
             <div className="flex items-center gap-2 mb-2">
               <Package className="w-3.5 h-3.5 text-accent-500" />
-              <span className="text-[11px] font-medium text-white/75 whitespace-nowrap">目标：分析资产化</span>
+              <span className="text-[11px] font-medium text-white/75 whitespace-nowrap">追求目标</span>
             </div>
             <p className="text-[10px] text-white/35 leading-relaxed">
-              把资料、任务、报告和验证结果沉淀成下一次可复用的 Work Kit。
+              清晰、可操作、可沉淀，并且足够有品牌质感。
             </p>
             <div className="mt-3 flex items-center justify-between text-[9px] text-white/30">
-              <span>Work Kit</span>
+              <span>AI Work Kit</span>
               <span>{getWorkKits().length} 个资产</span>
             </div>
           </div>
@@ -232,6 +218,5 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
-    </>
   )
 }

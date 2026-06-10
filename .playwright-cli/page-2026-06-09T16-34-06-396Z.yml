@@ -1,0 +1,168 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资料库" [ref=e22] [cursor=pointer]:
+        - /url: /materials/618-hair-dryer
+        - img [ref=e23]
+        - generic [ref=e25]: 资料库
+      - link "任务卡" [ref=e26] [cursor=pointer]:
+        - /url: /tasks/618-hair-dryer
+        - img [ref=e27]
+        - generic [ref=e32]: 任务卡
+      - link "报告" [ref=e33] [cursor=pointer]:
+        - /url: /report/618-hair-dryer
+        - img [ref=e34]
+        - generic [ref=e36]: 报告
+      - link "资产库" [ref=e37] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e38]
+        - generic [ref=e41]: 资产库
+    - generic [ref=e43]:
+      - generic [ref=e45]: PromoKit AI
+      - generic [ref=e46]: 电商大促 AI 工作包系统
+  - generic [ref=e47]:
+    - banner [ref=e48]:
+      - generic [ref=e50]:
+        - link "看板" [ref=e51] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e52]:
+          - generic [ref=e53]: /
+          - generic [ref=e54]: AI 工作台
+        - generic [ref=e55]:
+          - generic [ref=e56]: /
+          - generic [ref=e57]: 618-hair-dryer
+        - generic [ref=e58]:
+          - generic [ref=e59]: /
+          - generic [ref=e60]: t2
+      - generic [ref=e61]:
+        - button "切换浅色模式" [ref=e62]:
+          - img [ref=e63]
+        - link "幻灯片" [ref=e69] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e70]
+          - text: 幻灯片
+        - generic [ref=e73]: 本地 Demo
+    - main [ref=e75]:
+      - generic [ref=e76]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e78]:
+        - generic [ref=e80]:
+          - link "返回任务列表" [ref=e81] [cursor=pointer]:
+            - /url: /tasks/618-hair-dryer
+            - img [ref=e82]
+            - text: 返回任务列表
+          - heading "卖点文案生成" [level=1] [ref=e84]
+          - paragraph [ref=e85]: 618 高速吹风机竞品评论分析 · 文案岗位 · 王文案
+          - generic [ref=e88]: 模拟模式
+        - generic [ref=e89]:
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - text: 竞品数据
+              - generic [ref=e92]:
+                - generic [ref=e93]:
+                  - img [ref=e94]
+                  - generic [ref=e97]:
+                    - generic [ref=e98]: 米家
+                    - generic [ref=e99]: mijia-h700-reviews.xlsx
+                - generic [ref=e100]:
+                  - img [ref=e101]
+                  - generic [ref=e104]:
+                    - generic [ref=e105]: 飞科
+                    - generic [ref=e106]: flyco-f8-reviews.xlsx
+                - generic [ref=e107]:
+                  - img [ref=e108]
+                  - generic [ref=e111]:
+                    - generic [ref=e112]: 徕芬
+                    - generic [ref=e113]: laifen-se-reviews.xlsx
+            - generic [ref=e114]:
+              - text: Prompt
+              - paragraph [ref=e115]: 你是一位资深电商文案。请基于竞品评论中的用户原话，将每个痛点转译为可感知、可量化、可传播的商品卖点文案。
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - generic [ref=e118]: 智能知识关联
+                - generic [ref=e119]: 3/5 已采纳
+              - generic [ref=e120]:
+                - button "大促直播话术 Work Kit 93% 成功案例 v1.2 · 复用 5 次 · 评分 4.9 包含文案岗任务模板，可提前学习相似项目的资料结构、判断口径和输出格式。" [ref=e121]:
+                  - generic [ref=e122]:
+                    - img [ref=e124]
+                    - generic [ref=e126]:
+                      - generic [ref=e127]:
+                        - generic [ref=e128]: 大促直播话术 Work Kit
+                        - generic [ref=e129]: 93%
+                      - generic [ref=e130]:
+                        - generic [ref=e131]: 成功案例
+                        - generic [ref=e132]: v1.2 · 复用 5 次 · 评分 4.9
+                      - paragraph [ref=e133]: 包含文案岗任务模板，可提前学习相似项目的资料结构、判断口径和输出格式。
+                - button "小红书种草文案 Work Kit 95% 可复用流程 v1.3 · 复用 7 次 · 评分 4.7 包含文案岗任务模板，可提前学习相似项目的资料结构、判断口径和输出格式。" [ref=e134]:
+                  - generic [ref=e135]:
+                    - img [ref=e137]
+                    - generic [ref=e139]:
+                      - generic [ref=e140]:
+                        - generic [ref=e141]: 小红书种草文案 Work Kit
+                        - generic [ref=e142]: 95%
+                      - generic [ref=e143]:
+                        - generic [ref=e144]: 可复用流程
+                        - generic [ref=e145]: v1.3 · 复用 7 次 · 评分 4.7
+                      - paragraph [ref=e146]: 包含文案岗任务模板，可提前学习相似项目的资料结构、判断口径和输出格式。
+                - button "米家 H700 用户评论 86% 竞品样本 mijia-h700-reviews.xlsx 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。" [active] [ref=e147]:
+                  - generic [ref=e148]:
+                    - img [ref=e208]
+                    - generic [ref=e152]:
+                      - generic [ref=e153]:
+                        - generic [ref=e154]: 米家 H700 用户评论
+                        - generic [ref=e155]: 86%
+                      - generic [ref=e156]:
+                        - generic [ref=e157]: 竞品样本
+                        - generic [ref=e158]: mijia-h700-reviews.xlsx
+                      - paragraph [ref=e159]: 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。
+                - button "飞科 F8 用户评论 83% 竞品样本 flyco-f8-reviews.xlsx 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。" [ref=e160]:
+                  - generic [ref=e161]:
+                    - img [ref=e163]
+                    - generic [ref=e165]:
+                      - generic [ref=e166]:
+                        - generic [ref=e167]: 飞科 F8 用户评论
+                        - generic [ref=e168]: 83%
+                      - generic [ref=e169]:
+                        - generic [ref=e170]: 竞品样本
+                        - generic [ref=e171]: flyco-f8-reviews.xlsx
+                      - paragraph [ref=e172]: 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。
+                - button "徕芬 SE 用户评论 80% 竞品样本 laifen-se-reviews.xlsx 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。" [ref=e173]:
+                  - generic [ref=e174]:
+                    - img [ref=e176]
+                    - generic [ref=e178]:
+                      - generic [ref=e179]:
+                        - generic [ref=e180]: 徕芬 SE 用户评论
+                        - generic [ref=e181]: 80%
+                      - generic [ref=e182]:
+                        - generic [ref=e183]: 竞品样本
+                        - generic [ref=e184]: laifen-se-reviews.xlsx
+                      - paragraph [ref=e185]: 已被当前任务引用，可作为执行中自动关联的高相关资料，减少无关检索。
+            - generic [ref=e186]:
+              - text: 竞品对比智能体
+              - paragraph [ref=e187]: 系统可引入小型智能体（如话术对比、卖点验证），自动将分析结果与市场竞品进行横向对比，标记差异点与优化建议。
+              - generic [ref=e188]:
+                - generic [ref=e189]: 话术对比
+                - generic [ref=e190]: 卖点验证
+                - generic [ref=e191]: 竞品对标
+          - generic [ref=e193]:
+            - img [ref=e195]
+            - heading "准备就绪" [level=3] [ref=e198]
+            - paragraph [ref=e199]: 已加载 3 个竞品的评论数据，并采纳 3 个高相关知识项。
+            - button "生成分析" [ref=e200] [cursor=pointer]:
+              - img [ref=e201]
+              - text: 生成分析
+  - button [ref=e204]:
+    - img [ref=e205]

@@ -180,6 +180,14 @@ export default function Workspace() {
       desc: '保留本次分析依赖的资料范围',
     },
   ]
+  const sourceCoverage = Math.min(100, Math.round(((inputMats.length + adoptedRecommendations.length) / 8) * 100))
+  const qualityScore = Math.min(98, 64 + resultSectionCount * 8 + adoptedRecommendations.length * 4 - feedbackItems.length * 6)
+  const phaseItems = [
+    { label: '资料输入', value: `${inputMats.length} 份`, active: inputMats.length > 0 },
+    { label: '知识校准', value: `${adoptedRecommendations.length} 项`, active: adoptedRecommendations.length > 0 },
+    { label: 'AI 生成', value: showResult ? '完成' : generating ? '运行中' : '待启动', active: showResult || generating },
+    { label: '报告交接', value: submitted ? '已提交' : '待确认', active: submitted },
+  ]
 
   const toggleKnowledge = (id: string) => {
     setAdoptedKnowledgeIds((prev) => {
@@ -414,44 +422,87 @@ export default function Workspace() {
   }
 
   return (
-    <div className="max-w-4xl">
-      <div className="flex items-start justify-between mb-12">
-        <div>
-          <Link to={`/tasks/${projectSlug}`} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors flex items-center gap-1.5 mb-4">
-            <ArrowLeft className="w-3.5 h-3.5" /> 返回任务列表
-          </Link>
-          <h1 className="text-[32px] font-light tracking-[-0.02em] text-text-main mb-3">{task.title}</h1>
-          <p className="text-[14px] text-text-secondary">{project.name} · {roleLabels[task.role]}岗位 · {task.assignedTo}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span className={`w-[6px] h-[6px] rounded-full ${realAI ? 'bg-success' : 'bg-gray-300'}`} />
-            <span className="text-[11px] text-text-muted">
-              {realAI ? 'DeepSeek API 已连接' : '模拟模式'}
-              {isRealAIEnabled && (
-                <button onClick={() => setShowKeyInput(!showKeyInput)} className="text-accent-600 hover:underline ml-1">
-                  {realAI ? '更换' : '配置 API Key'}
-                </button>
-              )}
-            </span>
-          </div>
-          {isRealAIEnabled && showKeyInput && (
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                type="password"
-                value={apiKeyInput}
-                onChange={(e) => setApiKeyInput(e.target.value)}
-                placeholder="输入 DeepSeek API Key"
-                className="text-[12px] px-3 py-1.5 border border-border-default rounded-lg w-60"
-              />
-              <button onClick={() => {
-                const key = apiKeyInput.trim()
-                if (!key) { showToast('请输入 API Key', 'error'); return }
-                saveApiKey(key); setRealAI(true); setShowKeyInput(false); setApiKeyInput(''); showToast('API Key 已保存', 'success')
-              }} className="text-[11px] px-3 py-1.5 bg-accent-500 text-white rounded-lg font-medium">保存</button>
-              {realAI && <button onClick={() => { clearApiKey(); setRealAI(false); setShowKeyInput(false); showToast('API Key 已清除') }} className="text-[11px] text-text-muted hover:text-error">清除</button>}
+    <div className="max-w-[1480px] space-y-6">
+      <div className="brand-goal-panel p-6">
+        <div className="relative grid grid-cols-[1fr_420px] gap-8 items-end">
+          <div>
+            <Link to={`/tasks/${projectSlug}`} className="text-[11px] text-text-muted hover:text-text-secondary transition-colors inline-flex items-center gap-1.5 mb-5">
+              <ArrowLeft className="w-3.5 h-3.5" /> 返回任务列表
+            </Link>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="brand-goal-mark" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-600">AI Analysis Cockpit</span>
+              <span className={`text-[10px] px-2 py-1 rounded-md border ${realAI ? 'border-success/20 bg-success-soft text-success' : 'border-border-light bg-bg-surface text-text-muted'}`}>
+                {realAI ? 'DeepSeek 已连接' : '模拟推演模式'}
+              </span>
             </div>
-          )}
+            <h1 className="text-[40px] font-medium tracking-[-0.045em] text-text-main leading-tight mb-4">{task.title}</h1>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-3xl">
+              {project.name} · {roleLabels[task.role]}岗位 · {task.assignedTo}。把资料、知识库、Prompt 与人工验证收束到一个可提交、可追溯、可沉淀的 AI 工作台。
+            </p>
+            {isRealAIEnabled && (
+              <div className="mt-4">
+                <button onClick={() => setShowKeyInput(!showKeyInput)} className="text-[11px] text-accent-600 hover:text-accent-500">
+                  {realAI ? '更换 API Key' : '配置 DeepSeek API Key'}
+                </button>
+                {showKeyInput && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <input
+                      type="password"
+                      value={apiKeyInput}
+                      onChange={(e) => setApiKeyInput(e.target.value)}
+                      placeholder="输入 DeepSeek API Key"
+                      className="form-control text-[12px] px-3 py-1.5 w-72"
+                    />
+                    <button onClick={() => {
+                      const key = apiKeyInput.trim()
+                      if (!key) { showToast('请输入 API Key', 'error'); return }
+                      saveApiKey(key); setRealAI(true); setShowKeyInput(false); setApiKeyInput(''); showToast('API Key 已保存', 'success')
+                    }} className="btn-primary-filled text-[11px] px-3 py-1.5">保存</button>
+                    {realAI && <button onClick={() => { clearApiKey(); setRealAI(false); setShowKeyInput(false); showToast('API Key 已清除') }} className="text-[11px] text-text-muted hover:text-error">清除</button>}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              ['资料覆盖', `${sourceCoverage}%`, `${inputMats.length} 份资料 + ${adoptedRecommendations.length} 项知识`],
+              ['质量评分', `${qualityScore}%`, feedbackItems.length ? `${feedbackItems.length} 条异常待复核` : '暂无异常标记'],
+              ['结果区块', showResult ? `${resultSectionCount} 个` : '待生成', '进入报告的结构化内容'],
+              ['交接状态', submitted ? '已提交' : '待确认', submitted ? '报告链路已接收' : '提交后可沉淀资产'],
+            ].map(([label, value, desc]) => (
+              <div key={label} className="rounded-xl border border-border-light bg-bg-surface/70 p-4">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted mb-4">{label}</div>
+                <div className="text-[28px] font-light text-text-main leading-none mb-2">{value}</div>
+                <div className="text-[10px] text-text-muted leading-relaxed">{desc}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        {showResult && !submitted && (
+      </div>
+
+      <div className="data-panel p-4">
+        <div className="grid grid-cols-4 gap-3">
+          {phaseItems.map((phase, index) => (
+            <div key={phase.label} className={`rounded-xl border p-4 ${phase.active ? 'border-accent-500/25 bg-accent-500/[0.06]' : 'border-border-light bg-bg-primary/55'}`}>
+              <div className="flex items-center justify-between mb-3">
+                <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-mono ${phase.active ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>{index + 1}</span>
+                <span className={`w-2 h-2 rounded-full ${phase.active ? 'bg-accent-500' : 'bg-border-default'}`} />
+              </div>
+              <div className="text-[13px] font-semibold text-text-main">{phase.label}</div>
+              <div className="text-[11px] text-text-muted mt-1">{phase.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showResult && !submitted && (
+        <div className="action-panel p-4 flex items-center justify-between">
+          <div>
+            <div className="text-[13px] font-medium text-text-main">结果已生成，等待人工复核与提交</div>
+            <div className="text-[11px] text-text-muted mt-1">可编辑分析区块、标记异常，或将结果交接到策略报告。</div>
+          </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setWorkspaceEditMode(!workspaceEditMode)} className="btn-primary text-[13px]">
               {workspaceEditMode ? <Check className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
@@ -464,14 +515,17 @@ export default function Workspace() {
               <ThumbsUp className="w-4 h-4" /> 提交到报告
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+      <div className="grid grid-cols-[320px_minmax(0,1fr)_300px] gap-5">
         {/* Sidebar context */}
-        <div className="lg:col-span-3 space-y-5 data-panel p-5">
+        <div className="space-y-5 data-panel p-5 self-start sticky top-6">
           <div>
-            <span className="section-title">竞品数据</span>
+            <div className="flex items-center justify-between">
+              <span className="section-title">Source Deck</span>
+              <span className="text-[10px] font-semibold text-accent-600">{inputMats.length} 份输入</span>
+            </div>
             <div className="mt-3 space-y-2">
               {reviewMats.map((m) => (
                 <div key={m.id} className="flex items-center gap-3 text-[13px] py-2 border-b border-border-light last:border-0">
@@ -485,12 +539,14 @@ export default function Workspace() {
             </div>
           </div>
           <div>
-            <span className="section-title">Prompt</span>
-            <p className="mt-3 text-[13px] text-text-muted leading-relaxed">{task.promptPreview}</p>
+            <span className="section-title">Prompt Kernel</span>
+            <div className="mt-3 rounded-xl border border-border-light bg-bg-primary/60 p-4">
+              <p className="text-[12px] text-text-secondary leading-relaxed">{task.promptPreview}</p>
+            </div>
           </div>
           <div className="action-panel p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="section-title">智能知识关联</span>
+              <span className="section-title">Knowledge Radar</span>
               <span className="text-[10px] font-semibold text-accent-600">{adoptedRecommendations.length}/5 已采纳</span>
             </div>
             <div className="space-y-2.5">
@@ -539,45 +595,81 @@ export default function Workspace() {
               </ul>
             </div>
           )}
-          <div className="data-metric p-4">
-            <span className="section-title">竞品对比智能体</span>
-            <p className="mt-2 text-[11px] text-text-muted leading-relaxed">
-              系统可引入小型智能体（如话术对比、卖点验证），自动将分析结果与市场竞品进行横向对比，标记差异点与优化建议。
-            </p>
-            <div className="mt-3 flex items-center gap-2 text-[10px]">
-              <span className="px-2 py-1 rounded-md bg-bg-surface border border-accent-500/15 text-accent-600">话术对比</span>
-              <span className="px-2 py-1 rounded-md bg-bg-surface border border-border-light text-text-muted">卖点验证</span>
-              <span className="px-2 py-1 rounded-md bg-bg-surface border border-border-light text-text-muted">竞品对标</span>
-            </div>
-          </div>
         </div>
 
         {/* Main content */}
-        <div className="lg:col-span-9 min-w-0">
+        <div className="min-w-0">
           {!showResult && !generating && (
-            <div className="action-panel p-14 text-center">
-              <div className="w-16 h-16 rounded-[20px] bg-accent-50 flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-8 h-8 text-accent-500" />
+            <div className="action-panel overflow-hidden">
+              <div className="grid grid-cols-[1fr_260px]">
+                <div className="p-10">
+                  <div className="w-14 h-14 rounded-2xl bg-accent-50 flex items-center justify-center mb-7">
+                    <Sparkles className="w-7 h-7 text-accent-500" />
+                  </div>
+                  <div className="section-title mb-3">Ready To Run</div>
+                  <h3 className="text-[30px] font-medium tracking-[-0.035em] text-text-main mb-4">启动一次可追溯的 AI 分析</h3>
+                  <p className="text-[14px] text-text-muted mb-8 max-w-xl leading-relaxed">
+                    系统将读取 {reviewMats.length} 个竞品评论样本、{inputMats.length} 份项目资料和 {adoptedRecommendations.length} 个知识项，生成可编辑、可复核、可提交到报告的结构化结果。
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button onClick={handleGenerate} className="btn-primary-filled text-[15px] px-8 py-3">
+                      <Sparkles className="w-5 h-5" /> 生成分析
+                    </button>
+                    <span className="text-[11px] text-text-muted">预计输出 {task.outputFormat || '结构化分析结果'}</span>
+                  </div>
+                </div>
+                <div className="border-l border-border-light bg-bg-primary/45 p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="section-title mb-4">Run Stack</div>
+                    {[
+                      ['资料读取', `${inputMats.length} sources`],
+                      ['知识校准', `${adoptedRecommendations.length} references`],
+                      ['岗位角色', roleLabels[task.role]],
+                      ['输出格式', task.outputFormat || '结构化结果'],
+                    ].map(([label, value]) => (
+                      <div key={label} className="border-b border-border-light last:border-0 py-3">
+                        <div className="text-[10px] text-text-muted mb-1">{label}</div>
+                        <div className="text-[13px] font-medium text-text-main">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-xl border border-accent-500/15 bg-accent-500/[0.06] p-4">
+                    <div className="text-[11px] font-semibold text-accent-600 mb-1">目标</div>
+                    <div className="text-[12px] text-text-secondary leading-relaxed">生成后直接进入人工复核和资产交接，不让 AI 结果停留在一次性文本。</div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-[20px] font-light text-text-main mb-3">准备就绪</h3>
-              <p className="text-[14px] text-text-muted mb-8 max-w-sm mx-auto leading-relaxed">
-                已加载 {reviewMats.length} 个竞品的评论数据，并采纳 {adoptedRecommendations.length} 个高相关知识项。
-              </p>
-              <button onClick={handleGenerate} className="btn-primary-filled text-[15px] px-8 py-3">
-                <Sparkles className="w-5 h-5" /> 生成分析
-              </button>
             </div>
           )}
 
           {generating && (
-            <div className="data-panel p-14 text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-6">
-                {[0, 150, 300].map((d) => (
-                  <div key={d} className="w-2.5 h-2.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: `${d}ms` }} />
-                ))}
+            <div className="data-panel p-10">
+              <div className="grid grid-cols-[220px_1fr] gap-8 items-center">
+                <div className="relative h-[220px] rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] flex items-center justify-center overflow-hidden">
+                  <div className="absolute w-40 h-40 rounded-full border border-accent-500/20" />
+                  <div className="absolute w-28 h-28 rounded-full border border-accent-500/30" />
+                  <div className="w-16 h-16 rounded-2xl bg-accent-500 text-white flex items-center justify-center animate-pulse">
+                    <Sparkles className="w-8 h-8" />
+                  </div>
+                </div>
+                <div>
+                  <div className="section-title mb-3">AI Running</div>
+                  <h3 className="text-[28px] font-medium tracking-[-0.03em] text-text-main mb-3">正在构建分析结果...</h3>
+                  <p className="text-[13px] text-text-muted leading-relaxed mb-6">读取竞品评论、关联知识库、执行验证角色对比，并把结果整理为可提交报告的结构化区块。</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['读取资料', '校准知识', '生成结果'].map((label, index) => (
+                      <div key={label} className="rounded-xl border border-border-light bg-bg-primary/70 p-4">
+                        <div className="flex items-center gap-1.5 mb-3">
+                          {[0, 1, 2].map((dot) => (
+                            <span key={dot} className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: `${(index + dot) * 120}ms` }} />
+                          ))}
+                        </div>
+                        <div className="text-[12px] font-medium text-text-main">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <p className="text-[15px] font-medium text-text-main mb-2">AI 正在分析...</p>
-              <p className="text-[13px] text-text-muted">读取竞品评论、关联知识库、执行验证角色对比</p>
             </div>
           )}
 
@@ -1020,17 +1112,93 @@ export default function Workspace() {
             </div>
           )}
         </div>
+
+        <aside className="space-y-4 self-start sticky top-6">
+          <div className="data-panel p-5">
+            <div className="flex items-center justify-between mb-5">
+              <span className="section-title">Handoff Tower</span>
+              <Package className="w-4 h-4 text-accent-500" />
+            </div>
+            <div className="space-y-3">
+              {assetHandoffItems.map((item) => (
+                <div key={item.label} className="rounded-xl border border-border-light bg-bg-primary/60 p-4">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="text-[12px] font-semibold text-text-main">{item.label}</div>
+                    <div className="text-[13px] font-medium text-accent-600 shrink-0">{item.value}</div>
+                  </div>
+                  <p className="text-[10px] text-text-muted leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="action-panel p-5">
+            <div className="section-title mb-4">Quality Gate</div>
+            <div className="relative h-2 rounded-full bg-bg-primary overflow-hidden mb-4">
+              <div className="absolute inset-y-0 left-0 rounded-full bg-accent-500" style={{ width: `${qualityScore}%` }} />
+            </div>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <div className="text-[30px] font-light text-text-main leading-none">{qualityScore}%</div>
+                <div className="text-[10px] text-text-muted mt-1">综合可交付度</div>
+              </div>
+              <div className={`text-[10px] px-2 py-1 rounded-md ${qualityScore >= 84 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                {qualityScore >= 84 ? '可提交' : '需复核'}
+              </div>
+            </div>
+            <div className="grid gap-2">
+              {[
+                ['输入完整性', inputMats.length > 0],
+                ['知识引用', adoptedRecommendations.length > 0],
+                ['结果生成', showResult],
+                ['异常闭环', feedbackItems.length === 0],
+              ].map(([label, passed]) => (
+                <div key={String(label)} className="flex items-center justify-between text-[11px]">
+                  <span className="text-text-secondary">{label}</span>
+                  <span className={passed ? 'text-success' : 'text-text-muted'}>{passed ? '通过' : '待处理'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="data-panel p-5">
+            <div className="section-title mb-4">Next Move</div>
+            {submitted ? (
+              <div className="space-y-3">
+                <Link to={`/report/${projectSlug}`} className="btn-primary-filled w-full justify-center">
+                  <Package className="w-4 h-4" /> 去报告页发布
+                </Link>
+                <Link to={`/tasks/${projectSlug}`} className="btn-primary w-full justify-center">
+                  继续其他任务 <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ) : showResult ? (
+              <div className="space-y-3">
+                <button onClick={handleSubmit} className="btn-primary-filled w-full justify-center">
+                  <ThumbsUp className="w-4 h-4" /> 提交到报告
+                </button>
+                <button onClick={() => setShowFeedbackModal(true)} className="btn-primary w-full justify-center">
+                  <Flag className="w-4 h-4" /> 标记异常
+                </button>
+              </div>
+            ) : (
+              <button onClick={handleGenerate} disabled={generating} className="btn-primary-filled w-full justify-center disabled:opacity-60">
+                <Sparkles className="w-4 h-4" /> {generating ? '生成中' : '启动分析'}
+              </button>
+            )}
+          </div>
+        </aside>
       </div>
 
       {/* Feedback modal */}
       {showFeedbackModal && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-xl p-6 w-[400px] shadow-xl border border-border-light">
+        <div className="modal-backdrop">
+          <div className="modal-panel p-6 w-[420px]">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-medium text-text-main">标记异常</h3>
               <button onClick={() => { setShowFeedbackModal(false); setFeedbackText('') }} className="p-1"><X className="w-4 h-4 text-text-muted" /></button>
             </div>
-            <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="描述 AI 结果中需人工复核的内容..." className="w-full px-4 py-3 border border-border-default rounded-2xl text-[13px] resize-none focus:outline-none focus:border-accent-400 mb-4" autoFocus />
+            <textarea value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={4} placeholder="描述 AI 结果中需人工复核的内容..." className="form-control px-4 py-3 text-[13px] resize-none mb-4" autoFocus />
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => { setShowFeedbackModal(false); setFeedbackText('') }} className="btn-ghost">取消</button>
               <button onClick={confirmFeedback} className="btn-primary-filled">确认标记</button>

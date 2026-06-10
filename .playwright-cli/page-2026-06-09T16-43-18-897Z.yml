@@ -1,0 +1,703 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资产库" [ref=e22] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e23]
+        - generic [ref=e26]: 资产库
+    - generic [ref=e29]:
+      - generic [ref=e31]: PromoKit AI
+      - generic [ref=e32]: 电商大促 AI 工作包系统
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e36]:
+        - link "看板" [ref=e37] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e38]:
+          - generic [ref=e39]: /
+          - generic [ref=e40]: 资产库
+      - generic [ref=e41]:
+        - button "切换浅色模式" [ref=e42]:
+          - img [ref=e43]
+        - link "幻灯片" [ref=e49] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e50]
+          - text: 幻灯片
+        - generic [ref=e53]: 本地 Demo
+    - main [ref=e55]:
+      - generic [ref=e56]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e67]: KNOWLEDGE BASE · 团队知识库
+          - heading "AI 工作包资产库" [level=1] [ref=e68]
+          - paragraph [ref=e69]: 沉淀可复用的分析流程与团队经验。新项目启动前，在此浏览成功案例、学习历史经验。
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - img [ref=e73]
+            - generic [ref=e77]:
+              - generic [ref=e78]: "8"
+              - generic [ref=e79]: Work Kit 模板
+              - generic [ref=e80]: 可复用分析流程
+          - generic [ref=e81]:
+            - img [ref=e83]
+            - generic [ref=e86]:
+              - generic [ref=e87]: "30"
+              - generic [ref=e88]: 累计复用次数
+              - generic [ref=e89]: 跨项目经验传承
+          - generic [ref=e90]:
+            - img [ref=e92]
+            - generic [ref=e94]:
+              - generic [ref=e95]: "3"
+              - generic [ref=e96]: 已验证成功案例
+              - generic [ref=e97]: 评分 ≥ 4.8
+          - generic [ref=e98]:
+            - img [ref=e100]
+            - generic [ref=e103]:
+              - generic [ref=e104]: "1"
+              - generic [ref=e105]: 对比验证记录
+              - generic [ref=e106]: 保留/修订决策
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - img [ref=e112]
+            - generic [ref=e115]:
+              - generic [ref=e116]: Validation Agents · 知识库对比验证
+              - heading "固定流程每天跑，判断知识该保留还是修订" [level=2] [ref=e117]
+              - paragraph [ref=e118]: 将公司 Work Kit 与市场竞品话术、流程结构和项目反馈横向对比，用验证角色输出可执行的保留/修改动作，避免每次项目都重新设定。
+          - generic [ref=e119]:
+            - generic [ref=e120]:
+              - generic [ref=e121]: 每日
+              - generic [ref=e122]: 运行频率
+            - generic [ref=e123]:
+              - generic [ref=e124]: 3 个
+              - generic [ref=e125]: 智能体
+            - generic [ref=e126]:
+              - generic [ref=e127]: 保留/修订
+              - generic [ref=e128]: 动作
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - img [ref=e132]
+            - generic [ref=e134]:
+              - generic [ref=e135]: 准备启动新项目？
+              - generic [ref=e136]: 先浏览知识库中的成功案例，了解相似品类的大促分析经验
+          - button "创建新项目" [ref=e137] [cursor=pointer]:
+            - text: 创建新项目
+            - img [ref=e138]
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - img [ref=e142]
+            - textbox "搜索 Work Kit 名称、描述、标签..." [ref=e145]
+          - generic [ref=e146]:
+            - button "全部" [ref=e147]
+            - button "竞品分析" [ref=e148]
+            - button "618" [ref=e149]
+            - button "个护小家电" [ref=e150]
+            - button "多岗位" [ref=e151]
+            - button "直播" [ref=e152]
+            - button "话术" [ref=e153]
+            - button "转化" [ref=e154]
+            - button "详情页" [ref=e155]
+            - button "设计" [ref=e156]
+            - button "转化率" [ref=e157]
+            - button "用户体验" [ref=e158]
+            - button "小红书" [ref=e159]
+            - button "种草" [ref=e160]
+            - button "文案" [ref=e161]
+            - button "内容营销" [ref=e162]
+            - button "复盘" [ref=e163]
+            - button "爆品" [ref=e164]
+            - button "选品" [ref=e165]
+            - button "策略" [ref=e166]
+            - button "新品上架" [ref=e167]
+            - button "全流程" [ref=e168]
+            - button "上架准备" [ref=e169]
+            - button "双11" [ref=e170]
+            - button "客服" [ref=e171]
+            - button "备战" [ref=e172]
+            - button "售后" [ref=e173]
+            - button "定价" [ref=e174]
+            - button "价格策略" [ref=e175]
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - img [ref=e178]
+            - generic [ref=e180]: 已验证成功案例 · 优先学习
+          - generic [ref=e181]:
+            - generic [ref=e182] [cursor=pointer]:
+              - img [ref=e184]
+              - generic [ref=e186]:
+                - generic [ref=e187]: 618 竞品评论分析 Work Kit
+                - generic [ref=e188]: v1.2 · 复用 3 次 · 评分 4.8
+              - generic [ref=e189]: 成功案例
+            - generic [ref=e190] [cursor=pointer]:
+              - img [ref=e192]
+              - generic [ref=e194]:
+                - generic [ref=e195]: 大促直播话术 Work Kit
+                - generic [ref=e196]: v1.2 · 复用 5 次 · 评分 4.9
+              - generic [ref=e197]: 成功案例
+            - generic [ref=e198] [cursor=pointer]:
+              - img [ref=e200]
+              - generic [ref=e202]:
+                - generic [ref=e203]: 双11 客服备战 Work Kit
+                - generic [ref=e204]: v1.2 · 复用 6 次 · 评分 4.8
+              - generic [ref=e205]: 成功案例
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - generic [ref=e210]:
+                  - generic [ref=e211]: v1.2
+                  - generic [ref=e212]:
+                    - img [ref=e213]
+                    - text: "4.8"
+                  - generic [ref=e215]:
+                    - img [ref=e216]
+                    - text: 复用 3 次
+                - generic [ref=e221]: 创建于 2026-04-25
+              - heading "618 竞品评论分析 Work Kit" [level=2] [ref=e222]
+              - paragraph [ref=e223]: 一套完整的电商竞品评论分析流程，覆盖商品分析、卖点文案、客服 FAQ、详情页优化和大促策略汇总。适用于618/双11大促前的品类竞品准备工作。
+              - generic [ref=e224]:
+                - generic [ref=e225]: 竞品分析
+                - generic [ref=e226]: "618"
+                - generic [ref=e227]: 个护小家电
+                - generic [ref=e228]: 多岗位
+            - generic [ref=e229]:
+              - generic [ref=e230]:
+                - img [ref=e232]
+                - generic [ref=e234]:
+                  - text: 适用场景
+                  - paragraph [ref=e235]: 618/双11/新品上架/爆品复盘
+              - generic [ref=e236]:
+                - img [ref=e238]
+                - generic [ref=e243]:
+                  - text: 包含岗位
+                  - paragraph [ref=e244]: 运营 · 商品 · 文案 · 客服 · 设计
+              - generic [ref=e245]:
+                - img [ref=e247]
+                - generic [ref=e251]:
+                  - text: 资料结构
+                  - paragraph [ref=e252]: 竞品评论数据(Excel) · 商品参数对比表 · 客服问题记录 · 历史文案素材库
+              - generic [ref=e253]:
+                - img [ref=e255]
+                - generic [ref=e258]:
+                  - text: 任务模板
+                  - generic [ref=e259]:
+                    - generic [ref=e260]:
+                      - text: 竞品商品分析
+                      - generic [ref=e262]: (商品)
+                    - generic [ref=e263]:
+                      - text: 卖点文案转译
+                      - generic [ref=e265]: (文案)
+            - button "版本历史 (3)" [ref=e267]:
+              - img [ref=e268]
+              - text: 版本历史 (3)
+              - img [ref=e272]
+            - generic [ref=e275]:
+              - img [ref=e277]
+              - generic [ref=e279]:
+                - text: 上次反馈
+                - paragraph [ref=e280]: v1.1增加了客服风险话术分类后反馈良好。商品团队建议在v1.2中增加「用户原话摘录」模块，已补充。
+            - generic [ref=e281]:
+              - generic [ref=e282]:
+                - text: 来源项目：
+                - button "Q2 母婴用品用户洞察" [ref=e283]
+              - generic [ref=e284]:
+                - button "启动验证" [ref=e285] [cursor=pointer]:
+                  - img [ref=e286]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e289] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e290]
+                - button "复用此模板创建项目" [ref=e292] [cursor=pointer]:
+                  - img [ref=e293]
+                  - text: 复用此模板创建项目
+          - generic [ref=e298]:
+            - generic [ref=e299]:
+              - generic [ref=e300]:
+                - generic [ref=e301]:
+                  - generic [ref=e302]: v1.2
+                  - generic [ref=e303]:
+                    - img [ref=e304]
+                    - text: "4.9"
+                  - generic [ref=e306]:
+                    - img [ref=e307]
+                    - text: 复用 5 次
+                - generic [ref=e312]: 创建于 2026-05-10
+              - heading "大促直播话术 Work Kit" [level=2] [ref=e313]
+              - paragraph [ref=e314]: 基于商品卖点自动生成标准化直播话术框架，覆盖开场、痛点共鸣、卖点演示、信任背书和逼单五个环节，支持互动 Q&A 应答。
+              - generic [ref=e315]:
+                - generic [ref=e316]: 直播
+                - generic [ref=e317]: 话术
+                - generic [ref=e318]: "618"
+                - generic [ref=e319]: 转化
+            - generic [ref=e320]:
+              - generic [ref=e321]:
+                - img [ref=e323]
+                - generic [ref=e325]:
+                  - text: 适用场景
+                  - paragraph [ref=e326]: 618/双11期间直播场景，快速为不同品类生成标准化话术
+              - generic [ref=e327]:
+                - img [ref=e329]
+                - generic [ref=e334]:
+                  - text: 包含岗位
+                  - paragraph [ref=e335]: 运营 · 文案
+              - generic [ref=e336]:
+                - img [ref=e338]
+                - generic [ref=e342]:
+                  - text: 资料结构
+                  - paragraph [ref=e343]: 商品卖点列表 · 用户评论高频词 · 竞品直播话术参考
+              - generic [ref=e344]:
+                - img [ref=e346]
+                - generic [ref=e349]:
+                  - text: 任务模板
+                  - generic [ref=e351]:
+                    - text: 五段式话术结构
+                    - generic [ref=e353]: (文案)
+            - button "版本历史 (3)" [ref=e355]:
+              - img [ref=e356]
+              - text: 版本历史 (3)
+              - img [ref=e360]
+            - generic [ref=e363]:
+              - img [ref=e365]
+              - generic [ref=e367]:
+                - text: 上次反馈
+                - paragraph [ref=e368]: 文案团队反馈开场钩子需要更强的数字支撑，v1.2已优化。直播间实测转化率提升23%。
+            - generic [ref=e369]:
+              - generic [ref=e370]:
+                - text: 来源项目：
+                - button "Q2 母婴用品用户洞察" [ref=e371]
+              - generic [ref=e372]:
+                - button "启动验证" [ref=e373] [cursor=pointer]:
+                  - img [ref=e374]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e377] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e378]
+                - button "复用此模板创建项目" [ref=e380] [cursor=pointer]:
+                  - img [ref=e381]
+                  - text: 复用此模板创建项目
+          - generic [ref=e386]:
+            - generic [ref=e387]:
+              - generic [ref=e388]:
+                - generic [ref=e389]:
+                  - generic [ref=e390]: v1.1
+                  - generic [ref=e391]:
+                    - img [ref=e392]
+                    - text: "4.6"
+                  - generic [ref=e394]:
+                    - img [ref=e395]
+                    - text: 复用 2 次
+                - generic [ref=e400]: 创建于 2026-05-15
+              - heading "详情页信息结构优化 Work Kit" [level=2] [ref=e401]
+              - paragraph [ref=e402]: 基于用户评论关注热度，重排详情页模块顺序和首屏信息层级。将决策关键信息（静音、恒温、售后）前置，技术参数后移，降低用户决策门槛。
+              - generic [ref=e403]:
+                - generic [ref=e404]: 详情页
+                - generic [ref=e405]: 设计
+                - generic [ref=e406]: 转化率
+                - generic [ref=e407]: 用户体验
+            - generic [ref=e408]:
+              - generic [ref=e409]:
+                - img [ref=e411]
+                - generic [ref=e413]:
+                  - text: 适用场景
+                  - paragraph [ref=e414]: 618/双11大促前详情页改版 · 新品上架详情页设计 · 爆品详情页复盘优化
+              - generic [ref=e415]:
+                - img [ref=e417]
+                - generic [ref=e422]:
+                  - text: 包含岗位
+                  - paragraph [ref=e423]: 设计 · 文案 · 商品
+              - generic [ref=e424]:
+                - img [ref=e426]
+                - generic [ref=e430]:
+                  - text: 资料结构
+                  - paragraph [ref=e431]: 竞品详情页截图 · 用户评论关注热点排序 · 行业优秀详情页参考
+              - generic [ref=e432]:
+                - img [ref=e434]
+                - generic [ref=e437]:
+                  - text: 任务模板
+                  - generic [ref=e438]:
+                    - generic [ref=e439]:
+                      - text: 首屏信息结构
+                      - generic [ref=e441]: (设计)
+                    - generic [ref=e442]:
+                      - text: 卖点可视化建议
+                      - generic [ref=e444]: (文案)
+            - button "版本历史 (2)" [ref=e446]:
+              - img [ref=e447]
+              - text: 版本历史 (2)
+              - img [ref=e451]
+            - generic [ref=e454]:
+              - img [ref=e456]
+              - generic [ref=e458]:
+                - text: 上次反馈
+                - paragraph [ref=e459]: v1.0 按用户评论热度排序后转化率提升 18%。设计团队建议 v1.1 增加竞品详情页横向对比图，已补充。
+            - generic [ref=e460]:
+              - generic [ref=e461]:
+                - text: 来源项目：
+                - button "618 高速吹风机竞品评论分析" [ref=e462]
+              - generic [ref=e463]:
+                - button "启动验证" [ref=e464] [cursor=pointer]:
+                  - img [ref=e465]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e468] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e469]
+                - button "复用此模板创建项目" [ref=e471] [cursor=pointer]:
+                  - img [ref=e472]
+                  - text: 复用此模板创建项目
+          - generic [ref=e477]:
+            - generic [ref=e478]:
+              - generic [ref=e479]:
+                - generic [ref=e480]:
+                  - generic [ref=e481]: v1.3
+                  - generic [ref=e482]:
+                    - img [ref=e483]
+                    - text: "4.7"
+                  - generic [ref=e485]:
+                    - img [ref=e486]
+                    - text: 复用 7 次
+                - generic [ref=e491]: 创建于 2026-04-10
+              - heading "小红书种草文案 Work Kit" [level=2] [ref=e492]
+              - paragraph [ref=e493]: 将用户真实评论和痛点转化为小红书风格的种草文案。覆盖标题钩子、痛点引入、卖点种草、评论区互动和话题标签五个模块。
+              - generic [ref=e494]:
+                - generic [ref=e495]: 小红书
+                - generic [ref=e496]: 种草
+                - generic [ref=e497]: 文案
+                - generic [ref=e498]: 内容营销
+            - generic [ref=e499]:
+              - generic [ref=e500]:
+                - img [ref=e502]
+                - generic [ref=e504]:
+                  - text: 适用场景
+                  - paragraph [ref=e505]: 小红书日常种草/大促预热 · 新品上市内容矩阵 · 品类教育内容
+              - generic [ref=e506]:
+                - img [ref=e508]
+                - generic [ref=e513]:
+                  - text: 包含岗位
+                  - paragraph [ref=e514]: 文案 · 运营
+              - generic [ref=e515]:
+                - img [ref=e517]
+                - generic [ref=e521]:
+                  - text: 资料结构
+                  - paragraph [ref=e522]: 用户评论高频词 · 竞品种草帖参考 · 品类热搜词 · 品牌人设定位
+              - generic [ref=e523]:
+                - img [ref=e525]
+                - generic [ref=e528]:
+                  - text: 任务模板
+                  - generic [ref=e530]:
+                    - text: 种草文案结构模板
+                    - generic [ref=e532]: (文案)
+            - button "版本历史 (4)" [ref=e534]:
+              - img [ref=e535]
+              - text: 版本历史 (4)
+              - img [ref=e539]
+            - generic [ref=e542]:
+              - img [ref=e544]
+              - generic [ref=e546]:
+                - text: 上次反馈
+                - paragraph [ref=e547]: v1.2 优化了评论区互动话术后互动率提升 35%。v1.3 根据品类热搜词更新了标签策略。
+            - generic [ref=e548]:
+              - generic [ref=e549]:
+                - text: 来源项目：
+                - button "618 高速吹风机竞品评论分析" [ref=e550]
+              - generic [ref=e551]:
+                - button "启动验证" [ref=e552] [cursor=pointer]:
+                  - img [ref=e553]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e556] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e557]
+                - button "复用此模板创建项目" [ref=e559] [cursor=pointer]:
+                  - img [ref=e560]
+                  - text: 复用此模板创建项目
+          - generic [ref=e565]:
+            - generic [ref=e566]:
+              - generic [ref=e567]:
+                - generic [ref=e568]:
+                  - generic [ref=e569]: v1.0
+                  - generic [ref=e570]:
+                    - img [ref=e571]
+                    - text: "4.3"
+                  - generic [ref=e573]:
+                    - img [ref=e574]
+                    - text: 复用 1 次
+                - generic [ref=e579]: 创建于 2026-06-01
+              - heading "爆品复盘 Work Kit" [level=2] [ref=e580]
+              - paragraph [ref=e581]: 针对已成功的爆品进行全维度复盘，包括用户评价趋势、渠道表现、卖点有效性验证和竞品跟进策略。适合大促后或季度复盘使用。
+              - generic [ref=e582]:
+                - generic [ref=e583]: 复盘
+                - generic [ref=e584]: 爆品
+                - generic [ref=e585]: 选品
+                - generic [ref=e586]: 策略
+            - generic [ref=e587]:
+              - generic [ref=e588]:
+                - img [ref=e590]
+                - generic [ref=e592]:
+                  - text: 适用场景
+                  - paragraph [ref=e593]: 大促后爆品复盘 · 季度经营分析 · 选品策略调整
+              - generic [ref=e594]:
+                - img [ref=e596]
+                - generic [ref=e601]:
+                  - text: 包含岗位
+                  - paragraph [ref=e602]: 运营 · 商品 · 文案
+              - generic [ref=e603]:
+                - img [ref=e605]
+                - generic [ref=e609]:
+                  - text: 资料结构
+                  - paragraph [ref=e610]: 销售数据摘要 · 用户评价汇总 · 竞品同期表现 · 渠道投放数据
+              - generic [ref=e611]:
+                - img [ref=e613]
+                - generic [ref=e616]:
+                  - text: 任务模板
+                  - generic [ref=e617]:
+                    - generic [ref=e618]:
+                      - text: 爆品成功要素拆解
+                      - generic [ref=e620]: (商品)
+                    - generic [ref=e621]:
+                      - text: 竞品跟进分析
+                      - generic [ref=e623]: (运营)
+            - button "版本历史 (1)" [ref=e625]:
+              - img [ref=e626]
+              - text: 版本历史 (1)
+              - img [ref=e630]
+            - generic [ref=e633]:
+              - img [ref=e635]
+              - generic [ref=e637]:
+                - text: 上次反馈
+                - paragraph [ref=e638]: v1.0 刚上线，建议下次复盘时增加渠道 ROI 分析维度。
+            - generic [ref=e639]:
+              - generic [ref=e640]:
+                - text: 来源项目：
+                - button "Q2 母婴用品用户洞察" [ref=e641]
+              - generic [ref=e642]:
+                - button "启动验证" [ref=e643] [cursor=pointer]:
+                  - img [ref=e644]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e647] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e648]
+                - button "复用此模板创建项目" [ref=e650] [cursor=pointer]:
+                  - img [ref=e651]
+                  - text: 复用此模板创建项目
+          - generic [ref=e656]:
+            - generic [ref=e657]:
+              - generic [ref=e658]:
+                - generic [ref=e659]:
+                  - generic [ref=e660]: v1.1
+                  - generic [ref=e661]:
+                    - img [ref=e662]
+                    - text: "4.5"
+                  - generic [ref=e664]:
+                    - img [ref=e665]
+                    - text: 复用 4 次
+                - generic [ref=e670]: 创建于 2026-03-20
+              - heading "新品上架全流程 Work Kit" [level=2] [ref=e671]
+              - paragraph [ref=e672]: 从选品到上架的全流程模板：竞品分析→卖点提炼→详情页规划→推广策略→客服准备。适合新品类或新 SKU 首次上架时使用。
+              - generic [ref=e673]:
+                - generic [ref=e674]: 新品上架
+                - generic [ref=e675]: 全流程
+                - generic [ref=e676]: 选品
+                - generic [ref=e677]: 上架准备
+            - generic [ref=e678]:
+              - generic [ref=e679]:
+                - img [ref=e681]
+                - generic [ref=e683]:
+                  - text: 适用场景
+                  - paragraph [ref=e684]: 新品首次上架 · 新品类拓展 · 新品牌入驻平台
+              - generic [ref=e685]:
+                - img [ref=e687]
+                - generic [ref=e692]:
+                  - text: 包含岗位
+                  - paragraph [ref=e693]: 商品 · 文案 · 设计 · 客服
+              - generic [ref=e694]:
+                - img [ref=e696]
+                - generic [ref=e700]:
+                  - text: 资料结构
+                  - paragraph [ref=e701]: 品类市场分析 · 竞品全维度数据 · 供应链信息 · 平台规则文档
+              - generic [ref=e702]:
+                - img [ref=e704]
+                - generic [ref=e707]:
+                  - text: 任务模板
+                  - generic [ref=e708]:
+                    - generic [ref=e709]:
+                      - text: 品类竞争格局
+                      - generic [ref=e711]: (商品)
+                    - generic [ref=e712]:
+                      - text: 上架前检查清单
+                      - generic [ref=e714]: (运营)
+            - button "版本历史 (2)" [ref=e716]:
+              - img [ref=e717]
+              - text: 版本历史 (2)
+              - img [ref=e721]
+            - generic [ref=e724]:
+              - img [ref=e726]
+              - generic [ref=e728]:
+                - text: 上次反馈
+                - paragraph [ref=e729]: v1.0 的竞品维度不够全，v1.1 增加了价格带分析和人群细分。建议下版本增加推广预算模板。
+            - generic [ref=e730]:
+              - generic [ref=e731]:
+                - text: 来源项目：
+                - button "618 扫地机器人竞品分析" [ref=e732]
+              - generic [ref=e733]:
+                - button "启动验证" [ref=e734] [cursor=pointer]:
+                  - img [ref=e735]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e738] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e739]
+                - button "复用此模板创建项目" [ref=e741] [cursor=pointer]:
+                  - img [ref=e742]
+                  - text: 复用此模板创建项目
+          - generic [ref=e747]:
+            - generic [ref=e748]:
+              - generic [ref=e749]:
+                - generic [ref=e750]:
+                  - generic [ref=e751]: v1.2
+                  - generic [ref=e752]:
+                    - img [ref=e753]
+                    - text: "4.8"
+                  - generic [ref=e755]:
+                    - img [ref=e756]
+                    - text: 复用 6 次
+                - generic [ref=e761]: 创建于 2026-05-20
+              - heading "双11 客服备战 Work Kit" [level=2] [ref=e762]
+              - paragraph [ref=e763]: 大促期间客服团队的标准化备战方案：高频问题预判、话术模板、情绪管理、售后预案和排班建议。确保大促期间客服响应质量不下降。
+              - generic [ref=e764]:
+                - generic [ref=e765]: 双11
+                - generic [ref=e766]: 客服
+                - generic [ref=e767]: 备战
+                - generic [ref=e768]: 售后
+                - generic [ref=e769]: 话术
+            - generic [ref=e770]:
+              - generic [ref=e771]:
+                - img [ref=e773]
+                - generic [ref=e775]:
+                  - text: 适用场景
+                  - paragraph [ref=e776]: 双11/618大促客服备战 · 客服团队培训 · 售后流程优化
+              - generic [ref=e777]:
+                - img [ref=e779]
+                - generic [ref=e784]:
+                  - text: 包含岗位
+                  - paragraph [ref=e785]: 客服 · 运营
+              - generic [ref=e786]:
+                - img [ref=e788]
+                - generic [ref=e792]:
+                  - text: 资料结构
+                  - paragraph [ref=e793]: 历史大促客服数据 · 高频问题分类 · 售后数据统计 · 竞品客服话术
+              - generic [ref=e794]:
+                - img [ref=e796]
+                - generic [ref=e799]:
+                  - text: 任务模板
+                  - generic [ref=e800]:
+                    - generic [ref=e801]:
+                      - text: 大促高频问题预判
+                      - generic [ref=e803]: (客服)
+                    - generic [ref=e804]:
+                      - text: 售后应急预案
+                      - generic [ref=e806]: (运营)
+            - button "版本历史 (3)" [ref=e808]:
+              - img [ref=e809]
+              - text: 版本历史 (3)
+              - img [ref=e813]
+            - generic [ref=e816]:
+              - img [ref=e818]
+              - generic [ref=e820]:
+                - text: 上次反馈
+                - paragraph [ref=e821]: v1.1 的售后预案在实际大促中救急3次。v1.2 增加了智能机器人分流方案，客服压力降低40%。
+            - generic [ref=e822]:
+              - generic [ref=e823]:
+                - text: 来源项目：
+                - button "618 高速吹风机竞品评论分析" [ref=e824]
+              - generic [ref=e825]:
+                - button "启动验证" [ref=e826] [cursor=pointer]:
+                  - img [ref=e827]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e830] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e831]
+                - button "复用此模板创建项目" [ref=e833] [cursor=pointer]:
+                  - img [ref=e834]
+                  - text: 复用此模板创建项目
+          - generic [ref=e839]:
+            - generic [ref=e840]:
+              - generic [ref=e841]:
+                - generic [ref=e842]:
+                  - generic [ref=e843]: v1.0
+                  - generic [ref=e844]:
+                    - img [ref=e845]
+                    - text: "4.4"
+                  - generic [ref=e847]:
+                    - img [ref=e848]
+                    - text: 复用 2 次
+                - generic [ref=e853]: 创建于 2026-06-05
+              - heading "竞品价格策略分析 Work Kit" [level=2] [ref=e854]
+              - paragraph [ref=e855]: 系统化分析竞品定价策略：日常价格带、大促降价幅度、赠品策略、满减门槛和价格锚点设计。为618/双11定价决策提供数据支撑。
+              - generic [ref=e856]:
+                - generic [ref=e857]: 定价
+                - generic [ref=e858]: 竞品分析
+                - generic [ref=e859]: 价格策略
+                - generic [ref=e860]: "618"
+            - generic [ref=e861]:
+              - generic [ref=e862]:
+                - img [ref=e864]
+                - generic [ref=e866]:
+                  - text: 适用场景
+                  - paragraph [ref=e867]: 618/双11前定价决策 · 日常价格体系优化 · 竞品降价跟进策略
+              - generic [ref=e868]:
+                - img [ref=e870]
+                - generic [ref=e875]:
+                  - text: 包含岗位
+                  - paragraph [ref=e876]: 商品 · 运营
+              - generic [ref=e877]:
+                - img [ref=e879]
+                - generic [ref=e883]:
+                  - text: 资料结构
+                  - paragraph [ref=e884]: 竞品价格历史数据 · 促销活动记录 · 赠品成本数据 · 平台满减规则
+              - generic [ref=e885]:
+                - img [ref=e887]
+                - generic [ref=e890]:
+                  - text: 任务模板
+                  - generic [ref=e891]:
+                    - generic [ref=e892]:
+                      - text: 竞品价格带分析
+                      - generic [ref=e894]: (商品)
+                    - generic [ref=e895]:
+                      - text: 定价策略建议
+                      - generic [ref=e897]: (运营)
+            - button "版本历史 (1)" [ref=e899]:
+              - img [ref=e900]
+              - text: 版本历史 (1)
+              - img [ref=e904]
+            - generic [ref=e907]:
+              - img [ref=e909]
+              - generic [ref=e911]:
+                - text: 上次反馈
+                - paragraph [ref=e912]: v1.0 刚上线，建议下版本增加各平台满减规则自动计算功能。
+            - generic [ref=e913]:
+              - generic [ref=e914]:
+                - text: 来源项目：
+                - button "618 扫地机器人竞品分析" [ref=e915]
+              - generic [ref=e916]:
+                - button "启动验证" [ref=e917] [cursor=pointer]:
+                  - img [ref=e918]
+                  - text: 启动验证
+                - button "查看来源报告" [ref=e921] [cursor=pointer]:
+                  - text: 查看来源报告
+                  - img [ref=e922]
+                - button "复用此模板创建项目" [ref=e924] [cursor=pointer]:
+                  - img [ref=e925]
+                  - text: 复用此模板创建项目
+  - button [ref=e59]:
+    - img [ref=e60]

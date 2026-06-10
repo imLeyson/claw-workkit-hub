@@ -187,6 +187,12 @@ export default function TaskCards() {
     { icon: ClipboardCheck, label: '资产交接记录', value: `${handedOffTasks.length}/${tasks.length}`, desc: '记录结果如何进入报告' },
     { icon: Package, label: '沉淀工作包', value: anyGenerated ? '可推进' : '待分析', desc: '保存为下次启动资产' },
   ]
+  const taskConsoleStats = [
+    ['可启动', `${tasks.filter((task) => task.status === 'ready').length}`],
+    ['已生成', `${generatedTasks.length}`],
+    ['已提交', `${submittedTasks.length}`],
+    ['待资料', `${blockedPendingTasks.length}`],
+  ]
 
   const generateAll = useCallback(() => {
     if (isGenerating) return
@@ -276,29 +282,63 @@ export default function TaskCards() {
         <span>{submittedTasks.length}/{tasks.length} 已提交到报告</span>
       </div>
 
-      {/* Smart association — collapsible */}
-      <div className="mb-8 action-panel overflow-hidden">
-        <button onClick={() => setShowAssociation(!showAssociation)} className="w-full p-4 flex items-center justify-between text-left">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-accent-500" />
-            <span className="text-[11px] font-semibold text-text-main uppercase tracking-[0.06em]">可参考模板 · {relevantKits.length} 个高复用 Work Kit</span>
+      <div className="grid grid-cols-[310px_1fr] gap-5 items-start">
+        <aside className="action-panel p-4 sticky top-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="brand-goal-mark" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-600">Task Console</span>
           </div>
-          {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
-        </button>
-        {showAssociation && (
-        <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-          {relevantKits.map((k) => (
-            <Link key={k.id} to="/archive" className="action-card p-3 text-[11px]">
-              <div className="font-medium text-text-main mb-0.5 truncate">{k.name.slice(0, 12)}{k.name.length > 12 ? '...' : ''}</div>
-              <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次</div>
-            </Link>
-          ))}
-        </div>
-        )}
-      </div>
+          <h2 className="text-[18px] font-medium text-text-main mb-2">任务控制台</h2>
+          <p className="text-[12px] text-text-muted leading-relaxed mb-4">
+            先看资料是否就绪，再把任务送入工作台。任务完成后会进入报告和 Work Kit 资产链路。
+          </p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {taskConsoleStats.map(([label, value]) => (
+              <div key={label} className="data-metric p-3">
+                <div className="text-[18px] font-light text-text-main leading-none">{value}</div>
+                <div className="text-[10px] text-text-muted mt-1">{label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-xl border border-border-light bg-bg-primary/55 p-3 mb-4">
+            <button onClick={() => setShowAssociation(!showAssociation)} className="w-full flex items-center justify-between text-left">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-accent-500" />
+                <span className="text-[11px] font-semibold text-text-main">参考 Work Kit</span>
+              </div>
+              {showAssociation ? <ChevronUp className="w-4 h-4 text-accent-400" /> : <ChevronDown className="w-4 h-4 text-accent-400" />}
+            </button>
+            {showAssociation && (
+              <div className="mt-3 space-y-2">
+                {relevantKits.map((k) => (
+                  <Link key={k.id} to="/archive" className="block rounded-lg border border-border-light bg-bg-surface p-3 text-[11px] hover:border-accent-500/30 transition-colors">
+                    <div className="font-medium text-text-main mb-0.5 truncate">{k.name}</div>
+                    <div className="text-text-muted">{k.version} · 复用 {k.reuseCount} 次 · 评分 {k.rating}</div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <button onClick={openAddTask} className="w-full btn-ghost justify-center text-[12px]">
+              <Plus className="w-3.5 h-3.5" /> 添加任务
+            </button>
+            {!allReady && (
+              <button onClick={generateAll} disabled={isGenerating} className="w-full btn-primary-filled justify-center text-[12px]">
+                {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                批量生成
+              </button>
+            )}
+            {anyGenerated && (
+              <Link to={`/report/${projectSlug}`} className="w-full btn-primary justify-center text-[12px]">
+                查看报告 <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+        </aside>
 
-      {/* Task card grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Task workbench */}
+        <div className="space-y-3">
         {tasks.map((task) => {
           const inputMats = materials.filter((m) => task.inputMaterials.includes(m.id))
           const availableTypes = new Set(inputMats.map((m) => m.type))
@@ -323,9 +363,10 @@ export default function TaskCards() {
           ]
           return (
             <div key={task.id} className="action-card overflow-hidden group border-l-[3px] border-l-transparent hover:border-l-accent-400">
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
+              <div className="grid grid-cols-[1fr_300px]">
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-muted">{roleLabels[task.role]}岗</span>
                       <button
@@ -337,11 +378,11 @@ export default function TaskCards() {
                         title="编辑任务"
                       >
                         <Pencil className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <h3 className="text-[17px] font-medium text-text-main mt-1">{task.title}</h3>
+                    </button>
                   </div>
-                  <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
+                  <h3 className="text-[17px] font-medium text-text-main mt-1">{task.title}</h3>
+                    </div>
+                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                     task.status === 'submitted' ? 'bg-success-soft text-success' :
                     task.status === 'generated' ? 'bg-kit-50 text-kit-600' :
                     task.status === 'ready' ? 'bg-accent-500/10 text-accent-600' : blocked ? 'bg-warning-soft text-warning' : 'bg-bg-primary text-text-muted'
@@ -368,7 +409,10 @@ export default function TaskCards() {
                   ))}
                 </div>
 
-                <div className="mt-5 data-metric p-4">
+                </div>
+
+                <div className="border-l border-border-light bg-bg-primary/35 p-4">
+                  <div className="data-metric p-4">
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-2">
                       {blocked ? <AlertTriangle className="w-4 h-4 text-warning" /> : <ClipboardCheck className="w-4 h-4 text-accent-500" />}
@@ -391,9 +435,9 @@ export default function TaskCards() {
                       </div>
                     ))}
                   </div>
-                </div>
+                  </div>
 
-                <div className={`mt-3 rounded-xl border p-3 ${
+                  <div className={`mt-3 rounded-xl border p-3 ${
                   handoff ? 'border-success/20 bg-success-soft' : task.status === 'submitted' ? 'border-accent-500/20 bg-accent-500/[0.04]' : 'border-border-light bg-bg-primary/35'
                 }`}>
                   <div className="flex items-center justify-between gap-3">
@@ -409,6 +453,7 @@ export default function TaskCards() {
                     <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${handoff ? 'bg-success/10 text-success' : 'bg-bg-surface text-text-muted'}`}>
                       {handoff ? '已交接' : '待交接'}
                     </span>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -455,6 +500,7 @@ export default function TaskCards() {
             </div>
           )
         })}
+        </div>
       </div>
 
       {tasks.length === 0 && (
@@ -463,8 +509,8 @@ export default function TaskCards() {
 
       {/* Task form modal */}
       {showTaskForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in" onClick={() => setShowTaskForm(false)}>
-          <div className="bg-bg-surface rounded-2xl p-6 w-[560px] max-w-[95vw] shadow-2xl border border-border-default max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop animate-fade-in" onClick={() => setShowTaskForm(false)}>
+          <div className="modal-panel p-6 w-[560px] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[18px] font-medium text-text-main">{editingTask ? '编辑分析任务' : '添加自定义分析任务'}</h3>
               <button onClick={() => setShowTaskForm(false)} className="p-1 rounded-lg hover:bg-white/[0.06] cursor-pointer"><X className="w-4 h-4 text-text-muted" /></button>
@@ -491,7 +537,7 @@ export default function TaskCards() {
                     value={taskForm.assignedTo}
                     onChange={(e) => setTaskForm({ ...taskForm, assignedTo: e.target.value })}
                     placeholder="例：张经理"
-                    className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                    className="form-control text-[13px] px-3 py-2.5"
                   />
                 </div>
               </div>
@@ -503,7 +549,7 @@ export default function TaskCards() {
                   value={taskForm.title}
                   onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                   placeholder="例：竞品高频痛点挖掘"
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  className="form-control text-[13px] px-3 py-2.5"
                   autoFocus
                 />
               </div>
@@ -515,7 +561,7 @@ export default function TaskCards() {
                   onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                   placeholder="请输入对该分析任务的简要描述..."
                   rows={2}
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                  className="form-control text-[13px] px-3 py-2.5 resize-none"
                 />
               </div>
 
@@ -526,7 +572,7 @@ export default function TaskCards() {
                   value={taskForm.outputFormat}
                   onChange={(e) => setTaskForm({ ...taskForm, outputFormat: e.target.value })}
                   placeholder="例：表格：痛点、表现与改进行动"
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  className="form-control text-[13px] px-3 py-2.5"
                 />
               </div>
 
@@ -571,7 +617,7 @@ export default function TaskCards() {
                   onChange={(e) => setTaskForm({ ...taskForm, judgmentCriteriaStr: e.target.value })}
                   placeholder="例：&#10;痛点分析必须基于真实的差评评论&#10;建议方案有可执行的代码或文案细节"
                   rows={2}
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                  className="form-control text-[13px] px-3 py-2.5 resize-none"
                 />
               </div>
             </div>

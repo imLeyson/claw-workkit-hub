@@ -44,7 +44,7 @@ export default function MetricCard({ icon: Icon, label, value, sub, progress, co
   const c = colorMap[color]
 
   return (
-    <div className={`card-surface rounded-2xl p-5 flex flex-col gap-3 border-l-[3px] ${c.border} pl-[17px]`}>
+    <div className={`card-surface p-5 flex flex-col gap-3 border-l-[3px] ${c.border} pl-[17px]`}>
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-xl ${c.iconBg} flex items-center justify-center shrink-0`}>
           <Icon className={`w-5 h-5 ${c.iconColor}`} />

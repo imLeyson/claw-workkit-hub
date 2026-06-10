@@ -1,0 +1,455 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资料库" [ref=e22] [cursor=pointer]:
+        - /url: /materials/q2-mom-baby
+        - img [ref=e23]
+        - generic [ref=e25]: 资料库
+      - link "任务卡" [ref=e26] [cursor=pointer]:
+        - /url: /tasks/q2-mom-baby
+        - img [ref=e27]
+        - generic [ref=e32]: 任务卡
+      - link "报告" [ref=e33] [cursor=pointer]:
+        - /url: /report/q2-mom-baby
+        - img [ref=e34]
+        - generic [ref=e36]: 报告
+      - link "资产库" [ref=e38] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e39]
+        - generic [ref=e42]: 资产库
+    - generic [ref=e44]:
+      - generic [ref=e46]: PromoKit AI
+      - generic [ref=e47]: 电商大促 AI 工作包系统
+  - generic [ref=e48]:
+    - banner [ref=e49]:
+      - generic [ref=e51]:
+        - link "看板" [ref=e52] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e53]:
+          - generic [ref=e54]: /
+          - generic [ref=e55]: 策略报告
+        - generic [ref=e56]:
+          - generic [ref=e57]: /
+          - generic [ref=e58]: q2-mom-baby
+      - generic [ref=e59]:
+        - button "切换浅色模式" [ref=e60]:
+          - img [ref=e61]
+        - link "幻灯片" [ref=e67] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e68]
+          - text: 幻灯片
+        - generic [ref=e71]: 本地 Demo
+    - main [ref=e73]:
+      - generic [ref=e74]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e86]: 日常分析 · 母婴用品
+            - generic [ref=e87]:
+              - img [ref=e88]
+              - generic [ref=e91]: 最后生成：2026-04-21 14:00
+          - generic [ref=e92]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - img [ref=e97]
+                - text: 从资料到策略再到知识沉淀的闭环报告
+              - heading "大促策略报告" [level=1] [ref=e101]
+              - paragraph [ref=e102]: Q2 母婴用品用户洞察 已完成 3/3 个岗位分析，系统将资料引用、AI 输出、验证准入、执行进度和 Work Kit 沉淀串成一条可追踪链路。
+              - generic [ref=e103]:
+                - button "沉淀为复用工作包" [ref=e104] [cursor=pointer]:
+                  - img [ref=e105]
+                  - text: 沉淀为复用工作包
+                - button "保存编辑" [ref=e109] [cursor=pointer]:
+                  - img [ref=e110]
+                  - text: 保存编辑
+                - button "退出编辑" [ref=e114] [cursor=pointer]
+                - link "返回任务卡" [ref=e115] [cursor=pointer]:
+                  - /url: /tasks/q2-mom-baby
+                - link "进入 AI 工作台" [ref=e116] [cursor=pointer]:
+                  - /url: /workspace/q2-mom-baby/t9
+                  - text: 进入 AI 工作台
+                  - img [ref=e117]
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - img [ref=e121]
+                - generic [ref=e125]: 4 份
+                - generic [ref=e126]: 资料源
+              - generic [ref=e127]:
+                - img [ref=e128]
+                - generic [ref=e133]: 3 岗
+                - generic [ref=e134]: 协作岗位
+              - generic [ref=e135]:
+                - img [ref=e136]
+                - generic [ref=e139]: 3/3
+                - generic [ref=e140]: AI 输出
+              - generic [ref=e141]:
+                - img [ref=e142]
+                - generic [ref=e146]: 0/5
+                - generic [ref=e147]: 待办完成
+        - generic [ref=e148]:
+          - generic [ref=e149]:
+            - generic [ref=e150]:
+              - text: Closed Loop
+              - heading "本次大促分析的实际使用链路" [level=2] [ref=e151]
+            - generic [ref=e152]: 进行中
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - img [ref=e157]
+              - generic [ref=e161]:
+                - generic [ref=e162]: 资料接入
+                - generic [ref=e163]: 4/4
+              - paragraph [ref=e164]: 评论、参数、客服和历史文案统一结构化
+            - generic [ref=e165]:
+              - img [ref=e168]
+              - generic [ref=e171]:
+                - generic [ref=e172]: AI 分析
+                - generic [ref=e173]: 3/3
+              - paragraph [ref=e174]: 按岗位 Prompt 生成可审核结果
+            - generic [ref=e175]:
+              - img [ref=e178]
+              - generic [ref=e181]:
+                - generic [ref=e182]: 验证准入
+                - generic [ref=e183]: 通过
+              - paragraph [ref=e184]: 检查岗位覆盖、输出完整性与竞品对标
+            - generic [ref=e185]:
+              - img [ref=e188]
+              - generic [ref=e192]:
+                - generic [ref=e193]: 执行落地
+                - generic [ref=e194]: 0/5
+              - paragraph [ref=e195]: 把报告动作转成团队待办进度
+            - generic [ref=e196]:
+              - img [ref=e198]
+              - generic [ref=e201]:
+                - generic [ref=e202]: 资产回流
+                - generic [ref=e203]: v1.2
+              - paragraph [ref=e204]: 成功案例进入知识库供下次学习
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]:
+                - text: Input Evidence
+                - heading "系统已读取并引用的业务资料" [level=2] [ref=e209]
+              - generic [ref=e210]:
+                - generic [ref=e211]: "1575"
+                - generic [ref=e212]: 评论样本
+            - generic [ref=e213]:
+              - generic [ref=e214]:
+                - img [ref=e215]
+                - generic [ref=e220]: 4/4
+                - generic [ref=e221]: 被任务引用资料
+              - generic [ref=e222]:
+                - img [ref=e223]
+                - generic [ref=e225]: "1"
+                - generic [ref=e226]: 需复核/脱敏资料
+            - generic [ref=e227]:
+              - generic [ref=e228]:
+                - generic [ref=e229]:
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: Babycare 纸尿裤用户评论
+                    - generic [ref=e232]: babycare-diapers-reviews.xlsx
+                  - generic [ref=e233]: 竞品评论
+                - paragraph [ref=e234]: 尺寸偏小 / 漏尿
+                - generic [ref=e235]:
+                  - generic [ref=e236]: 520 条样本
+                  - generic [ref=e237]: 可直接引用
+              - generic [ref=e238]:
+                - generic [ref=e239]:
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: 全棉时代棉柔巾用户评论
+                    - generic [ref=e242]: purcotton-wipes-reviews.xlsx
+                  - generic [ref=e243]: 竞品评论
+                - paragraph [ref=e244]: 掉絮 / 厚度不足
+                - generic [ref=e245]:
+                  - generic [ref=e246]: 610 条样本
+                  - generic [ref=e247]: 可直接引用
+              - generic [ref=e248]:
+                - generic [ref=e249]:
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: 母婴客服高频问题记录
+                    - generic [ref=e252]: mom-baby-faq.xlsx
+                  - generic [ref=e253]: 客服记录
+                - paragraph [ref=e254]: 近半年售前售后共38条高频问题，覆盖安全性、材质、退换货等话题。
+                - generic [ref=e255]:
+                  - generic [ref=e256]: 结构化资料
+                  - generic [ref=e257]: 需脱敏
+              - generic [ref=e258]:
+                - generic [ref=e259]:
+                  - generic [ref=e260]:
+                    - generic [ref=e261]: 好奇金装纸尿裤用户评论
+                    - generic [ref=e262]: huggies-diapers-reviews.xlsx
+                  - generic [ref=e263]: 竞品评论
+                - paragraph [ref=e264]: 红屁股 / 吸水性不足
+                - generic [ref=e265]:
+                  - generic [ref=e266]: 445 条样本
+                  - generic [ref=e267]: 可直接引用
+          - generic [ref=e268]:
+            - generic [ref=e269]:
+              - generic [ref=e270]:
+                - text: AI Workflow
+                - heading "岗位任务如何被 AI 处理" [level=2] [ref=e271]
+              - generic [ref=e272]: 2 类来源标签
+            - generic [ref=e273]:
+              - generic [ref=e274]:
+                - generic [ref=e275]:
+                  - generic [ref=e276]:
+                    - img [ref=e278]
+                    - generic [ref=e282]:
+                      - generic [ref=e283]: 母婴用户痛点矩阵
+                      - generic [ref=e284]: 商品 · 李商品
+                  - generic [ref=e285]: 已提交
+                - paragraph [ref=e286]: 基于Babycare纸尿裤和全棉时代棉柔巾的用户评论，构建母婴品类用户痛点矩阵。
+                - generic [ref=e287]:
+                  - generic [ref=e288]: 竞品评论 · Babycare 纸尿裤用户评论
+                  - generic [ref=e289]: 竞品评论 · 全棉时代棉柔巾用户评论
+                  - generic [ref=e290]: 竞品评论 · 好奇金装纸尿裤用户评论
+                  - generic [ref=e291]: 竞品评论
+              - generic [ref=e292]:
+                - generic [ref=e293]:
+                  - generic [ref=e294]:
+                    - img [ref=e296]
+                    - generic [ref=e300]:
+                      - generic [ref=e301]: 商品卖点机会分析
+                      - generic [ref=e302]: 文案 · 王文案
+                  - generic [ref=e303]: 已提交
+                - paragraph [ref=e304]: 提取母婴用户评论中的安全焦虑和复购动机，转化为卖点机会。
+                - generic [ref=e305]:
+                  - generic [ref=e306]: 竞品评论 · Babycare 纸尿裤用户评论
+                  - generic [ref=e307]: 竞品评论 · 全棉时代棉柔巾用户评论
+                  - generic [ref=e308]: 竞品评论 · 好奇金装纸尿裤用户评论
+                  - generic [ref=e309]: 竞品评论
+              - generic [ref=e310]:
+                - generic [ref=e311]:
+                  - generic [ref=e312]:
+                    - img [ref=e314]
+                    - generic [ref=e318]:
+                      - generic [ref=e319]: 母婴客服 FAQ
+                      - generic [ref=e320]: 客服 · 赵客服
+                  - generic [ref=e321]: 已提交
+                - paragraph [ref=e322]: 整理母婴用户的售前高频疑虑和售后风险，生成客服应答模板。
+                - generic [ref=e323]:
+                  - generic [ref=e324]: 竞品评论 · Babycare 纸尿裤用户评论
+                  - generic [ref=e325]: 竞品评论 · 全棉时代棉柔巾用户评论
+                  - generic [ref=e326]: 客服记录 · 母婴客服高频问题记录
+                  - generic [ref=e327]: 竞品评论
+                  - generic [ref=e328]: 客服记录
+        - generic [ref=e329]:
+          - generic [ref=e330]:
+            - generic [ref=e331]:
+              - text: Executive Summary
+              - heading "可直接进入大促执行的核心判断" [level=2] [ref=e332]
+            - generic [ref=e333]:
+              - button "添加判断" [ref=e334] [cursor=pointer]:
+                - img [ref=e335]
+                - text: 添加判断
+              - generic [ref=e336]: 已汇总 3 个岗位输出
+          - generic [ref=e337]:
+            - generic [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]: "01"
+                - button "删除判断" [ref=e341]:
+                  - img [ref=e342]
+              - textbox [ref=e345]: 安全焦虑是母婴用户的第一决策因素：材质安全认证、致敏原检测和医护级标准的展示直接影响转化率，Babycare 凭借医护认证优势领先。
+            - generic [ref=e346]:
+              - generic [ref=e347]:
+                - generic [ref=e348]: "02"
+                - button "删除判断" [ref=e349]:
+                  - img [ref=e350]
+              - textbox [ref=e353]: 尺寸和舒适度是复购核心：Babycare 和好奇都被反馈尺寸偏小，全棉时代掉絮问题突出，用户对「合适度」的敏感度远高于价格。
+            - generic [ref=e354]:
+              - generic [ref=e355]:
+                - generic [ref=e356]: "03"
+                - button "删除判断" [ref=e357]:
+                  - img [ref=e358]
+              - textbox [ref=e361]: 品牌公众号内容种草效率高于短视频 2.3 倍：母婴用户更信任深度内容而非短暂曝光，全棉时代的内容策略值得参考。
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - generic [ref=e364]:
+              - text: Role Outputs
+              - heading "岗位分析结果与可复核证据" [level=2] [ref=e365]
+            - link "查看任务卡" [ref=e366] [cursor=pointer]:
+              - /url: /tasks/q2-mom-baby
+              - text: 查看任务卡
+              - img [ref=e367]
+          - generic [ref=e369]:
+            - navigation [ref=e370]:
+              - button "商品 1/1 已提交" [ref=e371]:
+                - text: 商品
+                - generic [ref=e372]: 1/1 已提交
+              - button "文案 1/1 已提交" [ref=e373]:
+                - text: 文案
+                - generic [ref=e374]: 1/1 已提交
+              - button "客服 1/1 已提交" [ref=e375]:
+                - text: 客服
+                - generic [ref=e376]: 1/1 已提交
+            - generic [ref=e378]:
+              - generic [ref=e379]:
+                - generic [ref=e380]:
+                  - heading "母婴用户痛点矩阵" [level=3] [ref=e381]
+                  - paragraph [ref=e382]: 引用 3 份资料 · 输出格式：用户痛点矩阵 · 选品建议
+                - generic [ref=e383]:
+                  - img [ref=e384]
+                  - text: 已提交
+              - generic [ref=e387]:
+                - generic [ref=e388]:
+                  - heading "用户核心痛点 Top 3" [level=4] [ref=e389]
+                  - table [ref=e391]:
+                    - rowgroup [ref=e392]:
+                      - row "痛点 频次 严重度 竞品覆盖 机会方向" [ref=e393]:
+                        - columnheader "痛点" [ref=e394]
+                        - columnheader "频次" [ref=e395]
+                        - columnheader "严重度" [ref=e396]
+                        - columnheader "竞品覆盖" [ref=e397]
+                        - columnheader "机会方向" [ref=e398]
+                    - rowgroup [ref=e399]:
+                      - row "尺寸偏小 高 (89次) 严重 2/3 推出「分龄尺码指南」或试用装" [ref=e400]:
+                        - cell "尺寸偏小" [ref=e401]
+                        - cell "高 (89次)" [ref=e402]
+                        - cell "严重" [ref=e403]
+                        - cell "2/3" [ref=e404]
+                        - cell "推出「分龄尺码指南」或试用装" [ref=e405]
+                      - row "漏尿/侧漏 高 (52次) 严重 1/3 强化「3D 防漏隔边」设计" [ref=e406]:
+                        - cell "漏尿/侧漏" [ref=e407]
+                        - cell "高 (52次)" [ref=e408]
+                        - cell "严重" [ref=e409]
+                        - cell "1/3" [ref=e410]
+                        - cell "强化「3D 防漏隔边」设计" [ref=e411]
+                      - row "红屁股/过敏 中 (38次) 严重 2/3 医护级安全认证 + 敏感肌适用" [ref=e412]:
+                        - cell "红屁股/过敏" [ref=e413]
+                        - cell "中 (38次)" [ref=e414]
+                        - cell "严重" [ref=e415]
+                        - cell "2/3" [ref=e416]
+                        - cell "医护级安全认证 + 敏感肌适用" [ref=e417]
+                      - row "掉絮/起毛 中 (28次) 中等 1/3 强调「不掉絮」高压水刺工艺" [ref=e418]:
+                        - cell "掉絮/起毛" [ref=e419]
+                        - cell "中 (28次)" [ref=e420]
+                        - cell "中等" [ref=e421]
+                        - cell "1/3" [ref=e422]
+                        - cell "强调「不掉絮」高压水刺工艺" [ref=e423]
+                      - row "吸水性不足 中 (22次) 中等 1/3 突出「高分子吸水树脂」技术" [ref=e424]:
+                        - cell "吸水性不足" [ref=e425]
+                        - cell "中 (22次)" [ref=e426]
+                        - cell "中等" [ref=e427]
+                        - cell "1/3" [ref=e428]
+                        - cell "突出「高分子吸水树脂」技术" [ref=e429]
+                - generic [ref=e430]:
+                  - heading "复购动机与竞品对比" [level=4] [ref=e431]
+                  - list [ref=e432]:
+                    - listitem [ref=e433]: — 安全信任是第一决策因素：材质安全认证的展示直接影响转化率，Babycare 凭借医护认证领先
+                    - listitem [ref=e434]: — 尺寸合适度是复购核心：Babycare 和好奇都被反馈尺寸偏小，建议增加试用装或分龄推荐功能
+                    - listitem [ref=e435]: — 品牌公众号内容的种草转化效率高于短视频 2.3 倍，全棉时代的内容营销值得参考
+                    - listitem [ref=e436]: — 好奇价格有优势但红屁股差评多，需要强化透气性和吸水性数据对比
+        - generic [ref=e437]:
+          - generic [ref=e438]:
+            - img [ref=e440]
+            - generic [ref=e443]:
+              - text: 验证审核 · 知识库对标准入
+              - paragraph [ref=e444]: 设置验证角色，判断分析结果与市场竞品的优劣，确定保留和修改内容
+          - generic [ref=e445]:
+            - generic [ref=e446]:
+              - generic [ref=e447]:
+                - generic [ref=e448]: AI 结果完整性
+                - generic [ref=e449]: 已通过
+              - generic [ref=e450]: 3 个岗位已提交
+            - generic [ref=e451]:
+              - generic [ref=e452]:
+                - generic [ref=e453]: 跨岗位覆盖
+                - generic [ref=e454]: 已通过
+              - generic [ref=e455]: 覆盖 3 个岗位角色
+            - generic [ref=e456]:
+              - generic [ref=e457]:
+                - generic [ref=e458]: 竞品对标验证
+                - generic [ref=e459]: 可进入验证
+              - generic [ref=e460]: 资料风险可控，可启动知识验证
+          - generic [ref=e461]:
+            - generic [ref=e462]:
+              - generic [ref=e463]: 公司知识库保留项
+              - textbox [ref=e464]: 618 竞品评论分析 Work Kit
+            - generic [ref=e465]:
+              - generic [ref=e466]: 市场竞品需追踪
+              - textbox [ref=e467]: Babycare · 尺寸偏小 / 全棉时代 · 掉絮 / 好奇 Huggies · 红屁股
+            - generic [ref=e468]:
+              - generic [ref=e469]: 验证角色建议
+              - textbox [ref=e470]: 运营负责人 + 商品负责人 + 客服质检共同确认保留/修订
+          - generic [ref=e471]:
+            - generic [ref=e472]: 人工验证备注
+            - textbox [ref=e473]: 验证通过后，将保留项写入团队知识库；修订项进入下一轮任务卡。
+        - generic [ref=e474]:
+          - generic [ref=e475]:
+            - generic [ref=e476]:
+              - generic [ref=e477]:
+                - text: Execution Board
+                - heading "下一步执行清单" [level=2] [ref=e478]
+              - generic [ref=e479]:
+                - button "添加动作" [ref=e480] [cursor=pointer]:
+                  - img [ref=e481]
+                  - text: 添加动作
+                - generic [ref=e482]:
+                  - generic [ref=e483]: 0%
+                  - generic [ref=e484]: 执行进度
+            - generic [ref=e486]:
+              - generic [ref=e487]:
+                - generic [ref=e488]: "1"
+                - textbox [ref=e489]: 商品岗整理安全认证文件：医护级认证、皮肤刺激性测试报告
+                - button "删除动作" [ref=e490]:
+                  - img [ref=e491]
+              - generic [ref=e494]:
+                - generic [ref=e495]: "2"
+                - textbox [ref=e496]: 文案岗优化信任内容：公众号深度种草文章 + 评论区真实用户反馈
+                - button "删除动作" [ref=e497]:
+                  - img [ref=e498]
+              - generic [ref=e501]:
+                - generic [ref=e502]: "3"
+                - textbox [ref=e503]: 客服岗建立敏感肌/过敏体质应答模板：安全第一，退换无忧
+                - button "删除动作" [ref=e504]:
+                  - img [ref=e505]
+              - generic [ref=e508]:
+                - generic [ref=e509]: "4"
+                - textbox [ref=e510]: 运营岗规划试用装策略：分龄尺码推荐 + 试用装引导复购
+                - button "删除动作" [ref=e511]:
+                  - img [ref=e512]
+              - generic [ref=e515]:
+                - generic [ref=e516]: "5"
+                - textbox [ref=e517]: 设计岗在详情页首屏展示安全认证标识与真实用户好评
+                - button "删除动作" [ref=e518]:
+                  - img [ref=e519]
+          - generic [ref=e522]:
+            - text: Knowledge Return
+            - heading "报告如何回流为下次可用资产" [level=2] [ref=e523]
+            - generic [ref=e524]:
+              - generic [ref=e525]:
+                - generic [ref=e526]:
+                  - generic [ref=e527]: 当前项目 Work Kit
+                  - generic [ref=e528]: v1.2
+                - paragraph [ref=e529]: v1.1增加了客服风险话术分类后反馈良好。商品团队建议在v1.2中增加「用户原话摘录」模块，已补充。
+              - generic [ref=e530]:
+                - generic [ref=e531]: 相似成功案例
+                - paragraph [ref=e533]: 暂无同类成功案例，建议先沉淀当前项目。
+              - generic [ref=e534]:
+                - button "保存/更新 Work Kit" [ref=e535] [cursor=pointer]:
+                  - img [ref=e536]
+                  - text: 保存/更新 Work Kit
+                - button "保存报告编辑" [ref=e540] [cursor=pointer]:
+                  - img [ref=e541]
+                  - text: 保存报告编辑
+                - button "恢复系统版本" [ref=e545] [cursor=pointer]:
+                  - img [ref=e546]
+                  - text: 恢复系统版本
+                - button "打开资产库" [ref=e549] [cursor=pointer]:
+                  - text: 打开资产库
+                  - img [ref=e550]
+  - button [ref=e77]:
+    - img [ref=e78]

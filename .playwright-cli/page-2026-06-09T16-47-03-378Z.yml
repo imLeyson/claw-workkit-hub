@@ -1,0 +1,60 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资料库" [ref=e22] [cursor=pointer]:
+        - /url: /materials/q2-mom-baby
+        - img [ref=e23]
+        - generic [ref=e25]: 资料库
+      - link "任务卡" [ref=e26] [cursor=pointer]:
+        - /url: /tasks/q2-mom-baby
+        - img [ref=e27]
+        - generic [ref=e32]: 任务卡
+      - link "报告" [ref=e33] [cursor=pointer]:
+        - /url: /report/q2-mom-baby
+        - img [ref=e34]
+        - generic [ref=e36]: 报告
+      - link "资产库" [ref=e38] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e39]
+        - generic [ref=e42]: 资产库
+    - generic [ref=e44]:
+      - generic [ref=e46]: PromoKit AI
+      - generic [ref=e47]: 电商大促 AI 工作包系统
+  - generic [ref=e48]:
+    - banner [ref=e49]:
+      - generic [ref=e51]:
+        - link "看板" [ref=e52] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e53]:
+          - generic [ref=e54]: /
+          - generic [ref=e55]: 策略报告
+        - generic [ref=e56]:
+          - generic [ref=e57]: /
+          - generic [ref=e58]: q2-mom-baby
+      - generic [ref=e59]:
+        - button "切换浅色模式" [ref=e60]:
+          - img [ref=e61]
+        - link "幻灯片" [ref=e67] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e68]
+          - text: 幻灯片
+        - generic [ref=e71]: 本地 Demo
+    - main [ref=e73]:
+      - generic [ref=e74]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e76]: 加载中...
+  - button [ref=e77]:
+    - img [ref=e78]

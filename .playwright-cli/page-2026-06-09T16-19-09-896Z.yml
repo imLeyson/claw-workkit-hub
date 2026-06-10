@@ -1,0 +1,40 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e91]:
+    - generic [ref=e94]: The Hidden Cost
+    - heading "团队经验 正在悄悄流失" [level=2] [ref=e95]:
+      - text: 团队经验
+      - text: 正在悄悄流失
+    - paragraph [ref=e96]: 每次大促的分析流程、判断标准和输出模板，都只存在个人脑子里。人一走，经验就没了。
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - img [ref=e99]
+        - generic [ref=e102]: 12h+
+        - generic [ref=e103]: 每次大促重复耗时
+        - generic [ref=e104]: 整理资料 + 分析 + 汇总报告
+      - generic [ref=e105]:
+        - img [ref=e106]
+        - generic [ref=e111]: 5 岗位
+        - generic [ref=e112]: 各自独立作战
+        - generic [ref=e113]: 分析口径与输出格式不统一
+      - generic [ref=e114]:
+        - img [ref=e115]
+        - generic [ref=e118]: 0 积累
+        - generic [ref=e119]: 经验无法沉淀
+        - generic [ref=e120]: 上次分析成果下次用不上
+    - paragraph [ref=e121]: 团队并不缺 AI 工具——缺的是把 AI 分析流程化、资产化的系统。
+  - generic [ref=e25]: 03 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

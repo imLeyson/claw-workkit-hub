@@ -1,0 +1,150 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic [ref=e317]:
+        - generic [ref=e318]: PromoKit AI
+        - generic [ref=e319]: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资料库" [ref=e240] [cursor=pointer]:
+        - /url: /materials/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+        - img [ref=e241]
+        - generic [ref=e243]: 资料库
+      - link "任务卡" [active] [ref=e245] [cursor=pointer]:
+        - /url: /tasks/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+        - img [ref=e246]
+        - generic [ref=e251]: 任务卡
+      - link "报告" [ref=e252] [cursor=pointer]:
+        - /url: /report/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+        - img [ref=e253]
+        - generic [ref=e255]: 报告
+      - link "资产库" [ref=e23] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e24]
+        - generic [ref=e27]: 资产库
+    - generic [ref=e29]:
+      - generic [ref=e31]: PromoKit AI
+      - generic [ref=e32]: 电商大促 AI 工作包系统
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e36]:
+        - link "看板" [ref=e37] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e38]:
+          - generic [ref=e39]: /
+          - generic [ref=e40]: 任务卡
+        - generic [ref=e256]:
+          - generic [ref=e257]: /
+          - generic [ref=e258]: 618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+      - generic [ref=e41]:
+        - button "切换浅色模式" [ref=e42]:
+          - img [ref=e43]
+        - link "幻灯片" [ref=e49] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e50]
+          - text: 幻灯片
+        - generic [ref=e53]: 本地 Demo
+    - main [ref=e55]:
+      - generic [ref=e56]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e321]:
+        - generic [ref=e322]:
+          - generic [ref=e323]:
+            - heading "岗位分析任务" [level=1] [ref=e324]
+            - paragraph [ref=e325]: 618 竞品评论分析 — 系统根据资料自动生成可执行的 AI 分析任务卡。
+          - button "生成全部任务卡" [ref=e327] [cursor=pointer]:
+            - img [ref=e328]
+            - text: 生成全部任务卡
+        - generic [ref=e331]:
+          - generic [ref=e332]: 0 个竞品
+          - generic [ref=e333]: ·
+          - generic [ref=e334]: 0 份资料
+          - generic [ref=e335]: ·
+          - generic [ref=e336]: 5 个岗位
+        - generic [ref=e337]:
+          - button "智能知识库 · 推荐 5 个高复用 Work Kit" [ref=e338]:
+            - generic [ref=e339]:
+              - img [ref=e340]
+              - generic [ref=e343]: 智能知识库 · 推荐 5 个高复用 Work Kit
+            - img [ref=e344]
+          - generic [ref=e346]:
+            - link "小红书种草文案 Work... v1.3 · 复用 7 次" [ref=e347] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e348]: 小红书种草文案 Work...
+              - generic [ref=e349]: v1.3 · 复用 7 次
+            - link "双11 客服备战 Wor... v1.2 · 复用 6 次" [ref=e350] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e351]: 双11 客服备战 Wor...
+              - generic [ref=e352]: v1.2 · 复用 6 次
+            - link "大促直播话术 Work ... v1.2 · 复用 5 次" [ref=e353] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e354]: 大促直播话术 Work ...
+              - generic [ref=e355]: v1.2 · 复用 5 次
+            - link "618 竞品评论分析 W... v1.2 · 复用 4 次" [ref=e356] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e357]: 618 竞品评论分析 W...
+              - generic [ref=e358]: v1.2 · 复用 4 次
+            - link "新品上架全流程 Work... v1.1 · 复用 4 次" [ref=e359] [cursor=pointer]:
+              - /url: /archive
+              - generic [ref=e360]: 新品上架全流程 Work...
+              - generic [ref=e361]: v1.1 · 复用 4 次
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - generic [ref=e364]:
+              - generic [ref=e365]:
+                - generic [ref=e366]:
+                  - generic [ref=e367]: 商品岗
+                  - heading "竞品商品分析" [level=3] [ref=e368]
+                - generic [ref=e369]: 待补资料
+              - paragraph [ref=e370]: 基于「618 竞品评论分析 Work Kit」模板生成。已完成 2/4 个启动前学习项，可继续在工作台关联知识库。
+              - generic [ref=e372]: 输入：暂无可用资料
+              - generic [ref=e373]:
+                - generic [ref=e374]: 竞品分析
+                - generic [ref=e375]: "618"
+                - generic [ref=e376]: 个护小家电
+            - generic [ref=e377]:
+              - generic [ref=e378]:
+                - generic [ref=e379]:
+                  - img [ref=e380]
+                  - text: 商品负责人
+                - button "复制 Prompt" [ref=e384]:
+                  - img [ref=e385]
+                  - text: 复制 Prompt
+              - link "补充资料" [ref=e388] [cursor=pointer]:
+                - /url: /materials/618-竞品评论分析
+                - text: 补充资料
+                - img [ref=e389]
+          - generic [ref=e391]:
+            - generic [ref=e392]:
+              - generic [ref=e393]:
+                - generic [ref=e394]:
+                  - generic [ref=e395]: 文案岗
+                  - heading "卖点文案转译" [level=3] [ref=e396]
+                - generic [ref=e397]: 待补资料
+              - paragraph [ref=e398]: 基于「618 竞品评论分析 Work Kit」模板生成。已完成 2/4 个启动前学习项，可继续在工作台关联知识库。
+              - generic [ref=e400]: 输入：暂无可用资料
+              - generic [ref=e401]:
+                - generic [ref=e402]: 竞品分析
+                - generic [ref=e403]: "618"
+                - generic [ref=e404]: 个护小家电
+            - generic [ref=e405]:
+              - generic [ref=e406]:
+                - generic [ref=e407]:
+                  - img [ref=e408]
+                  - text: 文案负责人
+                - button "复制 Prompt" [ref=e412]:
+                  - img [ref=e413]
+                  - text: 复制 Prompt
+              - link "补充资料" [ref=e416] [cursor=pointer]:
+                - /url: /materials/618-竞品评论分析
+                - text: 补充资料
+                - img [ref=e417]
+  - button [ref=e59]:
+    - img [ref=e60]

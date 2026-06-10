@@ -1,0 +1,64 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e249]:
+    - generic [ref=e252]: The Impact
+    - heading "用数据说话" [level=2] [ref=e253]
+    - generic [ref=e254]:
+      - generic [ref=e255]:
+        - generic [ref=e256]: Before
+        - generic [ref=e257]:
+          - generic [ref=e258]:
+            - generic [ref=e259]: ✕
+            - text: 各岗位各自整理资料
+          - generic [ref=e260]:
+            - generic [ref=e261]: ✕
+            - text: 分析口径与格式不统一
+          - generic [ref=e262]:
+            - generic [ref=e263]: ✕
+            - text: AI 输出无结构化沉淀
+          - generic [ref=e264]:
+            - generic [ref=e265]: ✕
+            - text: 每次大促从零启动
+      - generic [ref=e266]:
+        - generic [ref=e267]: With PromoKit AI
+        - generic [ref=e268]:
+          - generic [ref=e269]:
+            - generic [ref=e270]: ✓
+            - text: 统一资料库 · 同源协同
+          - generic [ref=e271]:
+            - generic [ref=e272]: ✓
+            - text: 各岗位结构化 AI 输出
+          - generic [ref=e273]:
+            - generic [ref=e274]: ✓
+            - text: 一键保存为 Work Kit
+          - generic [ref=e275]:
+            - generic [ref=e276]: ✓
+            - text: 下次大促几分钟启动
+    - generic [ref=e278]:
+      - generic [ref=e279]:
+        - generic [ref=e280]: 启动耗时
+        - generic [ref=e281]:
+          - generic [ref=e282]: 3h
+          - img [ref=e283]
+          - generic [ref=e285]: 5min
+      - generic [ref=e287]:
+        - generic [ref=e288]: 经验复用
+        - generic [ref=e289]:
+          - generic [ref=e290]: 0%
+          - img [ref=e291]
+          - generic [ref=e293]: 100%
+  - generic [ref=e25]: 07 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

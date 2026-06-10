@@ -1,0 +1,107 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e6]:
+        - img [ref=e7]
+        - generic:
+          - generic:
+            - generic: PromoKit AI
+            - generic: 电商大促 AI 工作包系统
+      - navigation [ref=e10]:
+        - link "看板" [ref=e11] [cursor=pointer]:
+          - /url: /
+          - img [ref=e12]
+          - generic [ref=e17]: 看板
+        - link "新建项目" [ref=e18] [cursor=pointer]:
+          - /url: /create
+          - img [ref=e19]
+          - generic [ref=e21]: 新建项目
+        - link "资料库" [ref=e240] [cursor=pointer]:
+          - /url: /materials/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+          - img [ref=e241]
+          - generic [ref=e243]: 资料库
+        - link "任务卡" [ref=e245] [cursor=pointer]:
+          - /url: /tasks/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+          - img [ref=e246]
+          - generic [ref=e251]: 任务卡
+        - link "报告" [ref=e252] [cursor=pointer]:
+          - /url: /report/618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+          - img [ref=e253]
+          - generic [ref=e255]: 报告
+        - link "资产库" [ref=e23] [cursor=pointer]:
+          - /url: /archive
+          - img [ref=e24]
+          - generic [ref=e27]: 资产库
+      - generic [ref=e29]:
+        - generic [ref=e31]: PromoKit AI
+        - generic [ref=e32]: 电商大促 AI 工作包系统
+    - generic [ref=e33]:
+      - banner [ref=e34]:
+        - generic [ref=e36]:
+          - link "看板" [ref=e37] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e38]:
+            - generic [ref=e39]: /
+            - generic [ref=e40]: 资料库
+          - generic [ref=e256]:
+            - generic [ref=e257]: /
+            - generic [ref=e258]: 618-%E7%AB%9E%E5%93%81%E8%AF%84%E8%AE%BA%E5%88%86%E6%9E%90
+        - generic [ref=e41]:
+          - button "切换浅色模式" [ref=e42]:
+            - img [ref=e43]
+          - link "幻灯片" [ref=e49] [cursor=pointer]:
+            - /url: /slides
+            - img [ref=e50]
+            - text: 幻灯片
+          - generic [ref=e53]: 本地 Demo
+      - main [ref=e55]:
+        - generic [ref=e56]: 本地 Demo · 数据保存在浏览器
+        - generic [ref=e259]:
+          - generic [ref=e260]:
+            - generic [ref=e261]:
+              - heading "资料库" [level=1] [ref=e262]
+              - paragraph [ref=e263]: 618 竞品评论分析 — 竞品评论、商品参数、客服记录。
+            - link "下一步：任务卡" [ref=e264] [cursor=pointer]:
+              - /url: /tasks/618-竞品评论分析
+              - text: 下一步：任务卡
+              - img [ref=e265]
+          - generic [ref=e267] [cursor=pointer]:
+            - img [ref=e269]
+            - paragraph [ref=e272]: 导入电商数据
+            - paragraph [ref=e273]: 支持 CSV 格式 · 自动识别竞品商品和资料分类 · 一键同步更新
+            - button "下载 CSV 模板" [ref=e275]:
+              - img [ref=e276]
+              - text: 下载 CSV 模板
+            - generic [ref=e279]:
+              - generic [ref=e280]: 标准字段
+              - generic [ref=e281]:
+                - generic [ref=e282]: 类型
+                - generic [ref=e283]: 竞品品牌
+                - generic [ref=e284]: 商品名称
+                - generic [ref=e285]: 平台
+                - generic [ref=e286]: 评论内容
+                - generic [ref=e287]: 客服问题
+                - generic [ref=e288]: 文案内容
+            - generic [ref=e289]:
+              - generic [ref=e290]: 导入评论表
+              - generic [ref=e291]: 导入商品参数
+              - generic [ref=e292]: 导入客服记录
+              - generic [ref=e293]: 导入历史文案
+          - generic [ref=e294]:
+            - generic [ref=e295]: 竞品商品 · 0
+            - button "添加竞品" [ref=e296]:
+              - img [ref=e297]
+              - text: 添加竞品
+          - generic [ref=e299]:
+            - paragraph [ref=e300]: 暂无竞品商品
+            - paragraph [ref=e301]: 上传竞品评论数据自动识别，或手动添加
+            - button "+ 手动添加竞品" [ref=e302]
+          - generic [ref=e304]: 全部资料 · 0
+          - generic [ref=e306]: 暂无资料，上传 CSV 数据包自动分类填充
+    - button [ref=e59]:
+      - img [ref=e60]
+  - generic [ref=e307]:
+    - img [ref=e308]
+    - generic [ref=e311]: 基于「618 竞品评论分析 Work Kit」模板创建成功 · 2 张任务卡已生成
+    - button [ref=e312]:
+      - img [ref=e313]

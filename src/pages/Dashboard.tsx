@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Target, Trash2, RotateCcw, Pencil, X, Package, BookOpen, GitBranch, Sparkles, Database, ClipboardCheck, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Trash2, RotateCcw, Pencil, X, Package, BookOpen, GitBranch, Sparkles, Database, ClipboardCheck, ShieldCheck } from 'lucide-react'
 import { roleLabels } from '../data/mock'
 import { getProjects, getTasks, getAIResult, getWorkKits, getMaterials, deleteProject, resetAllData, updateProject } from '../services/db'
 import type { Project } from '../types'
@@ -221,6 +221,36 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <div className="brand-goal-panel mb-8 p-5">
+        <div className="relative grid lg:grid-cols-[1.05fr_0.95fr] gap-6 items-end">
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="brand-goal-mark" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-600">Product Pursuit</span>
+            </div>
+            <h2 className="text-[30px] md:text-[36px] font-medium tracking-[-0.035em] text-text-main leading-tight mb-4">
+              清晰、可操作、可沉淀的 AI 工作包体验
+            </h2>
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-2xl">
+              PromoKit AI 追求把复杂的大促分析流程，转化为团队能够直接执行、复核和继承的工作系统；在保证工具效率的同时，建立具有品牌识别度和高级感的产品界面。
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-2">
+            {[
+              ['CLEAR', '清晰', '知道当前处在哪一步'],
+              ['ACTION', '可操作', '每页都有明确下一步'],
+              ['ASSET', '可沉淀', '把结果变成 Work Kit'],
+            ].map(([code, title, desc]) => (
+              <div key={code} className="rounded-xl border border-border-light bg-bg-surface/70 p-4">
+                <div className="font-mono text-[10px] text-accent-600 mb-5">{code}</div>
+                <div className="text-[15px] font-semibold text-text-main mb-1">{title}</div>
+                <div className="text-[10px] text-text-muted leading-relaxed">{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {[
           { value: String(totalCompetitors), label: '竞品覆盖', sub: `${projects.length} 品类 · ${totalCompetitors} 产品`, to: `/materials/${firstSlug}` },
@@ -361,14 +391,23 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-5">
-        <span className="section-title">分析项目 · {projects.length}</span>
-        <Link to="/create" className="text-[11px] font-medium text-accent-600 hover:text-accent-500 flex items-center gap-1">
-          + 新建项目
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+      <div className="data-panel overflow-hidden">
+        <div className="px-5 py-4 border-b border-border-light flex items-center justify-between">
+          <div>
+            <span className="section-title">Project Operations · {projects.length}</span>
+            <h2 className="text-[20px] font-medium text-text-main mt-1">项目运营台</h2>
+          </div>
+          <Link to="/create" className="btn-primary-filled text-[12px]">
+            + 新建项目
+          </Link>
+        </div>
+        <div className="grid grid-cols-[1.35fr_120px_170px_210px_160px] gap-0 px-5 py-3 border-b border-border-light bg-bg-primary/55 text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted">
+          <div>项目</div>
+          <div>AI 进度</div>
+          <div>资产链路</div>
+          <div>岗位协作</div>
+          <div className="text-right">操作</div>
+        </div>
         {projects.map((p) => {
           const tasks = getTasks(p.id)
           const materials = getMaterials(p.id)
@@ -384,63 +423,59 @@ export default function Dashboard() {
           ]
           const assetScore = Math.round((assetSteps.filter((step) => step.done).length / assetSteps.length) * 100)
           return (
-            <div key={p.id} className="relative group/card">
-              <Link
-                to={p.status === 'in_progress' ? `/materials/${p.slug}` : p.status === 'completed' ? `/report/${p.slug}` : `/tasks/${p.slug}`}
-                className="action-card overflow-hidden flex flex-col relative block"
-              >
-                {p.status === 'in_progress' && <div className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full bg-accent-500" />}
-                <div className={`p-5 flex-1 ${p.status === 'in_progress' ? 'pt-6' : ''}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-white/[0.03] px-2 py-1 rounded-md">{p.category}</span>
-                    {p.status === 'in_progress' && <span className="w-[6px] h-[6px] rounded-full bg-accent-500 pulse-dot" />}
-                    {p.status === 'completed' && <span className="w-[6px] h-[6px] rounded-full bg-success" />}
-                  </div>
-                  <h3 className="text-[15px] font-semibold text-text-main mb-2 leading-snug">{p.name}</h3>
-                  <p className="text-[12px] text-text-muted leading-relaxed line-clamp-2 mb-4">{p.description}</p>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-accent-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="text-[10px] font-medium text-text-muted">{done}/{tasks.length}</span>
-                  </div>
-                  <div className="rounded-xl border border-border-light bg-bg-primary/45 p-3 mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-semibold text-text-muted uppercase tracking-[0.08em]">资产链路</span>
-                      <span className={`text-[10px] font-medium ${assetScore >= 75 ? 'text-success' : assetScore >= 50 ? 'text-warning' : 'text-text-muted'}`}>{assetScore}%</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {assetSteps.map((step) => (
-                        <div key={step.label} className={`h-7 rounded-lg border flex items-center justify-center text-[9px] font-medium ${step.done ? 'border-accent-500/20 bg-accent-500/10 text-accent-600' : 'border-border-light bg-bg-surface/70 text-text-muted'}`}>
-                          {step.label}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-text-muted">
-                    <span className="flex items-center gap-1"><Target className="w-3 h-3" />{p.competitors.length} 竞品</span>
-                    <span>{p.createdAt}</span>
-                  </div>
+            <div key={p.id} className="grid grid-cols-[1.35fr_120px_170px_210px_160px] gap-0 px-5 py-4 border-b border-border-light last:border-b-0 items-center hover:bg-bg-primary/45 transition-colors group/row">
+              <div className="min-w-0 pr-5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted bg-bg-primary px-2 py-1 rounded-md">{p.category}</span>
+                  {p.status === 'in_progress' && <span className="w-[6px] h-[6px] rounded-full bg-accent-500 pulse-dot" />}
+                  {p.status === 'completed' && <span className="w-[6px] h-[6px] rounded-full bg-success" />}
+                  <span className="text-[10px] text-text-muted">{p.createdAt}</span>
                 </div>
-                <div className="px-5 py-3 bg-bg-primary/50 border-t border-border-light flex items-center justify-between">
-                  <span className="text-[11px] text-text-muted">{p.team.map((t) => roleLabels[t.role]).join(' · ')}</span>
-                  <span className="text-[11px] font-medium text-accent-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-                    {p.status === 'in_progress' ? '进入' : p.status === 'completed' ? '查看' : '开始'}
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                <div className="text-[14px] font-semibold text-text-main truncate">{p.name}</div>
+                <p className="text-[11px] text-text-muted leading-relaxed truncate mt-1">{p.description}</p>
+              </div>
+              <div className="pr-5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex-1 h-1.5 bg-bg-primary rounded-full overflow-hidden">
+                    <div className="h-full bg-accent-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="text-[10px] font-medium text-text-muted">{done}/{tasks.length}</span>
                 </div>
-              </Link>
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                <div className="text-[10px] text-text-muted">{p.competitors.length} 竞品 · {materials.length} 资料</div>
+              </div>
+              <div className="pr-5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className={`text-[11px] font-medium ${assetScore >= 75 ? 'text-success' : assetScore >= 50 ? 'text-warning' : 'text-text-muted'}`}>{assetScore}%</span>
+                  <span className="text-[10px] text-text-muted">{hasKit ? '已入库' : '待沉淀'}</span>
+                </div>
+                <div className="grid grid-cols-4 gap-1">
+                  {assetSteps.map((step) => (
+                    <div key={step.label} title={step.label} className={`h-1.5 rounded-full ${step.done ? 'bg-accent-500' : 'bg-border-default'}`} />
+                  ))}
+                </div>
+              </div>
+              <div className="min-w-0 pr-5">
+                <div className="text-[12px] text-text-main truncate">{p.team.map((t) => roleLabels[t.role]).join(' · ')}</div>
+                <div className="text-[10px] text-text-muted mt-1">{projectHandoffs.length} 条交接记录</div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Link
+                  to={p.status === 'in_progress' ? `/materials/${p.slug}` : p.status === 'completed' ? `/report/${p.slug}` : `/tasks/${p.slug}`}
+                  className="btn-ghost text-[12px] px-3 py-1.5"
+                >
+                  {p.status === 'in_progress' ? '进入' : p.status === 'completed' ? '查看' : '开始'}
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
                 <button
                   onClick={(e) => { e.preventDefault(); handleOpenEdit(p) }}
-                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-white/5 cursor-pointer"
+                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-white/5 cursor-pointer opacity-0 group-hover/row:opacity-100 transition-opacity"
                   title="编辑项目"
                 >
                   <Pencil className="w-3.5 h-3.5 text-text-muted hover:text-accent-500" />
                 </button>
                 <button
                   onClick={(e) => { e.preventDefault(); setDeleteId(p.id) }}
-                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-red-500/10 hover:border-red-200 cursor-pointer"
+                  className="w-7 h-7 rounded-lg bg-bg-surface border border-border-light flex items-center justify-center hover:bg-red-500/10 hover:border-red-200 cursor-pointer opacity-0 group-hover/row:opacity-100 transition-opacity"
                   title="删除项目"
                 >
                   <Trash2 className="w-3.5 h-3.5 text-text-muted hover:text-error" />
@@ -452,8 +487,8 @@ export default function Dashboard() {
       </div>
 
       {deleteId && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-2xl p-6 w-[360px] shadow-xl text-center">
+        <div className="modal-backdrop">
+          <div className="modal-panel p-6 w-[360px] text-center">
             <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-5 h-5 text-error" />
             </div>
@@ -475,8 +510,8 @@ export default function Dashboard() {
       </div>
 
       {showReset && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-2xl p-6 w-[380px] shadow-xl text-center">
+        <div className="modal-backdrop">
+          <div className="modal-panel p-6 w-[380px] text-center">
             <div className="w-11 h-11 rounded-xl bg-accent-50 flex items-center justify-center mx-auto mb-4">
               <RotateCcw className="w-5 h-5 text-accent-500" />
             </div>
@@ -494,8 +529,8 @@ export default function Dashboard() {
 
       {/* Edit project modal */}
       {editingProject && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in" onClick={() => setEditingProject(null)}>
-          <div className="bg-bg-surface rounded-2xl p-6 w-[480px] max-w-[90vw] shadow-2xl border border-border-default" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop animate-fade-in" onClick={() => setEditingProject(null)}>
+          <div className="modal-panel p-6 w-[480px]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-medium text-text-main font-semibold">编辑项目信息</h3>
               <button onClick={() => setEditingProject(null)} className="p-1 rounded-lg hover:bg-white/[0.06] cursor-pointer"><X className="w-4 h-4 text-text-muted" /></button>
@@ -508,7 +543,7 @@ export default function Dashboard() {
                   value={projectForm.name}
                   onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
                   placeholder="例：618 美妆个护竞品分析"
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  className="form-control text-[13px] px-3 py-2.5"
                   autoFocus
                 />
               </div>
@@ -520,7 +555,7 @@ export default function Dashboard() {
                   value={projectForm.category}
                   onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
                   placeholder="例：个护美妆"
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  className="form-control text-[13px] px-3 py-2.5"
                 />
               </div>
 
@@ -531,7 +566,7 @@ export default function Dashboard() {
                   value={projectForm.campaign}
                   onChange={(e) => setProjectForm({ ...projectForm, campaign: e.target.value })}
                   placeholder="例：618 年中大促"
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main"
+                  className="form-control text-[13px] px-3 py-2.5"
                 />
               </div>
 
@@ -542,7 +577,7 @@ export default function Dashboard() {
                   onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                   placeholder="例：针对竞品评论、参数及文案进行多维度调研..."
                   rows={3}
-                  className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-transparent text-text-main resize-none"
+                  className="form-control text-[13px] px-3 py-2.5 resize-none"
                 />
               </div>
             </div>

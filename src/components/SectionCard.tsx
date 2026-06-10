@@ -10,7 +10,7 @@ interface SectionCardProps {
 
 export default function SectionCard({ title, subtitle, children, className = '', compact }: SectionCardProps) {
   return (
-    <div className={`card-surface rounded-2xl ${compact ? 'p-4' : 'p-5'} ${className}`}>
+    <div className={`card-surface ${compact ? 'p-4' : 'p-5'} ${className}`}>
       {title && (
         <div className="mb-4">
           <h3 className="heading-card">{title}</h3>

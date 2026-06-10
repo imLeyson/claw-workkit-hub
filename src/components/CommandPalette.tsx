@@ -83,8 +83,8 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative w-full max-w-[520px] bg-bg-surface border border-border-default rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-black/35" />
+      <div className="modal-panel relative w-[520px] overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border-default">
           <Search className="w-4 h-4 text-text-muted" />
           <input

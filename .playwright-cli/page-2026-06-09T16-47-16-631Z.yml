@@ -1,0 +1,224 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资料库" [ref=e22] [cursor=pointer]:
+        - /url: /materials/q2-mom-baby
+        - img [ref=e23]
+        - generic [ref=e25]: 资料库
+      - link "任务卡" [ref=e26] [cursor=pointer]:
+        - /url: /tasks/q2-mom-baby
+        - img [ref=e27]
+        - generic [ref=e32]: 任务卡
+      - link "报告" [ref=e33] [cursor=pointer]:
+        - /url: /report/q2-mom-baby
+        - img [ref=e34]
+        - generic [ref=e36]: 报告
+      - link "资产库" [ref=e38] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e39]
+        - generic [ref=e42]: 资产库
+    - generic [ref=e44]:
+      - generic [ref=e46]: PromoKit AI
+      - generic [ref=e47]: 电商大促 AI 工作包系统
+  - generic [ref=e48]:
+    - banner [ref=e49]:
+      - generic [ref=e51]:
+        - link "看板" [ref=e52] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e53]:
+          - generic [ref=e54]: /
+          - generic [ref=e55]: 策略报告
+        - generic [ref=e56]:
+          - generic [ref=e57]: /
+          - generic [ref=e58]: q2-mom-baby
+      - generic [ref=e59]:
+        - button "切换浅色模式" [ref=e60]:
+          - img [ref=e61]
+        - link "幻灯片" [ref=e67] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e68]
+          - text: 幻灯片
+        - generic [ref=e71]: 本地 Demo
+    - main [ref=e73]:
+      - generic [ref=e74]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e85]: 日常分析 · 母婴用品
+          - heading "大促策略报告" [level=1] [ref=e86]
+          - paragraph [ref=e87]: Q2 母婴用品用户洞察 — 3/3 个岗位结果已提交。
+          - generic [ref=e88]:
+            - button "沉淀为复用工作包" [active] [ref=e89] [cursor=pointer]:
+              - img [ref=e90]
+              - text: 沉淀为复用工作包
+            - link "返回任务卡" [ref=e94] [cursor=pointer]:
+              - /url: /tasks/q2-mom-baby
+        - generic [ref=e95]:
+          - text: 执行摘要
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: "01"
+              - text: 安全焦虑是母婴用户的第一决策因素：材质安全认证、致敏原检测和医护级标准的展示直接影响转化率，Babycare 凭借医护认证优势领先。
+            - generic [ref=e99]:
+              - generic [ref=e100]: "02"
+              - text: 尺寸和舒适度是复购核心：Babycare 和好奇都被反馈尺寸偏小，全棉时代掉絮问题突出，用户对「合适度」的敏感度远高于价格。
+            - generic [ref=e101]:
+              - generic [ref=e102]: "03"
+              - text: 品牌公众号内容种草效率高于短视频 2.3 倍：母婴用户更信任深度内容而非短暂曝光，全棉时代的内容策略值得参考。
+        - generic [ref=e103]:
+          - navigation [ref=e104]:
+            - generic [ref=e105]: 岗位
+            - button "商品" [ref=e106]
+            - button "文案" [ref=e107]
+            - button "客服" [ref=e108]
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - heading "母婴用户痛点矩阵" [level=3] [ref=e112]
+              - generic [ref=e113]:
+                - img [ref=e114]
+                - text: 已提交
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - heading "用户核心痛点 Top 3" [level=4] [ref=e119]
+                - table [ref=e121]:
+                  - rowgroup [ref=e122]:
+                    - row "痛点 频次 严重度 竞品覆盖 机会方向" [ref=e123]:
+                      - columnheader "痛点" [ref=e124]
+                      - columnheader "频次" [ref=e125]
+                      - columnheader "严重度" [ref=e126]
+                      - columnheader "竞品覆盖" [ref=e127]
+                      - columnheader "机会方向" [ref=e128]
+                  - rowgroup [ref=e129]:
+                    - row "尺寸偏小 高 (89次) 严重 2/3 推出「分龄尺码指南」或试用装" [ref=e130]:
+                      - cell "尺寸偏小" [ref=e131]
+                      - cell "高 (89次)" [ref=e132]
+                      - cell "严重" [ref=e133]
+                      - cell "2/3" [ref=e134]
+                      - cell "推出「分龄尺码指南」或试用装" [ref=e135]
+                    - row "漏尿/侧漏 高 (52次) 严重 1/3 强化「3D 防漏隔边」设计" [ref=e136]:
+                      - cell "漏尿/侧漏" [ref=e137]
+                      - cell "高 (52次)" [ref=e138]
+                      - cell "严重" [ref=e139]
+                      - cell "1/3" [ref=e140]
+                      - cell "强化「3D 防漏隔边」设计" [ref=e141]
+                    - row "红屁股/过敏 中 (38次) 严重 2/3 医护级安全认证 + 敏感肌适用" [ref=e142]:
+                      - cell "红屁股/过敏" [ref=e143]
+                      - cell "中 (38次)" [ref=e144]
+                      - cell "严重" [ref=e145]
+                      - cell "2/3" [ref=e146]
+                      - cell "医护级安全认证 + 敏感肌适用" [ref=e147]
+                    - row "掉絮/起毛 中 (28次) 中等 1/3 强调「不掉絮」高压水刺工艺" [ref=e148]:
+                      - cell "掉絮/起毛" [ref=e149]
+                      - cell "中 (28次)" [ref=e150]
+                      - cell "中等" [ref=e151]
+                      - cell "1/3" [ref=e152]
+                      - cell "强调「不掉絮」高压水刺工艺" [ref=e153]
+                    - row "吸水性不足 中 (22次) 中等 1/3 突出「高分子吸水树脂」技术" [ref=e154]:
+                      - cell "吸水性不足" [ref=e155]
+                      - cell "中 (22次)" [ref=e156]
+                      - cell "中等" [ref=e157]
+                      - cell "1/3" [ref=e158]
+                      - cell "突出「高分子吸水树脂」技术" [ref=e159]
+              - generic [ref=e160]:
+                - heading "复购动机与竞品对比" [level=4] [ref=e161]
+                - list [ref=e162]:
+                  - listitem [ref=e163]: — 安全信任是第一决策因素：材质安全认证的展示直接影响转化率，Babycare 凭借医护认证领先
+                  - listitem [ref=e164]: — 尺寸合适度是复购核心：Babycare 和好奇都被反馈尺寸偏小，建议增加试用装或分龄推荐功能
+                  - listitem [ref=e165]: — 品牌公众号内容的种草转化效率高于短视频 2.3 倍，全棉时代的内容营销值得参考
+                  - listitem [ref=e166]: — 好奇价格有优势但红屁股差评多，需要强化透气性和吸水性数据对比
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - img [ref=e170]
+            - generic [ref=e173]:
+              - text: 验证审核 · 知识库对标准入
+              - paragraph [ref=e174]: 设置验证角色，判断分析结果与市场竞品的优劣，确定保留和修改内容
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - generic [ref=e177]:
+                - generic [ref=e178]: AI 结果完整性
+                - generic [ref=e179]: 已通过
+              - generic [ref=e180]: 3 个岗位已提交
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - generic [ref=e183]: 跨岗位覆盖
+                - generic [ref=e184]: 已通过
+              - generic [ref=e185]: 覆盖 3 个岗位角色
+            - generic [ref=e186]:
+              - generic [ref=e187]:
+                - generic [ref=e188]: 竞品对标验证
+                - generic [ref=e189]: 待分配
+              - generic [ref=e190]: 需指定审核人进行竞品对比验证
+        - generic [ref=e191]:
+          - text: 下一步执行清单
+          - generic [ref=e192]:
+            - button "商品岗整理安全认证文件：医护级认证、皮肤刺激性测试报告" [ref=e193]:
+              - img [ref=e194]
+              - generic [ref=e196]: 商品岗整理安全认证文件：医护级认证、皮肤刺激性测试报告
+            - button "文案岗优化信任内容：公众号深度种草文章 + 评论区真实用户反馈" [ref=e197]:
+              - img [ref=e198]
+              - generic [ref=e200]: 文案岗优化信任内容：公众号深度种草文章 + 评论区真实用户反馈
+            - button "客服岗建立敏感肌/过敏体质应答模板：安全第一，退换无忧" [ref=e201]:
+              - img [ref=e202]
+              - generic [ref=e204]: 客服岗建立敏感肌/过敏体质应答模板：安全第一，退换无忧
+            - button "运营岗规划试用装策略：分龄尺码推荐 + 试用装引导复购" [ref=e205]:
+              - img [ref=e206]
+              - generic [ref=e208]: 运营岗规划试用装策略：分龄尺码推荐 + 试用装引导复购
+            - button "设计岗在详情页首屏展示安全认证标识与真实用户好评" [ref=e209]:
+              - img [ref=e210]
+              - generic [ref=e212]: 设计岗在详情页首屏展示安全认证标识与真实用户好评
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - img [ref=e217]
+            - generic [ref=e221]:
+              - heading "沉淀为复用工作包" [level=3] [ref=e222]
+              - paragraph [ref=e223]: 保存流程、验证结论和成功标记，下次大促直接复用。
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - img [ref=e226]
+              - generic [ref=e229]: 3/3
+              - generic [ref=e230]: 结果完整性
+            - generic [ref=e231]:
+              - img [ref=e232]
+              - generic [ref=e235]: 3岗
+              - generic [ref=e236]: 跨岗位覆盖
+            - generic [ref=e237]:
+              - img [ref=e238]
+              - generic [ref=e240]: "4.8"
+              - generic [ref=e241]: 沉淀评分
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - generic [ref=e244]: 项目
+              - generic [ref=e245]: Q2 母婴用品用户洞察
+            - generic [ref=e246]:
+              - generic [ref=e247]: 版本
+              - generic [ref=e248]: 自动升级版本
+            - generic [ref=e249]:
+              - generic [ref=e250]: 包含
+              - generic [ref=e251]: 3/3 个结果 · 3 个岗位
+            - generic [ref=e252]:
+              - generic [ref=e253]: 已有版本
+              - generic [ref=e254]: v1.2 · 3 条历史
+          - button "标记为已验证成功案例 项目沉淀后评分写入 4.8，成功案例会在资产库优先展示，供新项目启动前学习。" [ref=e255]:
+            - generic [ref=e256]:
+              - img [ref=e258]
+              - generic [ref=e260]:
+                - generic [ref=e261]: 标记为已验证成功案例
+                - paragraph [ref=e262]: 项目沉淀后评分写入 4.8，成功案例会在资产库优先展示，供新项目启动前学习。
+          - generic [ref=e263]:
+            - button "取消" [ref=e264] [cursor=pointer]
+            - button "确认保存" [ref=e265] [cursor=pointer]
+  - button [ref=e77]:
+    - img [ref=e78]

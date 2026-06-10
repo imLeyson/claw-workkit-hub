@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e5]:
+    - img [ref=e9]
+    - heading "PromoKit AI" [level=1] [ref=e12]
+    - paragraph [ref=e13]: 电商大促 AI 工作包系统
+    - paragraph [ref=e14]:
+      - text: 把一次有效的大促分析流程
+      - text: 沉淀为团队可复用的 AI 工作包
+    - generic [ref=e15]:
+      - generic [ref=e16]: "618"
+      - generic [ref=e17]: ·
+      - generic [ref=e18]: 双 11
+      - generic [ref=e19]: ·
+      - generic [ref=e20]: 新品上架
+      - generic [ref=e21]: ·
+      - generic [ref=e22]: 爆品复盘
+  - generic [ref=e25]: 01 / 09
+  - button [disabled] [ref=e26]:
+    - img [ref=e27]
+  - button [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

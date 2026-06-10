@@ -1,0 +1,49 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e43]:
+    - generic [ref=e46]: Why PromoKit AI
+    - heading "大促前的准备 团队总是从头来过" [level=2] [ref=e47]:
+      - text: 大促前的准备
+      - text: 团队总是从头来过
+    - paragraph [ref=e48]: 五个岗位各自收集信息、各自分析、各自输出——口径不一，结果难以对齐。
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - img [ref=e52]
+        - generic [ref=e55]:
+          - generic [ref=e56]: 3h+
+          - generic [ref=e57]: 运营岗
+          - generic [ref=e58]: 每次手动整理竞品评论表格
+      - generic [ref=e59]:
+        - img [ref=e61]
+        - generic [ref=e64]:
+          - generic [ref=e65]: 无法复用
+          - generic [ref=e66]: 文案岗
+          - generic [ref=e67]: 凭个人经验重新撰写话术
+      - generic [ref=e68]:
+        - img [ref=e70]
+        - generic [ref=e72]:
+          - generic [ref=e73]: 从零梳理
+          - generic [ref=e74]: 客服岗
+          - generic [ref=e75]: 每次重新整理 FAQ 知识库
+      - generic [ref=e76]:
+        - img [ref=e78]
+        - generic [ref=e84]:
+          - generic [ref=e85]: 缺少依据
+          - generic [ref=e86]: 设计岗
+          - generic [ref=e87]: 凭感觉调整详情页信息层级
+    - paragraph [ref=e89]: 结果：下次大促，所有人从零开始再来一遍。
+  - generic [ref=e25]: 02 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

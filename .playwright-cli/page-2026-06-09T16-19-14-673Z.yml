@@ -1,0 +1,45 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e215]:
+    - generic [ref=e218]: Key Differentiator
+    - heading "我们保存的不是结果 而是流程本身" [level=2] [ref=e219]:
+      - text: 我们保存的不是结果
+      - text: 而是流程本身
+    - paragraph [ref=e220]: 每个 Work Kit 记录的是资料结构、任务模板、Prompt 和报告格式。换一个品类、换一次大促，照样能用。
+    - generic [ref=e221]:
+      - generic [ref=e222]:
+        - generic [ref=e223]:
+          - img [ref=e225]
+          - generic [ref=e230]:
+            - generic [ref=e231]: 618 竞品评论分析 Work Kit
+            - generic [ref=e232]: v1.2 · 已复用 3 次
+        - generic [ref=e233]: 可复用模板
+      - generic [ref=e234]:
+        - generic [ref=e235]:
+          - text: v1.0 初始模板
+          - img [ref=e236]
+        - generic [ref=e238]:
+          - text: v1.1 客服增强
+          - img [ref=e239]
+        - generic [ref=e241]: v1.2 首屏优化
+      - generic [ref=e242]:
+        - generic [ref=e243]: 资料结构
+        - generic [ref=e244]: 岗位配置
+        - generic [ref=e245]: 任务 Prompt
+        - generic [ref=e246]: 报告格式
+    - paragraph [ref=e247]: 每次大促后迭代一个版本——团队经验永不丢失。
+  - generic [ref=e25]: 06 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

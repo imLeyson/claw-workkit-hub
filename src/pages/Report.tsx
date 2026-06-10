@@ -478,17 +478,20 @@ export default function Report() {
       </div>
 
       {/* Assetization publisher */}
-      <div className="mb-10 action-panel p-5">
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
+      <div className="mb-10 brand-goal-panel p-5">
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
           <div className="flex flex-col justify-between gap-6">
             <div>
-              <span className="section-title">Asset Publisher</span>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="brand-goal-mark" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent-600">Asset Publisher</span>
+              </div>
               <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mt-3 mb-3">发布前资产化检查</h2>
               <p className="text-[13px] text-text-secondary leading-relaxed">
                 保存 Work Kit 之前，先确认本次分析是否已经具备可学习、可复用、可验证的条件。达标越高，下一个项目启动时越能直接继承本次经验。
               </p>
             </div>
-            <div className="data-metric p-5">
+            <div className="rounded-xl border border-border-light bg-bg-surface/75 p-5">
               <div className="flex items-end justify-between gap-4 mb-4">
                 <div>
                   <div className="text-[42px] font-light leading-none text-text-main">{readinessScore}%</div>
@@ -506,7 +509,7 @@ export default function Report() {
 
           <div className="grid md:grid-cols-2 gap-3">
             {readinessItems.map((item) => (
-              <div key={item.label} className={`rounded-xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/60'}`}>
+              <div key={item.label} className={`rounded-xl border p-4 ${item.ready ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-surface/75'}`}>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="text-[13px] font-medium text-text-main">{item.label}</div>
                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${item.ready ? 'bg-success text-white' : 'bg-bg-surface text-text-muted'}`}>
@@ -520,7 +523,7 @@ export default function Report() {
           </div>
         </div>
 
-        <div className="mt-5 pt-5 border-t border-border-light">
+        <div className="relative mt-5 pt-5 border-t border-border-light">
           <div className="flex items-center justify-between gap-4 mb-3">
             <div className="text-[13px] font-medium text-text-main">保存后将沉淀的资产</div>
             <button onClick={() => setShowSaveDialog(true)} className="btn-primary">
@@ -587,6 +590,93 @@ export default function Report() {
                 还没有接收到工作台交接记录。建议回到 AI 工作台提交分析结果，系统会自动记录区块、知识依据、来源资料和复核标记。
               </p>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-10 grid grid-cols-[310px_1fr] gap-5 items-start">
+        <aside className="action-panel p-4 sticky top-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="brand-goal-mark" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-600">Strategy Console</span>
+          </div>
+          <h2 className="text-[18px] font-medium text-text-main mb-2">策略发布控制台</h2>
+          <p className="text-[12px] text-text-muted leading-relaxed mb-4">
+            从岗位结果、资料证据、执行清单到 Work Kit 发布，统一检查本次报告是否具备沉淀条件。
+          </p>
+          <div className="data-metric p-4 mb-4">
+            <div className="flex items-end justify-between gap-3 mb-3">
+              <div>
+                <div className="text-[34px] font-light leading-none text-text-main">{readinessScore}%</div>
+                <div className="text-[10px] text-text-muted mt-1">发布就绪度</div>
+              </div>
+              <span className={`tag ${readinessScore >= 75 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                {readinessScore >= 75 ? '可发布' : '待补齐'}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-bg-surface overflow-hidden">
+              <div className="h-full rounded-full bg-accent-500" style={{ width: `${readinessScore}%` }} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            {closureSteps.map((step) => (
+              <div key={step.label} className="rounded-lg border border-border-light bg-bg-primary/55 p-3">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[11px] font-medium text-text-main">{step.label}</span>
+                  <span className="font-mono text-[10px] text-accent-600">{step.status}</span>
+                </div>
+                <div className="text-[10px] text-text-muted truncate">{step.desc}</div>
+              </div>
+            ))}
+          </div>
+        </aside>
+
+        <div className="space-y-4">
+          <div className="data-panel overflow-hidden">
+            <div className="px-5 py-4 border-b border-border-light flex items-center justify-between">
+              <div>
+                <span className="section-title">Report Workbench</span>
+                <h2 className="text-[20px] font-medium text-text-main mt-1">报告作业区</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setEditMode(true)} className="btn-ghost text-[12px]">
+                  <Edit3 className="w-3.5 h-3.5" /> 编辑报告
+                </button>
+                <button onClick={() => setShowSaveDialog(true)} className="btn-primary-filled text-[12px]">
+                  <Package className="w-3.5 h-3.5" /> 发布 Work Kit
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-[1fr_130px_130px_150px] px-5 py-3 border-b border-border-light bg-bg-primary/55 text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted">
+              <div>作业项</div>
+              <div>状态</div>
+              <div>证据</div>
+              <div className="text-right">下一步</div>
+            </div>
+            {[
+              ['岗位结果', `${submittedCount}/${tasks.length}`, `${generatedCount} 个 AI 输出`, submittedCount === tasks.length ? '复核报告' : '补齐岗位'],
+              ['资料证据', `${referencedMaterials.length}/${materials.length}`, `${sensitiveCount} 个风险`, sensitiveCount ? '处理复核' : '可引用'],
+              ['执行清单', `${completedNextSteps}/${nextSteps.length}`, '团队待办进度', completedNextSteps === nextSteps.length ? '进入发布' : '更新动作'],
+              ['资产沉淀', existingKit ? existingKit.version : '待发布', `${reusableAssets.length} 类资产`, '发布 Work Kit'],
+            ].map(([label, status, evidence, next]) => (
+              <div key={label} className="grid grid-cols-[1fr_130px_130px_150px] px-5 py-4 border-b border-border-light last:border-b-0 items-center hover:bg-bg-primary/45 transition-colors">
+                <div className="text-[13px] font-medium text-text-main">{label}</div>
+                <div className="text-[12px] text-text-secondary">{status}</div>
+                <div className="text-[11px] text-text-muted">{evidence}</div>
+                <div className="text-right">
+                  <span className="text-[11px] font-medium text-accent-600">{next}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-4 gap-3">
+            {reusableAssets.map((asset) => (
+              <div key={asset.title} className="data-metric p-4">
+                <div className="text-[12px] font-medium text-text-main mb-1">{asset.title}</div>
+                <p className="text-[10px] text-text-muted leading-relaxed">{asset.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -1270,8 +1360,8 @@ export default function Report() {
 
       {/* Save dialog */}
       {showSaveDialog && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-[28px] p-6 w-[760px] max-w-[94vw] shadow-xl border border-border-light">
+        <div className="modal-backdrop">
+          <div className="modal-panel p-6 w-[760px]">
             <div className="flex items-start justify-between gap-5 mb-5">
               <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center"><Package className="w-5 h-5 text-accent-500" /></div>
@@ -1280,7 +1370,7 @@ export default function Report() {
                   <p className="text-[12px] text-text-muted">保存流程、验证结论和启动学习包，下次大促直接复用。</p>
                 </div>
               </div>
-              <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.05] px-4 py-3 text-center shrink-0">
+              <div className="rounded-xl border border-accent-500/15 bg-accent-500/[0.05] px-4 py-3 text-center shrink-0">
                 <div className="text-[26px] font-light text-text-main leading-none">{readinessScore}%</div>
                 <div className="text-[10px] text-text-muted mt-1">发布就绪度</div>
               </div>
@@ -1294,7 +1384,7 @@ export default function Report() {
                     { icon: ShieldCheck, label: '交接', value: `${projectHandoffs.length}条`, pass: projectHandoffs.length > 0 },
                     { icon: Star, label: '评分', value: successRating ? String(successRating) : '待定', pass: successRating >= 4.8 },
                   ].map((item) => (
-                    <div key={item.label} className={`rounded-2xl border p-3 ${item.pass ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/70'}`}>
+                    <div key={item.label} className={`rounded-xl border p-3 ${item.pass ? 'border-success/20 bg-success-soft' : 'border-border-light bg-bg-primary/70'}`}>
                       <item.icon className={`w-4 h-4 mb-2 ${item.pass ? 'text-success' : 'text-text-muted'}`} />
                       <div className="text-[18px] font-light text-text-main leading-none mb-1">{item.value}</div>
                       <div className="text-[10px] text-text-muted">{item.label}</div>
@@ -1302,7 +1392,7 @@ export default function Report() {
                   ))}
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 text-[12px] space-y-1.5">
+                <div className="workbench-section p-4 text-[12px] space-y-1.5">
                   <div className="flex justify-between gap-4"><span className="text-text-muted">项目</span><span className="font-medium text-right">{project.name}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">版本</span><span className="font-medium">{nextVersionLabel}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">包含</span><span className="font-medium">{submittedTasks.length}/{tasks.length} 个结果 · {roleTabs.length} 个岗位</span></div>
@@ -1312,7 +1402,7 @@ export default function Report() {
 
                 <button
                   onClick={() => setMarkAsSuccess((v) => !v)}
-                  className={`w-full rounded-2xl border p-4 text-left transition-colors ${
+                  className={`w-full rounded-xl border p-4 text-left transition-colors ${
                     markAsSuccess ? 'border-amber-500/25 bg-amber-500/10' : 'border-border-light bg-bg-primary/60'
                   }`}
                 >
@@ -1330,7 +1420,7 @@ export default function Report() {
                 </button>
               </div>
 
-              <div className="rounded-2xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
+              <div className="rounded-xl border border-accent-500/20 bg-accent-500/[0.04] p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em]">Launch Learning Pack</div>
@@ -1432,8 +1522,8 @@ export default function Report() {
         </div>
       )}
       {saved && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-bg-surface rounded-[28px] p-7 w-[560px] max-w-[92vw] shadow-xl border border-border-light">
+        <div className="modal-backdrop">
+          <div className="modal-panel p-7 w-[560px]">
             <div className="flex items-start gap-4 mb-5">
               <div className="w-14 h-14 rounded-2xl bg-success-soft flex items-center justify-center shrink-0"><TrendingUp className="w-7 h-7 text-success" /></div>
               <div className="min-w-0">
@@ -1448,14 +1538,14 @@ export default function Report() {
             </div>
             <div className="grid sm:grid-cols-3 gap-2 mb-5">
               {publishReceiptItems.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-border-light bg-bg-primary/60 p-3">
+                <div key={item.label} className="rounded-xl border border-border-light bg-bg-primary/60 p-3">
                   <div className="text-[17px] font-light text-text-main leading-none mb-1">{item.value}</div>
                   <div className="text-[11px] font-medium text-text-main">{item.label}</div>
                   <div className="text-[9px] text-text-muted leading-relaxed mt-1">{item.desc}</div>
                 </div>
               ))}
             </div>
-            <div className="rounded-2xl border border-accent-500/15 bg-accent-500/[0.04] p-4 mb-5">
+            <div className="rounded-xl border border-accent-500/15 bg-accent-500/[0.04] p-4 mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <BookOpen className="w-4 h-4 text-accent-500" />
                 <span className="text-[12px] font-semibold text-text-main">下次启动将继承</span>

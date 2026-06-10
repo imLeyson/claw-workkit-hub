@@ -1,0 +1,60 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e155]:
+    - generic [ref=e158]: How It Works
+    - heading "六步完成闭环 最后一步才是关键" [level=2] [ref=e159]:
+      - text: 六步完成闭环
+      - text: 最后一步才是关键
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e164]: "01"
+          - generic [ref=e165]: 创建项目
+          - generic [ref=e166]: 设定目标与范围
+        - img [ref=e168]
+      - generic [ref=e170]:
+        - generic [ref=e171]:
+          - generic [ref=e173]: "02"
+          - generic [ref=e174]: 导入资料
+          - generic [ref=e175]: 上传竞品数据
+        - img [ref=e177]
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - generic [ref=e182]: "03"
+          - generic [ref=e183]: 生成任务
+          - generic [ref=e184]: AI 自动拆解
+        - img [ref=e186]
+      - generic [ref=e188]:
+        - generic [ref=e189]:
+          - generic [ref=e191]: "04"
+          - generic [ref=e192]: AI 分析
+          - generic [ref=e193]: 结构化输出
+        - img [ref=e195]
+      - generic [ref=e197]:
+        - generic [ref=e198]:
+          - generic [ref=e200]: "05"
+          - generic [ref=e201]: 汇总报告
+          - generic [ref=e202]: 跨岗位整合
+        - img [ref=e204]
+      - generic [ref=e207]:
+        - generic [ref=e209]: "06"
+        - generic [ref=e210]: 沉淀复用
+        - generic [ref=e211]: 保存 Work Kit
+    - paragraph [ref=e213]:
+      - text: 第 6 步沉淀的 Work Kit，让下一次的第 1 步
+      - text: 从"从零开始" 变成 "几分钟启动"。
+  - generic [ref=e25]: 05 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

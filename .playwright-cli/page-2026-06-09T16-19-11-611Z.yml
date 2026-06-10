@@ -1,0 +1,48 @@
+- generic [ref=e3]:
+  - img
+  - generic [ref=e123]:
+    - generic [ref=e126]: The Solution
+    - heading "用 PromoKit AI 把流程变成资产" [level=2] [ref=e127]:
+      - text: 用 PromoKit AI
+      - text: 把流程变成资产
+    - paragraph [ref=e128]: 同一份数据源 → 五个岗位协同分析 → 结构化输出 → 一键沉淀为可复用工作包
+    - generic [ref=e129]:
+      - generic [ref=e130]:
+        - generic [ref=e131]: "01"
+        - generic [ref=e132]: 评论挖掘
+        - generic [ref=e133]: 自动聚类用户高频痛点，构建分析矩阵
+      - generic [ref=e134]:
+        - generic [ref=e135]: "02"
+        - generic [ref=e136]: 卖点生成
+        - generic [ref=e137]: 用户原话转化为可量化、可传播的商品卖点
+      - generic [ref=e138]:
+        - generic [ref=e139]: "03"
+        - generic [ref=e140]: 客服 FAQ
+        - generic [ref=e141]: 售前疑虑 + 售后风险话术，带等级标注
+      - generic [ref=e142]:
+        - generic [ref=e143]: "04"
+        - generic [ref=e144]: 详情页优化
+        - generic [ref=e145]: 基于用户关注热度重排信息层级
+      - generic [ref=e146]:
+        - generic [ref=e147]: "05"
+        - generic [ref=e148]: 策略汇总
+        - generic [ref=e149]: 跨岗位整合大促执行清单与风险点
+      - generic [ref=e150]:
+        - generic [ref=e151]: "06"
+        - generic [ref=e152]: 资产沉淀
+        - generic [ref=e153]: 保存流程与模板，下次大促几分钟启动
+  - generic [ref=e25]: 04 / 09
+  - button [ref=e26]:
+    - img [ref=e27]
+  - button [active] [ref=e29]:
+    - img [ref=e30]
+  - generic [ref=e32]:
+    - button [ref=e33]
+    - button [ref=e34]
+    - button [ref=e35]
+    - button [ref=e36]
+    - button [ref=e37]
+    - button [ref=e38]
+    - button [ref=e39]
+    - button [ref=e40]
+    - button [ref=e41]

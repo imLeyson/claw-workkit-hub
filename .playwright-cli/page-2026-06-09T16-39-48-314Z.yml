@@ -1,0 +1,45 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e7]
+      - generic:
+        - generic:
+          - generic: PromoKit AI
+          - generic: 电商大促 AI 工作包系统
+    - navigation [ref=e10]:
+      - link "看板" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img [ref=e12]
+        - generic [ref=e17]: 看板
+      - link "新建项目" [ref=e18] [cursor=pointer]:
+        - /url: /create
+        - img [ref=e19]
+        - generic [ref=e21]: 新建项目
+      - link "资产库" [ref=e23] [cursor=pointer]:
+        - /url: /archive
+        - img [ref=e24]
+        - generic [ref=e27]: 资产库
+    - generic [ref=e29]:
+      - generic [ref=e31]: PromoKit AI
+      - generic [ref=e32]: 电商大促 AI 工作包系统
+  - generic [ref=e33]:
+    - banner [ref=e34]:
+      - generic [ref=e36]:
+        - link "看板" [ref=e37] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e38]:
+          - generic [ref=e39]: /
+          - generic [ref=e40]: 新建项目
+      - generic [ref=e41]:
+        - button "切换浅色模式" [ref=e42]:
+          - img [ref=e43]
+        - link "幻灯片" [ref=e49] [cursor=pointer]:
+          - /url: /slides
+          - img [ref=e50]
+          - text: 幻灯片
+        - generic [ref=e53]: 本地 Demo
+    - main [ref=e55]:
+      - generic [ref=e56]: 本地 Demo · 数据保存在浏览器
+      - generic [ref=e58]: 加载中...
+  - button [ref=e59]:
+    - img [ref=e60]

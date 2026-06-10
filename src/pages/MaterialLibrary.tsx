@@ -297,6 +297,12 @@ export default function MaterialLibrary() {
     { icon: ShieldCheck, label: '质量准入', value: riskMaterials.length === 0 ? '可用' : `${riskMaterials.length} 待复核`, desc: '标记脱敏与人工复核风险' },
     { icon: Package, label: '资产沉淀', value: requiredReady ? '可推进' : '待补齐', desc: '进入 Work Kit 的资料结构模板' },
   ]
+  const dataConsoleStats = [
+    ['资料', `${materials.length}`],
+    ['竞品', `${competitors.length}`],
+    ['引用', `${taskLinkedMaterials}`],
+    ['复核', `${riskMaterials.length}`],
+  ]
 
   return (
     <div className="max-w-6xl">
@@ -431,73 +437,91 @@ export default function MaterialLibrary() {
         </div>
       </div>
 
-      <div className="flex items-start justify-between mb-10">
-        <div>
-          <h2 className="text-[24px] font-light tracking-[-0.02em] text-text-main mb-2">资料库</h2>
-          <p className="text-[13px] text-text-secondary max-w-md leading-relaxed">{project.name} — 竞品评论、商品参数、客服记录与历史文案会被转化为岗位任务输入。</p>
-        </div>
-        <Link to={`/tasks/${projectSlug}`} className="btn-primary">下一步：任务卡 <ArrowRight className="w-4 h-4" /></Link>
-      </div>
-
-      <div className="grid md:grid-cols-4 gap-3 mb-8">
-        {materialTypeStats.map((item) => {
-          const Icon = typeIcons[item.type] || FileSpreadsheet
-          return (
-            <div key={item.type} className={`data-metric p-4 ${item.ready ? 'border-success/20 bg-success-soft' : item.required ? 'border-warning/20 bg-warning-soft' : ''}`}>
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <Icon className={`w-4 h-4 ${item.ready ? 'text-success' : item.required ? 'text-warning' : 'text-text-muted'}`} />
-                <span className="text-[20px] font-light text-text-main leading-none">{item.count}</span>
+      <div className="grid grid-cols-[310px_1fr] gap-5 items-start">
+        <aside className="action-panel p-4 sticky top-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="brand-goal-mark" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-600">Data Console</span>
+          </div>
+          <h2 className="text-[18px] font-medium text-text-main mb-2">数据接入控制台</h2>
+          <p className="text-[12px] text-text-muted leading-relaxed mb-4">
+            先补齐资料结构，再进入任务卡。所有导入都会同步到竞品、资料列表和任务引用关系。
+          </p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {dataConsoleStats.map(([label, value]) => (
+              <div key={label} className="data-metric p-3">
+                <div className="text-[18px] font-light text-text-main leading-none">{value}</div>
+                <div className="text-[10px] text-text-muted mt-1">{label}</div>
               </div>
-              <div className="text-[12px] font-medium text-text-main">{item.label}</div>
-              <p className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</p>
-              <div className="mt-3 text-[10px] font-medium">
-                {item.ready ? <span className="text-success">已覆盖</span> : item.required ? <span className="text-warning">建议优先补齐</span> : <span className="text-text-muted">可选增强</span>}
+            ))}
+          </div>
+          <div onClick={() => !uploading && fileInputRef.current?.click()} className={`rounded-xl border border-dashed p-4 cursor-pointer group mb-4 ${uploading ? 'border-accent-300 bg-accent-50/60' : 'border-border-default hover:border-accent-300'}`}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-bg-primary border border-border-light flex items-center justify-center transition-colors group-hover:border-accent-300 group-hover:bg-accent-50">
+                {uploading ? (
+                  <div className="w-5 h-5 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <UploadCloud className="w-5 h-5 text-accent-500" />
+                )}
+              </div>
+              <div>
+                <p className="text-[13px] font-medium text-text-main">{uploading ? '正在解析数据...' : '导入电商数据'}</p>
+                <p className="text-[10px] text-text-muted mt-0.5">CSV / XLSX / TXT</p>
               </div>
             </div>
-          )
-        })}
-      </div>
-
-      {/* Upload */}
-      <div onClick={() => !uploading && fileInputRef.current?.click()} className={`action-panel p-6 text-center mb-10 cursor-pointer group border-dashed ${uploading ? 'border-accent-300 bg-accent-50/60' : 'hover:border-accent-300'}`}>
-        <div className="w-12 h-12 rounded-xl bg-bg-primary border border-border-light flex items-center justify-center mx-auto mb-4 transition-colors group-hover:border-accent-300 group-hover:bg-accent-50">
-          {uploading ? (
-            <div className="w-6 h-6 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <UploadCloud className="w-7 h-7 text-accent-500" />
-          )}
-        </div>
-        <p className="text-[15px] font-medium text-text-main mb-1">{uploading ? '正在解析数据...' : '导入电商数据'}</p>
-        <p className="text-[12px] text-text-muted mb-4">支持 CSV 格式 · 自动识别竞品商品和资料分类 · 一键同步更新</p>
-        <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.txt" onChange={handleFileUpload} className="hidden" />
-        <div className="mb-4 flex items-center justify-center">
+            <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.txt" onChange={handleFileUpload} className="hidden" />
+            <div className="grid grid-cols-2 gap-1.5">
+              {['评论表', '商品参数', '客服记录', '历史文案'].map((label) => (
+                <span key={label} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}
+                  className="text-[10px] px-2 py-1.5 rounded-lg cursor-pointer border border-border-light bg-bg-surface text-text-muted hover:border-accent-300 hover:text-accent-600 transition-colors text-center"
+                >{label}</span>
+              ))}
+            </div>
+          </div>
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); downloadTemplate() }}
-            className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-surface px-4 py-2 text-[12px] font-medium text-accent-600 transition-colors hover:border-accent-300 hover:bg-accent-50"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-border-default bg-bg-surface px-4 py-2 text-[12px] font-medium text-accent-600 transition-colors hover:border-accent-300 hover:bg-accent-50 mb-4"
           >
             <Download className="h-3.5 w-3.5" />
             下载 CSV 模板
           </button>
-        </div>
-        <div className="mx-auto mb-4 max-w-2xl rounded-xl border border-border-light bg-bg-primary/60 px-4 py-3 text-left">
-          <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="rounded-xl border border-border-light bg-bg-primary/60 px-3 py-3 mb-4">
+            <div className="mb-2 text-[11px] font-medium text-text-secondary">标准字段</div>
+            <div className="flex flex-wrap gap-1.5">
             {['类型', '竞品品牌', '商品名称', '平台', '评论内容', '客服问题', '文案内容'].map((field) => (
               <span key={field} className={`rounded-md px-2 py-1 text-[10px] ${field === '类型' ? 'bg-accent-50 text-accent-600' : 'bg-bg-surface text-text-muted'}`}>
                 {field}
               </span>
             ))}
+            </div>
           </div>
-        </div>
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          {['导入评论表', '导入商品参数', '导入客服记录', '导入历史文案'].map((label) => (
-            <span key={label} onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}
-              className="text-[11px] px-3 py-1.5 rounded-lg cursor-pointer border border-border-light bg-bg-surface text-text-muted hover:border-accent-300 hover:text-accent-600 transition-colors"
-            >{label}</span>
-          ))}
-        </div>
-      </div>
+          <div className="space-y-2">
+            {materialTypeStats.map((item) => {
+              const Icon = typeIcons[item.type] || FileSpreadsheet
+              return (
+                <div key={item.type} className={`rounded-lg border p-3 ${item.ready ? 'border-success/20 bg-success-soft' : item.required ? 'border-warning/20 bg-warning-soft' : 'border-border-light bg-bg-primary/55'}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-3.5 h-3.5 ${item.ready ? 'text-success' : item.required ? 'text-warning' : 'text-text-muted'}`} />
+                      <span className="text-[11px] font-medium text-text-main">{item.label}</span>
+                    </div>
+                    <span className="text-[12px] font-medium text-text-main">{item.count}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </aside>
+
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="section-title">Source Workbench</span>
+              <h2 className="text-[22px] font-medium text-text-main mt-1">来源作业台</h2>
+            </div>
+            <Link to={`/tasks/${projectSlug}`} className="btn-primary">下一步：任务卡 <ArrowRight className="w-4 h-4" /></Link>
+          </div>
 
       {/* Competitors */}
       <div className="flex items-center justify-between mb-4">
@@ -548,24 +572,24 @@ export default function MaterialLibrary() {
 
       {/* Comp form modal */}
       {showCompForm && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50" onClick={() => setShowCompForm(false)}>
-          <div className="bg-bg-surface rounded-xl p-6 w-[480px] max-w-[90vw] shadow-xl border border-border-light" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-backdrop" onClick={() => setShowCompForm(false)}>
+          <div className="modal-panel p-6 w-[480px]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-medium text-text-main">{editingIndex !== null ? '编辑竞品' : '添加竞品商品'}</h3>
               <button onClick={() => setShowCompForm(false)} className="p-1 rounded-lg hover:bg-white/[0.06]"><X className="w-4 h-4 text-text-muted" /></button>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">商品名称 *</label><input type="text" value={compForm.name} onChange={(e) => setCompForm({ ...compForm, name: e.target.value })} placeholder="例：米家高速吹风机 H700" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" autoFocus /></div>
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">品牌</label><input type="text" value={compForm.brand} onChange={(e) => setCompForm({ ...compForm, brand: e.target.value })} placeholder="例：小米米家" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">商品名称 *</label><input type="text" value={compForm.name} onChange={(e) => setCompForm({ ...compForm, name: e.target.value })} placeholder="例：米家高速吹风机 H700" className="form-control text-[13px] px-3 py-2.5" autoFocus /></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">品牌</label><input type="text" value={compForm.brand} onChange={(e) => setCompForm({ ...compForm, brand: e.target.value })} placeholder="例：小米米家" className="form-control text-[13px] px-3 py-2.5" /></div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">平台</label><select value={compForm.platform} onChange={(e) => setCompForm({ ...compForm, platform: e.target.value })} className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400 bg-bg-surface">{PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">价格</label><input type="text" value={compForm.price} onChange={(e) => setCompForm({ ...compForm, price: e.target.value })} placeholder="¥499" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
-                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">评论数</label><input type="number" value={compForm.reviewCount} onChange={(e) => setCompForm({ ...compForm, reviewCount: e.target.value })} placeholder="426" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">平台</label><select value={compForm.platform} onChange={(e) => setCompForm({ ...compForm, platform: e.target.value })} className="form-control text-[13px] px-3 py-2.5 bg-bg-surface">{PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}</select></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">价格</label><input type="text" value={compForm.price} onChange={(e) => setCompForm({ ...compForm, price: e.target.value })} placeholder="¥499" className="form-control text-[13px] px-3 py-2.5" /></div>
+                <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">评论数</label><input type="number" value={compForm.reviewCount} onChange={(e) => setCompForm({ ...compForm, reviewCount: e.target.value })} placeholder="426" className="form-control text-[13px] px-3 py-2.5" /></div>
               </div>
-              <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">好评率 (%)</label><input type="number" value={compForm.rating} onChange={(e) => setCompForm({ ...compForm, rating: e.target.value })} placeholder="91.4" step="0.1" min="0" max="100" className="w-24 text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /></div>
-              <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">高频差评问题</label><input type="text" value={compForm.topIssues} onChange={(e) => setCompForm({ ...compForm, topIssues: e.target.value })} placeholder="噪音偏大 | 风嘴松动 | 发热明显（用 | 分隔）" className="w-full text-[13px] px-3 py-2.5 border border-border-default rounded-xl focus:outline-none focus:border-accent-400" /><p className="text-[10px] text-text-muted mt-1">多个问题用 "|" 分隔</p></div>
+              <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">好评率 (%)</label><input type="number" value={compForm.rating} onChange={(e) => setCompForm({ ...compForm, rating: e.target.value })} placeholder="91.4" step="0.1" min="0" max="100" className="form-control w-24 text-[13px] px-3 py-2.5" /></div>
+              <div><label className="block text-[11px] font-medium text-text-muted mb-1.5">高频差评问题</label><input type="text" value={compForm.topIssues} onChange={(e) => setCompForm({ ...compForm, topIssues: e.target.value })} placeholder="噪音偏大 | 风嘴松动 | 发热明显（用 | 分隔）" className="form-control text-[13px] px-3 py-2.5" /><p className="text-[10px] text-text-muted mt-1">多个问题用 "|" 分隔</p></div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
               <button onClick={() => setShowCompForm(false)} className="btn-ghost text-[13px]">取消</button>
@@ -582,7 +606,7 @@ export default function MaterialLibrary() {
           const Icon = typeIcons[m.type] || FileSpreadsheet
           const linkedTasks = tasks.filter((task) => task.inputMaterials.includes(m.id))
           return (
-            <div key={m.id} className="card-surface rounded-[18px] p-4 group cursor-default hover:border-accent-500/20 transition-colors border-l-[3px] border-l-transparent hover:border-l-accent-400">
+            <div key={m.id} className="action-card p-4 group cursor-default border-l-[3px] border-l-transparent hover:border-l-accent-400">
               <div className="flex items-center gap-4">
                 <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-accent-50 transition-colors"><Icon className="w-4.5 h-4.5 text-text-muted group-hover:text-accent-500 transition-colors" /></div>
                 <div className="flex-1 min-w-0"><div className="text-[13px] font-medium text-text-main truncate">{m.label}</div><div className="text-[10px] text-text-muted">{m.fileName} · {m.uploadedAt}</div></div>
@@ -604,6 +628,8 @@ export default function MaterialLibrary() {
           )
         })}
         {materials.length === 0 && <div className="text-center py-10 text-[13px] text-text-muted">暂无资料，上传 CSV 数据包自动分类填充</div>}
+      </div>
+        </div>
       </div>
     </div>
   )

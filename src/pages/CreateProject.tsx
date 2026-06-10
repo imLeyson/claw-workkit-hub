@@ -342,12 +342,12 @@ export default function CreateProject() {
         </p>
       </div>
 
-      <div className="mb-8 data-panel p-5">
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-5 items-center">
+      <div className="mb-8 brand-goal-panel p-5">
+        <div className="relative grid lg:grid-cols-[0.9fr_1.1fr] gap-5 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-primary px-3 py-1 text-[11px] text-text-muted mb-4">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-border-default bg-bg-surface/80 px-3 py-1 text-[11px] text-text-muted mb-4">
               <GitBranch className="w-3.5 h-3.5" />
-              项目配置
+              LAUNCH SYSTEM
             </div>
             <h2 className="text-[22px] font-medium tracking-[-0.02em] text-text-main mb-2">
               {workKit ? '从历史成功案例启动新项目' : '从项目创建开始规划资产沉淀'}
@@ -357,10 +357,17 @@ export default function CreateProject() {
                 ? '复用不是复制旧结论，而是继承资料结构、任务框架和验证经验，再结合新活动重新判断。'
                 : '每个新项目都会沿着资料、任务、工作台、报告、资产库的链路推进，最终沉淀成团队下一次能直接学习的 Work Kit。'}
             </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {['清晰配置', '可操作任务', '可沉淀资产'].map((item) => (
+                <span key={item} className="rounded-lg border border-border-light bg-bg-surface/75 px-3 py-1.5 text-[11px] font-medium text-text-secondary">
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {launchAssets.map((item) => (
-              <div key={item.label} className="data-metric p-4">
+              <div key={item.label} className="rounded-xl border border-border-light bg-bg-surface/75 p-4">
                 <div className="text-[22px] font-light text-text-main leading-none mb-2">{item.value}</div>
                 <div className="text-[12px] font-medium text-text-main">{item.label}</div>
                 <div className="text-[10px] text-text-muted leading-relaxed mt-1">{item.desc}</div>
@@ -375,7 +382,7 @@ export default function CreateProject() {
         <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-6 mb-10">
           <div className="data-panel p-5">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-accent-50 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-accent-50 flex items-center justify-center shrink-0">
                 <Package className="w-5 h-5 text-accent-500" />
               </div>
               <div className="min-w-0 flex-1">
@@ -425,7 +432,7 @@ export default function CreateProject() {
                 <div className="text-[11px] font-semibold text-accent-600 uppercase tracking-[0.08em] mb-1">Pre-learning Pack</div>
                 <h2 className="text-[18px] font-medium text-text-main">启动前学习包</h2>
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-accent-50 flex flex-col items-center justify-center">
+              <div className="w-16 h-16 rounded-xl bg-accent-50 flex flex-col items-center justify-center">
                 <span className="text-[19px] font-light text-accent-600 leading-none">{learningPercent}%</span>
                 <span className="text-[9px] text-accent-500 mt-1">{learnedCount}/{learningItems.length}</span>
               </div>
@@ -455,12 +462,12 @@ export default function CreateProject() {
                     <button
                       key={item.id}
                       onClick={() => setActiveLearningId(item.id)}
-                      className={`w-full rounded-2xl border p-3 text-left transition-all ${
+                      className={`w-full rounded-xl border p-3 text-left transition-all ${
                         active ? 'border-accent-500/35 bg-accent-500/[0.06]' : 'border-border-light bg-bg-primary/55 hover:border-accent-500/20'
                       }`}
                     >
                       <div className="flex items-start gap-2.5">
-                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${learned ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${learned ? 'bg-accent-500 text-white' : 'bg-bg-surface text-text-muted'}`}>
                           {learned ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -477,7 +484,7 @@ export default function CreateProject() {
               </div>
 
               {activeLearningItem && (
-                <div className="rounded-[22px] border border-border-light bg-bg-primary/60 p-4 min-h-[360px] flex flex-col">
+                <div className="rounded-xl border border-border-light bg-bg-primary/60 p-4 min-h-[360px] flex flex-col">
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
                       <div className="text-[10px] text-text-muted mb-1">{activeLearningItem.meta}</div>
@@ -496,14 +503,14 @@ export default function CreateProject() {
                   </div>
 
                   <div className="space-y-4 flex-1">
-                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                    <div className="rounded-xl bg-bg-surface border border-border-light p-3">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-accent-600 mb-2">
                         <Target className="w-3.5 h-3.5" />学习目标
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">{activeLearningItem.objective}</p>
                     </div>
 
-                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                    <div className="rounded-xl bg-bg-surface border border-border-light p-3">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-ai-400 mb-2">
                         <Lightbulb className="w-3.5 h-3.5" />关键要点
                       </div>
@@ -516,14 +523,14 @@ export default function CreateProject() {
                       </ul>
                     </div>
 
-                    <div className="rounded-2xl bg-bg-surface border border-border-light p-3">
+                    <div className="rounded-xl bg-bg-surface border border-border-light p-3">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-kit-600 mb-2">
                         <ListChecks className="w-3.5 h-3.5" />如何带入新项目
                       </div>
                       <p className="text-[12px] text-text-secondary leading-relaxed">{activeLearningItem.apply}</p>
                     </div>
 
-                    <div className="rounded-2xl bg-accent-500/[0.04] border border-accent-500/20 p-3">
+                    <div className="rounded-xl bg-accent-500/[0.04] border border-accent-500/20 p-3">
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-accent-600 mb-2">
                         <Sparkles className="w-3.5 h-3.5" />将写入任务卡
                       </div>
@@ -543,7 +550,7 @@ export default function CreateProject() {
                         onChange={(e) => setLearningNotes((prev) => ({ ...prev, [activeLearningItem.id]: e.target.value }))}
                         rows={3}
                         placeholder="记录本次新项目要沿用什么、要避免什么、需要补充哪些资料..."
-                        className="w-full bg-bg-surface border border-border-default rounded-2xl p-3 text-[12px] text-text-main leading-relaxed resize-none focus:outline-none focus:border-accent-400"
+                        className="w-full bg-bg-surface border border-border-default rounded-xl p-3 text-[12px] text-text-main leading-relaxed resize-none focus:outline-none focus:border-accent-400"
                       />
                     </div>
                   </div>
